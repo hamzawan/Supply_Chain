@@ -1,0 +1,88 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Edit Delivery Challan Supplier</h4>
+</div>
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">
+    <form  action="" method="post">
+      <div class="form-row">
+        <div class="form-group col-md-3">
+          <label for="">DC No</label>
+          <input type="text" readonly class="form-control form-control-sm" value="{{ dc_header.dc_no }}">
+        </div>
+        <div class="form-group col-md-3">
+          <label>Supplier Name</label>
+          <input list="browsers" class="form-control form-control-sm" value="sp1">
+            <datalist id="browsers">
+             <option value="Internet Explorer">
+          </datalist>
+        </div>
+        <div class="form-group col-md-3 ">
+          <label for="">From</label>
+          <input type="text" class="form-control form-control-sm" value="user1">
+        </div>
+      </div>
+    </form>
+  </li>
+  <li class="list-group-item">
+
+    <div class="table-title">
+        <div class="row">
+          <div class="form-group col-md-3">
+            <input type="text" list="item" placeholder="Enter PO No here..." class="form-control form-control-sm">
+          </div>
+          <datalist id="item">
+            <option value="RFQ/SP/101">RFQ/SP/101</option>
+            <option value="RFQ/SP/102">RFQ/SP/102</option>
+            <option value="RFQ/SP/103">RFQ/SP/103</option>
+            <option value="RFQ/SP/104">RFQ/SP/104</option>
+            <option value="RFQ/SP/105">RFQ/SP/105</option>
+          </datalist>
+            <div style="margin-left:20px;">
+                <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i>Insert Another Item</button>
+            </div>
+        </div>
+    </div>
+    <table class="table table-bordered" id="dataTable">
+        <thead>
+            <tr>
+                <th width="70px">S No.</th>
+                <th width="200px">Item Name</th>
+                <th>Description</th>
+                <th width="90px">Quantity</th>
+                <th width="70px">Unit</th>
+                <th width="130px">Unit/Price</th>
+                <th width="150px">Remarks</th>
+                <th>Po No.</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+          {% for value in dc_detail %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ value.item_name }}</td>
+            <td>{{ value.item_description }}</td>
+            <td>{{ value.quantity }}</td>
+            <td>{{ value.unit }}</td>
+            <td>{{ value.unit_price }}</td>
+            <td>{{ value.remarks }}</td>
+            <td>{{ value.po_no }}</td>
+            <td><a class="add" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+    <div class="text-center">
+      <button type="submit" class="btn btn-outline-primary" name="">Update <small>(Delivery Challan)</small></button>
+    </div>
+  </li>
+</ul>
+</div>
+
+
+{% endblock body %}

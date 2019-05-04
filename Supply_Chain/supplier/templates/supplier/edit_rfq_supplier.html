@@ -1,0 +1,74 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Edit RFQ Supplier</h4>
+</div>
+<ul class="list-group list-group-flush">
+<form  action="" method="post" id="edit-rfq-supplier-form">
+  <li class="list-group-item">
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label for="">RFQ No</label>
+          <input type="text" class="form-control form-control-sm" value="{{rfq_header.rfq_no}}" id="edit_rfq_supplier" readonly>
+        </div>
+        <div class="form-group col-md-2">
+          <label>Supplier Name</label>
+          <input list="browsers" class="form-control form-control-sm" value="sp1">
+            <datalist id="browsers">
+             <option value="Internet Explorer">
+          </datalist>
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Attn</label>
+          <input type="text" class="form-control form-control-sm" value="{{rfq_header.attn}}">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Follow Up</label>
+          <input type="text" class="form-control form-control-sm" value="{{rfq_header.follow_up}}">
+        </div>
+      </div>
+
+    <div class="table-title">
+        <div class="row">
+            <div style="margin-left:20px;">
+                <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add Another</button>
+            </div>
+        </div>
+    </div>
+    <table class="table table-bordered" id="edit-rfq-supplier-table">
+        <thead>
+            <tr>
+                <th width="80px">S NO.</th>
+                <th width="300px">Item Name</th>
+                <th width="400px">Item Description</th>
+                <th>Unit</th>
+                <th>Quantity</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+          {% for value in rfq_detail  %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ value.item_name }}</td>
+            <td>{{ value.item_description }}</td>
+            <td>{{ value.unit }}</td>
+            <td>{{ value.quantity }}</td>
+            <td><a class="add" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+    <div class="text-center">
+      <button type="submit" class="btn btn-outline-primary has_id" id="{{pk}}" name="">Update <small>(RFQ)</small></button>
+    </div>
+  </li>
+</form>
+</ul>
+</div>
+
+
+{% endblock body %}

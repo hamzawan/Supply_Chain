@@ -1,0 +1,68 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>New Delivery Challan Supplier</h4>
+</div>
+<ul class="list-group list-group-flush">
+<form  action="" id="new-dc-supplier-form" method="post">
+  <li class="list-group-item">
+      <div class="form-row">
+        <div class="form-group col-md-3">
+          <label for="">DC No</label>
+          <input type="text" readonly class="form-control form-control-sm" value="{{get_last_dc_no}}" id="dc_no_supplier">
+        </div>
+        <div class="form-group col-md-3">
+          <label>Supplier Name</label>
+          <input list="browsers" class="form-control form-control-sm" id="dc_supplier">
+            <datalist id="browsers">
+             <option value="Internet Explorer">
+          </datalist>
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item">
+    <div class="table-title">
+        <div class="row">
+          <div class="form-group col-md-3">
+            <input type="text" list="item" placeholder="Enter PO No here..." class="form-control form-control-sm" id="po_no">
+          </div>
+          <datalist id="item">
+            {% for value in all_po %}
+            <option value="{{value|get_item:'po_no'}}"></option>
+            {% endfor %}
+          </datalist>
+            <div style="margin-left:20px;">
+                <button type="button" class="btn btn-info add-new-dc-supplier"><i class="fa fa-plus"></i>Insert Item</button>
+            </div>
+        </div>
+    </div>
+    <table class="table table-bordered" id="new-dc-supplier-table">
+        <thead>
+            <tr>
+                <th width="70px">S No.</th>
+                <th width="180px">Item Name</th>
+                <th>Description</th>
+                <th width="90px">Quantity</th>
+                <th width="90px">Unit</th>
+                <th width="120px">Price</th>
+                <th width="90px">Remarks</th>
+                <th width="140px">PO Ref.</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div class="text-center">
+      <button type="submit" class="btn btn-outline-primary" name="">Submit <small>(Delivery Challan)</small></button>
+    </div>
+  </li>
+</form>
+</ul>
+</div>
+
+
+{% endblock body %}

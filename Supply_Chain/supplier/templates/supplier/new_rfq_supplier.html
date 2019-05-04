@@ -1,0 +1,66 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>New RFQ Supplier</h4>
+</div>
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">
+    <form id="myForm" action="{% url 'new-rfq-supplier' %}" method="post">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group col-md-3">
+          <label for="">RFQ No</label>
+          <input type="text" class="form-control form-control-sm" readonly required value="{{get_last_rfq_no}}" id="rfq_no">
+        </div>
+        <div class="form-group col-md-3">
+          <label>Supplier Name</label>
+          <input list="browsers" class="form-control form-control-sm" required id="suppliers">
+            <datalist id="browsers">
+             <option value="Internet Explorer">
+          </datalist>
+        </div>
+        <div class="form-group col-md-3">
+          <label for="">Attn</label>
+          <input type="text" class="form-control form-control-sm" required id="attn">
+        </div>
+        <div class="form-group col-md-3">
+          <label for="">Follow Up</label>
+          <input type="date" class="form-control form-control-sm" required id="follow_up">
+        </div>
+      </div>
+</li>
+<li class="list-group-item">
+    <div class="table-title">
+        <div class="row">
+            <div style="margin-left:20px;">
+                <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add New</button>
+            </div>
+        </div>
+    </div>
+    <table class="table table-bordered" id="mytable">
+        <thead>
+            <tr>
+                <th width="80px">S NO.</th>
+                <th width="300px">Item Name</th>
+                <th width="400px">Item Description</th>
+                <th>Unit</th>
+                <th>Quantity</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div class="text-center">
+      <button type="submit" class="btn btn-outline-primary">Submit <small>(RFQ)</small></button>
+    </div>
+  </form>
+  </li>
+</ul>
+</div>
+
+
+{% endblock body %}
