@@ -40,7 +40,7 @@
               </tr>
           </thead>
           <tbody>
-            {% for value in all_po %}
+            {% for value in all_po reversed %}
             <tr>
                 <td> {{ forloop.counter }} </td>
                 <td> {{ value.po_no }} </td>

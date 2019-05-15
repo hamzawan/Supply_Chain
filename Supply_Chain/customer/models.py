@@ -10,6 +10,7 @@ class RfqCustomerHeader(models.Model):
 
 
 class RfqCustomerDetail(models.Model):
+    item_code = models.CharField(max_length = 100, unique = True)
     item_name = models.CharField(max_length = 100)
     item_description = models.TextField()
     quantity = models.IntegerField()
@@ -33,6 +34,7 @@ class QuotationHeaderCustomer(models.Model):
 
 
 class QuotationDetailCustomer(models.Model):
+    item_code = models.CharField(max_length = 100, unique = True)
     item_name = models.CharField(max_length = 100)
     item_description = models.TextField()
     quantity = models.IntegerField()
@@ -59,6 +61,7 @@ class PoHeaderCustomer(models.Model):
 
 
 class PoDetailCustomer(models.Model):
+    item_code = models.CharField(max_length = 100, unique = True)
     item_name = models.CharField(max_length = 100)
     item_description = models.TextField()
     quantity = models.IntegerField()
@@ -76,6 +79,7 @@ class DcHeaderCustomer(models.Model):
 
 
 class DcDetailCustomer(models.Model):
+    item_code = models.CharField(max_length = 100, unique = True)
     item_name = models.CharField(max_length = 100)
     item_description = models.TextField()
     quantity = models.IntegerField()

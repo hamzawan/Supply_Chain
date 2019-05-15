@@ -1,0 +1,62 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Add Product</h4>
+</div>
+<ul class="list-group list-group-flush">
+<form id="add-item-form" action="{% url 'new-rfq-supplier' %}" method="post">
+  <li class="list-group-item">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group col-md-3">
+          <label for="">Type</label>
+          <input type="text" class="form-control form-control-sm" id="type">
+        </div>
+        <div class="form-group col-md-3">
+          <label for="">Size</label>
+          <input type="text" class="form-control form-control-sm" id="size">
+        </div>
+        <div class="form-group col-md-3">
+          <label for="">Product Name</label>
+          <input type="text" class="form-control form-control-sm" id="product_name">
+        </div>
+        <div class="form-group col-md-3">
+          <label for="">Product Description</label>
+          <textarea name="name" rows="" cols="25" id="product_desc"></textarea>
+        </div>
+      </div>
+      <div class="table-title">
+        <div class="text-right">
+            <button type="button" class="btn btn-info add-new-row"><i class="fa fa-plus"></i> Add New</button>
+        </div>
+      </div>
+      <br>
+</li>
+<li class="list-group-item">
+    <table class="table table-bordered" id="add-item-table">
+        <thead>
+            <tr>
+                <th width="120px">S No.</th>
+                <th width="200px">Product Name</th>
+                <th width="300px">Product Description</th>
+                <th width="150px">Type</th>
+                <th width="150px">Size</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div class="text-center">
+      <button type="submit" class="btn btn-outline-primary">Submit <small>(RFQ)</small></button>
+    </div>
+  </li>
+  </form>
+</ul>
+</div>
+
+
+{% endblock body %}

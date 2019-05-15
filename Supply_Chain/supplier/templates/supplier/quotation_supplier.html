@@ -40,7 +40,7 @@
               </tr>
           </thead>
           <tbody>
-          {% for value in all_quotation %}
+          {% for value in all_quotation reversed %}
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td> {{ value.quotation_no }} </td>

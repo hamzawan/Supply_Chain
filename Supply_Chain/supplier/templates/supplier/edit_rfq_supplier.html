@@ -16,34 +16,43 @@
         </div>
         <div class="form-group col-md-2">
           <label>Supplier Name</label>
-          <input list="browsers" class="form-control form-control-sm" value="sp1">
+          <input list="browsers" class="form-control form-control-sm" value="sp1" value="edit_rfq_supplier_name">
             <datalist id="browsers">
              <option value="Internet Explorer">
           </datalist>
         </div>
         <div class="form-group col-md-2">
           <label for="">Attn</label>
-          <input type="text" class="form-control form-control-sm" value="{{rfq_header.attn}}">
+          <input type="text" class="form-control form-control-sm" value="{{rfq_header.attn}}" id="edit_rfq_attn">
         </div>
         <div class="form-group col-md-2">
           <label for="">Follow Up</label>
-          <input type="text" class="form-control form-control-sm" value="{{rfq_header.follow_up}}">
+          <input type="date" class="form-control form-control-sm" value="{{rfq_header.follow_up|date:"Y-m-d"}}" id="edit_rfq_follow_up">
         </div>
       </div>
 
-    <div class="table-title">
-        <div class="row">
-            <div style="margin-left:20px;">
-                <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add Another</button>
+      <div class="table-title">
+          <div class="row">
+            <div class="form-group col-md-3">
+              <input type="text" list="item" placeholder="Enter Item Code here..." class="form-control form-control-sm" id="edit_item_code">
             </div>
-        </div>
-    </div>
+            <datalist id="item">
+              {% for value in all_item_code %}
+              <option value="{{value.product_code}}" />
+              {% endfor %}
+            </datalist>
+              <div style="margin-left:20px;">
+                  <button type="button" class="btn btn-info edit_rfq has_id" id="{{pk}}"><i class="fa fa-plus"></i>Insert Item</button>
+              </div>
+          </div>
+      </div>
     <table class="table table-bordered" id="edit-rfq-supplier-table">
         <thead>
             <tr>
-                <th width="80px">S NO.</th>
-                <th width="300px">Item Name</th>
-                <th width="400px">Item Description</th>
+                <th width="70px">S NO.</th>
+                <th width="200px">Item Code</th>
+                <th width="200px">Item Name</th>
+                <th width="390px">Item Description</th>
                 <th>Unit</th>
                 <th>Quantity</th>
                 <th>Action</th>
@@ -53,6 +62,7 @@
           {% for value in rfq_detail  %}
           <tr>
             <td>{{ forloop.counter }}</td>
+            <td>{{ value.item_code }}</td>
             <td>{{ value.item_name }}</td>
             <td>{{ value.item_description }}</td>
             <td>{{ value.unit }}</td>

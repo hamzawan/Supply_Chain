@@ -45,15 +45,17 @@ def new_rfq_customer(request):
 def edit_rfq_customer(request,pk):
     rfq_header = RfqCustomerHeader.objects.filter(id = pk).first()
     rfq_detail = RfqCustomerDetail.objects.filter(rfq_id = pk).all()
+    print(rfq_detail)
     if request.method == 'POST':
         items = json.loads(request.POST.get('items'))
-        print(len(rfq_detail))
-        for i, value in enumerate(rfq_detail):
-            value.item_name = items[i]["item_name"]
-            value.item_description = items[i]["item_description"]
-            value.unit = items[i]["unit"]
-            value.quantity = items[i]["quantity"]
-            value.save()
+        print(rfq_detail)
+        # for i, value in enumerate(rfq_detail):
+        #     value.item_name = items[i]["item_name"]
+        #     value.item_description = items[i]["item_description"]
+        #     value.unit = items[i]["unit"]
+        #     value.quantity = items[i]["quantity"]
+        #     value.save()
+
         return JsonResponse({"result":"success"})
     return render(request,'customer/edit_rfq_customer.html',{'rfq_header':rfq_header,'pk':pk,'rfq_detail':rfq_detail})
 
@@ -211,5 +213,5 @@ def mrn_customer(request):
     return render(request, 'customer/mrn_customer.html',{'all_dc':all_dc})
 
 
-def edit_mrn_customer(request):
+def edit_mrn_customer(request,pk):
     return render(request, 'customer/edit_mrn_customer.html')

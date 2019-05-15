@@ -20,5 +20,5 @@ urlpatterns = [
     path('delivery_challan/edit', views.edit_delivery_challan_customer, name = 'edit-delivery-challan-customer'),
 
     path('mrn/', views.mrn_customer, name = 'mrn-customer'),
-    path('mrn/edit', views.edit_mrn_customer, name = 'edit-mrn-customer'),
+    path('mrn/edit/<pk>', views.edit_mrn_customer, name = 'edit-mrn-customer'),
 ]

@@ -38,7 +38,7 @@
             </tr>
         </thead>
         <tbody>
-          {% for row in all_rfq %}
+          {% for row in all_rfq reversed %}
           <tr>
               <td>{{ forloop.counter }}</td>
               <td>{{ row.rfq_no }}</td>

@@ -4,7 +4,7 @@
 
 <div class="card" style="width: 100%;">
 <div class="card-header">
-  <h4>MRN Customer</h4>
+  <h4>MRN Customer hahah</h4>
 </div>
 <ul class="list-group list-group-flush">
   <li class="list-group-item">
@@ -42,7 +42,7 @@
                 {% elif value.mrn_status == 'Rejected' %}
                 <td class="bg-danger" > <b>{{ value.mrn_status }}</b></td>
                 {% endif %}
-                <td><a class="edit" href="{% url 'edit-mrn-supplier' %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a class="delete"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+                <td><a class="edit_list" href="{% url 'edit-mrn-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a class="delete"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
             </tr>
             {% endfor %}
           </tbody>

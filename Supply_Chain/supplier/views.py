@@ -4,10 +4,14 @@ from .models import (RfqSupplierHeader,RfqSupplierDetail,
                     QuotationHeaderSupplier, QuotationDetailSupplier,
                     PoHeaderSupplier, PoDetailSupplier,
                     DcHeaderSupplier, DcDetailSupplier)
+from inventory.models import Add_products
 from django.core import serializers
 from django.forms.models import model_to_dict
 import json
 import datetime
+from django.db import IntegrityError
+from django.conf import settings
+from datetime import datetime
 
 
 def home(request):
@@ -17,9 +21,9 @@ def rfq_supplier(request):
     all_rfq = RfqSupplierHeader.objects.all()
     return render(request, 'supplier/rfq_supplier.html',{'all_rfq':all_rfq})
 
-
 def new_rfq_supplier(request):
     get_last_rfq_no = RfqSupplierHeader.objects.last()
+    all_item_code = list(Add_products.objects.values('product_code'))
     if get_last_rfq_no:
         get_last_rfq_no = get_last_rfq_no.rfq_no
         get_last_rfq_no = get_last_rfq_no[-3:]
@@ -28,6 +32,13 @@ def new_rfq_supplier(request):
         get_last_rfq_no = 'RFQ/SP/' + str(num)
     else:
         get_last_rfq_no = 'RFQ/SP/101'
+    item_code = request.POST.get('item_code',False)
+    if item_code:
+        data = Add_products.objects.filter(product_code = item_code)
+        for value in data:
+            print(value.product_code)
+        row = serializers.serialize('json',data)
+        return HttpResponse(json.dumps({'row':row}))
     if request.method == 'POST':
         attn = request.POST.get('attn',False)
         follow_up = request.POST.get('follow_up',False)
@@ -37,26 +48,44 @@ def new_rfq_supplier(request):
         rfq_header.save()
         header_id = RfqSupplierHeader.objects.get(rfq_no=get_last_rfq_no)
         for value in items:
-            rfq_detail = RfqSupplierDetail(item_name = value["item_name"], item_description = value["item_description"],
+            rfq_detail = RfqSupplierDetail(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"],
                                             quantity = value["quantity"], unit = value["unit"], rfq_id = header_id)
             rfq_detail.save()
         return JsonResponse({"result": "success"})
-    return render(request,'supplier/new_rfq_supplier.html',{'get_last_rfq_no':get_last_rfq_no})
+    return render(request,'supplier/new_rfq_supplier.html',{'get_last_rfq_no':get_last_rfq_no, 'all_item_code':all_item_code})
 
 
 def edit_rfq_supplier(request,pk):
     rfq_header = RfqSupplierHeader.objects.filter(id = pk).first()
     rfq_detail = RfqSupplierDetail.objects.filter(rfq_id = pk).all()
-    if request.method == 'POST':
-        items = json.loads(request.POST.get('items'))
-        for i, value in enumerate(rfq_detail):
-            value.item_name = items[i]["item_name"]
-            value.item_description = items[i]["item_description"]
-            value.unit = items[i]["unit"]
-            value.quantity = items[i]["quantity"]
-            value.save()
-        return JsonResponse({"result":"success"})
-    return render(request,'supplier/edit_rfq_supplier.html',{'rfq_header':rfq_header,'pk':pk,'rfq_detail':rfq_detail})
+    all_item_code = list(Add_products.objects.values('product_code'))
+    try:
+        item_code = request.POST.get('item_code',False)
+        print(item_code)
+        if item_code:
+            data = Add_products.objects.filter(product_code = item_code)
+            item_code_exist = RfqSupplierDetail.objects.filter(item_code = item_code, rfq_id = pk).first()
+            if item_code_exist:
+                return HttpResponse(json.dumps({'message':"Item Already Exist"}))
+            row = serializers.serialize('json',data)
+            return HttpResponse(json.dumps({'row':row}))
+        if request.method == 'POST':
+            rfq_detail.delete()
+            edit_rfq_attn = request.POST.get('edit_rfq_attn',False)
+            edit_rfq_follow_up = request.POST.get('edit_rfq_follow_up',False)
+            rfq_header.attn = edit_rfq_attn
+            rfq_header.follow_up = edit_rfq_follow_up
+            rfq_header.save();
+            header_id = RfqSupplierHeader.objects.get(id = pk)
+            items = json.loads(request.POST.get('items'))
+            for value in items:
+                rfq_detail_update = RfqSupplierDetail(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"], unit = value["unit"], rfq_id = header_id)
+                rfq_detail_update.save()
+            return JsonResponse({"result":"success"})
+    except IntegrityError:
+        print("Data Already Exist")
+    return render(request,'supplier/edit_rfq_supplier.html',{'rfq_header':rfq_header,'pk':pk,'rfq_detail':rfq_detail, 'all_item_code':all_item_code})
+
 
 def quotation_supplier(request):
     all_quotation = QuotationHeaderSupplier.objects.all()
@@ -75,13 +104,17 @@ def new_quotation_supplier(request):
     else:
         get_last_quotation_no = 'QU/SP/101'
     rfq_no = request.POST.get('rfq_no',False)
+    print(rfq_no)
     if rfq_no:
         fk = RfqSupplierHeader.objects.get(rfq_no = rfq_no)
         data = RfqSupplierDetail.objects.filter(rfq_id = fk)
-        for value in data:
-            print(value.item_name)
-        row = serializers.serialize('json',data)
-        return HttpResponse(json.dumps({'row':row}))
+        if data:
+            for value in data:
+                print(value.item_name)
+            row = serializers.serialize('json',data)
+            return HttpResponse(json.dumps({'row':row}))
+        else:
+            return HttpResponse(json.dumps({'message':"no record found"}))
     if request.method == 'POST':
         attn = request.POST.get('attn',False)
         prcbasis = request.POST.get('prcbasis',False)
@@ -100,7 +133,7 @@ def new_quotation_supplier(request):
         items = json.loads(request.POST.get('items'))
         header_id = QuotationHeaderSupplier.objects.get(quotation_no = get_last_quotation_no)
         for value in items:
-            quotation_detail = QuotationDetailSupplier(item_name = value["item_name"], item_description = value["item_description"],
+            quotation_detail = QuotationDetailSupplier(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"],
                                             quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_id = header_id)
             quotation_detail.save()
         return JsonResponse({'result':'success'})
@@ -156,7 +189,7 @@ def new_purchase_order_supplier(request):
         items = json.loads(request.POST.get('items'))
         header_id = PoHeaderSupplier.objects.get(po_no = get_last_po_no)
         for value in items:
-            po_detail = PoDetailSupplier(item_name = value["item_name"], item_description = value["item_description"],
+            po_detail = PoDetailSupplier(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"],
                                             quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_no = value["quotation_no"] ,po_id = header_id)
             po_detail.save()
         return JsonResponse({'result':'success'})
@@ -196,13 +229,13 @@ def new_delivery_challan_supplier(request):
         return HttpResponse(json.dumps({'row':row, 'po_no':po_no}))
     if request.method == 'POST':
         date = datetime.date.today()
-        dc_header = DcHeaderSupplier(dc_no = get_last_dc_no, date = date, mrn_status = "Pending")
+        dc_header = DcHeaderSupplier(dc_no = get_last_dc_no, date = date)
         dc_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = DcHeaderSupplier.objects.get(dc_no = get_last_dc_no)
         for value in items:
-            dc_detail = DcDetailSupplier(item_name = value["item_name"], item_description = value["item_description"],
-                                            quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], po_no = value["po_no"] ,dc_id = header_id)
+            dc_detail = DcDetailSupplier(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"],
+                                            quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0,  unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], po_no = value["po_no"] ,dc_id = header_id)
             dc_detail.save()
         return JsonResponse({'result':'success'})
     return render(request, 'supplier/new_delivery_challan_supplier.html',{'all_po':all_po,'get_last_dc_no':get_last_dc_no})
@@ -222,5 +255,10 @@ def mrn_supplier(request):
 def edit_mrn_supplier(request,pk):
     dc_header = DcHeaderSupplier.objects.filter(id=pk).first()
     dc_detail = DcDetailSupplier.objects.filter(dc_id=pk).all()
-    print(dc_detail)
-    return render(request, 'supplier/edit_mrn_supplier.html',{'dc_header':dc_header,'dc_detail':dc_detail})
+    if request.method == 'POST':
+        items = json.loads(request.POST.get('items'))
+        for i,value in enumerate(dc_detail):
+            value.accepted_quantity = items[i]["accepted_quantity"]
+            value.save()
+        return JsonResponse({"result":"success"})
+    return render(request, 'supplier/edit_mrn_supplier.html',{'dc_header':dc_header,'dc_detail':dc_detail,'pk':pk})

@@ -32,6 +32,20 @@ line-height: 13px;
 margin-right: 4px;
 }
 
+.table-title .add-new-row {
+    float: right;
+height: 30px;
+font-weight: bold;
+font-size: 12px;
+text-shadow: none;
+min-width: 100px;
+border-radius: 50px;
+line-height: 13px;
+}
+.table-title .add-new-row i {
+margin-right: 4px;
+}
+
 
 .table-title .add-new-quotation-customer {
     float: right;
@@ -116,7 +130,24 @@ border-radius: 50px;
 line-height: 13px;
 }
 
+
 .table-title .add-new-dc-customer i {
+margin-right: 4px;
+}
+
+.table-title .add-item-purchase{
+float: right;
+height: 30px;
+font-weight: bold;
+font-size: 12px;
+text-shadow: none;
+min-width: 100px;
+border-radius: 50px;
+line-height: 13px;
+}
+
+
+.table-title .add-item-purchase i {
 margin-right: 4px;
 }
 
@@ -182,5 +213,32 @@ table.table thead tr th {
 
 table.table tbody tr td {
   white-space: nowrap; overflow: hidden; text-overflow:ellipsis;
-  font-size: 14px;
+  font-size: 12px;
+}
+
+table.table thead tr th{
+  font-size:12px;
+}
+
+#text {
+  width: 400px;
+  height: 30px;
+}
+
+/* #tax_table{
+  margin-left: 60%;
+} */
+
+#t_table tr th {
+  font-size:12px;
+}
+
+#t_table, th, td{
+  border: 1px solid;
+}
+
+
+#t_table tr td textarea{
+  width: 400px;
+  height: 50px;
 }

@@ -2,7 +2,7 @@ from django.db import models
 import datetime
 
 class RfqSupplierHeader(models.Model):
-    rfq_no = models.CharField(max_length = 100, unique = True)
+    rfq_no = models.CharField(max_length = 100)
     date = models.DateField(default = datetime.date.today)
     attn = models.CharField(max_length = 100)
     follow_up = models.DateField(blank = True)
@@ -10,6 +10,7 @@ class RfqSupplierHeader(models.Model):
 
 
 class RfqSupplierDetail(models.Model):
+    item_code = models.CharField(max_length = 100)
     item_name = models.CharField(max_length = 100)
     item_description = models.TextField()
     quantity = models.IntegerField()
@@ -18,7 +19,7 @@ class RfqSupplierDetail(models.Model):
 
 
 class QuotationHeaderSupplier(models.Model):
-    quotation_no = models.CharField(max_length = 100, unique = True)
+    quotation_no = models.CharField(max_length = 100)
     date = models.DateField(default = datetime.date.today)
     attn = models.CharField(max_length = 100)
     prc_basis = models.CharField(max_length = 100)
@@ -33,6 +34,7 @@ class QuotationHeaderSupplier(models.Model):
 
 
 class QuotationDetailSupplier(models.Model):
+    item_code = models.CharField(max_length = 100)
     item_name = models.CharField(max_length = 100)
     item_description = models.TextField()
     quantity = models.IntegerField()
@@ -43,7 +45,7 @@ class QuotationDetailSupplier(models.Model):
 
 
 class PoHeaderSupplier(models.Model):
-    po_no = models.CharField(max_length = 100, unique = True)
+    po_no = models.CharField(max_length = 100)
     date = models.DateField(default = datetime.date.today)
     attn = models.CharField(max_length = 100)
     prc_basis = models.CharField(max_length = 100)
@@ -59,6 +61,7 @@ class PoHeaderSupplier(models.Model):
 
 
 class PoDetailSupplier(models.Model):
+    item_code = models.CharField(max_length = 100)
     item_name = models.CharField(max_length = 100)
     item_description = models.TextField()
     quantity = models.IntegerField()
@@ -70,14 +73,16 @@ class PoDetailSupplier(models.Model):
 
 
 class DcHeaderSupplier(models.Model):
-    dc_no = models.CharField(max_length = 100, unique = True)
+    dc_no = models.CharField(max_length = 100)
     date = models.DateField(default = datetime.date.today)
-    mrn_status = models.CharField(max_length = 100)
 
 class DcDetailSupplier(models.Model):
+    item_code = models.CharField(max_length = 100)
     item_name = models.CharField(max_length = 100)
     item_description = models.TextField()
     quantity = models.IntegerField()
+    accepted_quantity = models.IntegerField()
+    returned_quantity = models.IntegerField()
     unit = models.CharField(max_length = 100)
     unit_price = models.DecimalField(max_digits = 8, decimal_places = 2)
     remarks = models.CharField(max_length = 100)
