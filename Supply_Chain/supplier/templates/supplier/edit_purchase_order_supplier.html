@@ -7,8 +7,8 @@
   <h4>Edit Purchase Order Supplier</h4>
 </div>
 <ul class="list-group list-group-flush">
+<form  action="" method="post" id="edit-supplier-po-submit">
   <li class="list-group-item">
-    <form  action="" method="post">
       <div class="form-row">
         <div class="form-group col-md-2">
           <label for="">Purchase Order No</label>
@@ -23,77 +23,74 @@
         </div>
         <div class="form-group col-md-2">
           <label for="">Attn</label>
-          <input type="text" class="form-control form-control-sm" value="{{ po_header.attn }}">
+          <input type="text" class="form-control form-control-sm" value="{{ po_header.attn }}" id="edit_po_attn">
         </div>
         <div class="form-group col-md-2">
           <label for="">Prc Basis</label>
-          <input type="text" class="form-control form-control-sm" value="{{ po_header.prc_basis }}">
+          <input type="text" class="form-control form-control-sm" value="{{ po_header.prc_basis }}" id="edit_po_prcbasis">
         </div>
         <div class="form-group col-md-2">
           <label for="">Lead Time</label>
-          <input type="text" class="form-control form-control-sm" value="{{ po_header.leadtime }}" >
+          <input type="text" class="form-control form-control-sm" value="{{ po_header.leadtime }}" id="edit_po_leadtime">
         </div>
         <div class="form-group col-md-2">
           <label for="">Validity</label>
-          <input type="text" class="form-control form-control-sm" value="{{ po_header.validity }}">
+          <input type="text" class="form-control form-control-sm" value="{{ po_header.validity }}" id="edit_po_validity">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group col-md-2">
           <label for="">Payment</label>
-          <input type="text" class="form-control form-control-sm" value="{{ po_header.payment }}">
+          <input type="text" class="form-control form-control-sm" value="{{ po_header.payment }}" id="edit_po_payment">
         </div>
         <div class="form-group col-md-2">
           <label>Remarks</label>
-          <input list="browsers" class="form-control form-control-sm" value="{{ po_header.remarks }}" >
+          <input list="browsers" class="form-control form-control-sm" value="{{ po_header.remarks }}" id="edit_po_remarks">
             <datalist id="browsers">
              <option value="Internet Explorer">
           </datalist>
         </div>
         <div class="form-group col-md-2">
           <label for="">Currency Rate</label>
-          <input type="text" class="form-control form-control-sm" value="{{ po_header.currency }}" >
+          <input type="text" class="form-control form-control-sm" value="{{ po_header.currency }}" id="edit_po_currency_rate">
         </div>
         <div class="form-group col-md-2">
           <label for="">Exchange Rate</label>
-          <input type="text" class="form-control form-control-sm" value="{{ po_header.exchange_rate }}">
+          <input type="text" class="form-control form-control-sm" value="{{ po_header.exchange_rate }}" id="edit_po_exchange_rate">
         </div>
         <div class="form-group col-md-2">
           <label for="">Follow Up</label>
-          <input type="date" class="form-control form-control-sm" value="{{ po_header.follow_up }}">
+          <input type="date" class="form-control form-control-sm" value="{{ po_header.follow_up }}" id="edit_po_follow_up">
         </div>
       </div>
-    </form>
     </li>
     <li class="list-group-item">
     <div class="table-title">
         <div class="row">
           <div class="form-group col-md-3">
-            <input type="text" list="item" placeholder="Enter QO No here..." class="form-control form-control-sm">
+            <input type="text" list="item" placeholder="Enter Item Code here..." class="form-control form-control-sm" id="edit_item_code">
           </div>
           <datalist id="item">
-            <option value="RFQ/SP/101">RFQ/SP/101</option>
-            <option value="RFQ/SP/102">RFQ/SP/102</option>
-            <option value="RFQ/SP/103">RFQ/SP/103</option>
-            <option value="RFQ/SP/104">RFQ/SP/104</option>
-            <option value="RFQ/SP/105">RFQ/SP/105</option>
+            {% for value in all_item_code %}
+            <option value="{{value.product_code}}" />
+            {% endfor %}
           </datalist>
             <div style="margin-left:20px;">
-                <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i>Insert Another Item</button>
+                <button type="button" class="btn btn-info has_id edit-po-supplier" id="{{pk}}"><i class="fa fa-plus"></i>Insert Another Item</button>
             </div>
         </div>
     </div>
-    <table class="table table-bordered" id="dataTable">
+    <table class="table table-bordered" id="edit-po-supplier-table">
         <thead>
             <tr>
                 <th width="70px">S No.</th>
-                <th width="200px">Item Name</th>
+                <th width="140px">Item Code</th>
+                <th width="140px">Item Name</th>
                 <th>Description</th>
                 <th width="90px">Quantity</th>
-                <th width="70px">Unit</th>
-                <th width="130px">Unit/Price</th>
+                <th width="120px">Unit</th>
+                <th width="120px">Unit/Price</th>
                 <th width="150px">Remarks</th>
-                <th width="150px">Quotation Ref.</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -101,22 +98,23 @@
           {% for value in po_detail %}
           <tr>
             <td>{{ forloop.counter }}</td>
+            <td>{{ value.item_code }}</td>
             <td>{{ value.item_name }}</td>
             <td>{{ value.item_description }}</td>
             <td>{{ value.quantity }}</td>
             <td>{{ value.unit }}</td>
             <td>{{ value.unit_price }}</td>
             <td>{{ value.remarks }}</td>
-            <td>{{ value.quotation_no }}</td>
-            <td><a class="add" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+            <td><a class="add-po-edit" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-po-edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-po-edit" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
           </tr>
           {% endfor %}
         </tbody>
     </table>
     <div class="text-center">
-      <button type="submit" class="btn btn-outline-primary" name="">Update <small>(Quotation)</small></button>
+      <button type="submit" class="btn btn-outline-primary has_id" id="{{pk}}">Update <small>(Quotation)</small></button>
     </div>
   </li>
+</form>
 </ul>
 </div>
 

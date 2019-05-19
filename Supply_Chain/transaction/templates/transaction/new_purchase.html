@@ -42,7 +42,7 @@
           </div>
           <datalist id="item">
             {% for value in all_item_code %}
-            <option value="{{value.item_code}}" />
+            <option value="{{value.product_code}}" />
             {% endfor %}
           </datalist>
             <div style="margin-left:20px;">
@@ -50,14 +50,14 @@
             </div>
         </div>
     </div>
-    <table class="table table-bordered" id="new-po-supplier-table">
+    <table class="table table-bordered" id="new-purchase-table">
         <thead>
             <tr>
                 <th width="40px">S No.</th>
                 <th width="100px">Item Code</th>
                 <th width="70px">Item Name</th>
                 <th width="70px">Qty</th>
-                <th width="40px">Unit</th>
+                <th width="70px">Unit</th>
                 <th width="70px">Price</th>
                 <th width="90px">Value Of Goods</th>
                 <th width="90px">Sales Tax in % </th>
@@ -76,19 +76,19 @@
         <div class="form-inline">
           <div class="form-group">
             <label for="text" style="font-size:14px;" >Cartage Amount:</label>
-              <input type="text" class="form-control form-control-sm" id="cartage_amount" style="border-top: 0px; border-right:0px; border-left:0px;" value="0.00">
+              <input type="text" class="form-control form-control-sm" id="cartage_amount" style="border-top: 0px; border-right:0px; border-left:0px;" required value="0.00">
           </div>
         </div>
         <div class="form-inline">
           <div class="form-group">
             <label for="text" style="font-size:14px;">Additional Tax: &nbsp;&nbsp;&nbsp;</label>
-            <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="additional_tax" value="0.00">
+            <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="additional_tax" required value="0.00">
           </div>
         </div>
         <div class="form-inline">
           <div class="form-group">
             <label for="text" style="font-size:14px;">Withholding Tax:&nbsp;</label>
-            <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="withholding_tax" value="0">
+            <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="withholding_tax" required value="0">
           </div>
         </div>
         <div class="form-inline">

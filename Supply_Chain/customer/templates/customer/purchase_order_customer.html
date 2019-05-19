@@ -28,8 +28,7 @@
           <thead>
               <tr>
                   <th width="70px" >S NO.</th>
-                  <th >PO no</th>
-                  <th width="130px">Quotation Ref</th>
+                  <th width="130px">PO No</th>
                   <th >Customer</th>
                   <th >Date</th>
                   <th >From</th>
@@ -41,21 +40,26 @@
               </tr>
           </thead>
           <tbody>
-            <tr>
-                <td></td>
-                <td></td>
-                <td class="hideextra">Lorem ipsum dolor sit amet</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>
-                  <input type="checkbox" checked name="" value="">
-                </td>
-                <td><a class="edit" href="{% url 'edit-purchase-order-customer' %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a class="delete"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
-            </tr>
+            {% for value in all_po reversed %}
+              <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td> {{ value.po_no }} </td>
+                  <td> CU1 </td>
+                  <td> {{ value.date }} </td>
+                  <td> User1  </td>
+                  <td> {{ value.currency }} </td>
+                  <td> {{ value.exchange_rate }} </td>
+                  <td> {{ value.follow_up }} </td>
+                  <td>
+                    {% if value.show_notification == True %}
+                      Yes
+                    {% else %}
+                      No
+                    {% endif %}
+                  </td>
+                  <td><a class="edit_list" href="{% url 'edit-purchase-order-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a class="delete-all"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+              </tr>
+            {% endfor %}
           </tbody>
       </table>
     </div>

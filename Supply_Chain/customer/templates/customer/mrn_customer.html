@@ -4,13 +4,10 @@
 
 <div class="card" style="width: 100%;">
 <div class="card-header">
-  <h4>MRN Customer hahah</h4>
+  <h4>MRN Customer</h4>
 </div>
 <ul class="list-group list-group-flush">
   <li class="list-group-item">
-    <!-- <div class="form-row">
-      <input type="text" name=""class="form-control col-md-2" value="">
-    </div> -->
     <div class="input-group">
       <input type="text" class="form-control col-md-3" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
       <div class="input-group-append">
@@ -26,23 +23,15 @@
               <tr>
                   <th width="70px" >S NO.</th>
                   <th width="140px">DC no</th>
-                  <th width="70px">MRN Status</th>
                   <th width="70px">Action</th>
               </tr>
           </thead>
           <tbody>
-            {% for value in all_dc %}
+            {% for value in all_dc reversed %}
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ value.dc_no }}</td>
-                {% if value.mrn_status == 'Pending' %}
-                <td class="bg-warning" > <b>{{ value.mrn_status }}</b></td>
-                {% elif value.mrn_status == 'Accepted' %}
-                <td class="bg-success" > <b>{{ value.mrn_status }}</b></td>
-                {% elif value.mrn_status == 'Rejected' %}
-                <td class="bg-danger" > <b>{{ value.mrn_status }}</b></td>
-                {% endif %}
-                <td><a class="edit_list" href="{% url 'edit-mrn-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a class="delete"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+                <td><a class="edit_list" href="{% url 'edit-mrn-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a></td>
             </tr>
             {% endfor %}
           </tbody>

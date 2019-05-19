@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from supplier.models import DcHeaderSupplier, DcDetailSupplier
+from inventory.models import Add_products
 from django.core import serializers
 from django.db.models import Q
 import json
@@ -11,10 +11,10 @@ def purchase(request):
 
 
 def new_purchase(request):
-    all_item_code = DcDetailSupplier.objects.filter(~Q(accepted_quantity = 0))
+    all_item_code = Add_products.objects.all()
     print(all_item_code)
     for value in all_item_code:
-        print(value.item_code)
+        print(value.product_code)
     # get_last_quotation_no = QuotationHeaderSupplier.objects.last()
     # if get_last_quotation_no:
     #     get_last_quotation_no = get_last_quotation_no.quotation_no
@@ -26,9 +26,7 @@ def new_purchase(request):
     #     get_last_quotation_no = 'QU/SP/101'
     item_code = request.POST.get('item_code_purchase',False)
     if item_code:
-        data = DcDetailSupplier.objects.filter(item_code = item_code)
-        for value in data:
-            print(value.item_code)
+        data = Add_products.objects.filter(product_code = item_code)
         row = serializers.serialize('json',data)
         return HttpResponse(json.dumps({'row':row}))
     # if request.method == 'POST':

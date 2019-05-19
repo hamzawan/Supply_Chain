@@ -73,16 +73,16 @@ class PoDetailCustomer(models.Model):
 
 
 class DcHeaderCustomer(models.Model):
-    dc_no = models.CharField(max_length = 100, unique = True)
+    dc_no = models.CharField(max_length = 100)
     date = models.DateField(default = datetime.date.today)
-    mrn_status = models.CharField(max_length = 100)
-
 
 class DcDetailCustomer(models.Model):
-    item_code = models.CharField(max_length = 100, unique = True)
+    item_code = models.CharField(max_length = 100)
     item_name = models.CharField(max_length = 100)
     item_description = models.TextField()
     quantity = models.IntegerField()
+    accepted_quantity = models.IntegerField()
+    returned_quantity = models.IntegerField()
     unit = models.CharField(max_length = 100)
     unit_price = models.DecimalField(max_digits = 8, decimal_places = 2)
     remarks = models.CharField(max_length = 100)

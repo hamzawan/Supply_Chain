@@ -29,25 +29,23 @@
               <tr>
                   <th width="70px" >S NO.</th>
                   <th width="140px">DC no</th>
-                  <th width="140px">PO Ref</th>
                   <th >Customer Name</th>
                   <th >Date</th>
                   <th >From</th>
-                  <th >MRN Status</th>
                   <th >Action</th>
               </tr>
           </thead>
           <tbody>
+            {% for value in all_dc reversed %}
             <tr>
-                <td></td>
-                <td></td>
-                <td class="hideextra">Lorem ipsum dolor sit amet</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><a class="edit" href="{% url 'edit-delivery-challan-customer' %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a class="delete"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ value.dc_no }}</td>
+                <td>sp1</td>
+                <td>{{ value.date }}</td>
+                <td>user1</td>
+                <td><a class="edit_list" href="{% url 'edit-delivery-challan-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a class="delete-po-supplier"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
             </tr>
+            {% endfor %}
           </tbody>
       </table>
     </div>

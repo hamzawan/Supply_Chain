@@ -42,7 +42,7 @@
               {% endfor %}
             </datalist>
               <div style="margin-left:20px;">
-                  <button type="button" class="btn btn-info edit_rfq has_id" id="{{pk}}"><i class="fa fa-plus"></i>Insert Item</button>
+                  <button type="button" class="btn btn-info edit-rfq-supplier has_id" id="{{pk}}"><i class="fa fa-plus"></i>Insert Item</button>
               </div>
           </div>
       </div>
@@ -50,10 +50,10 @@
         <thead>
             <tr>
                 <th width="70px">S NO.</th>
-                <th width="200px">Item Code</th>
-                <th width="200px">Item Name</th>
+                <th width="100px">Item Code</th>
+                <th width="100px">Item Name</th>
                 <th width="390px">Item Description</th>
-                <th>Unit</th>
+                <th width="150px">Unit</th>
                 <th>Quantity</th>
                 <th>Action</th>
             </tr>
@@ -67,7 +67,7 @@
             <td>{{ value.item_description }}</td>
             <td>{{ value.unit }}</td>
             <td>{{ value.quantity }}</td>
-            <td><a class="add" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+            <td><a class="add-rfq-edit" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-rfq-edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-rfq-edit" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
           </tr>
           {% endfor %}
         </tbody>

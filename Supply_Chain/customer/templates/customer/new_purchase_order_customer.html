@@ -68,11 +68,11 @@
     <div class="table-title">
         <div class="row">
           <div class="form-group col-md-3">
-            <input type="text" list="item" placeholder="Enter QO No here..." class="form-control form-control-sm" id="quotation_no">
+            <input type="text" list="item" placeholder="Enter Item Code here..." class="form-control form-control-sm" id="item_code_po">
           </div>
           <datalist id="item">
-            {% for value in all_quotation %}
-            <option value="{{value|get_item:'quotation_no'}}" />
+            {% for value in all_item_code %}
+            <option value="{{value.product_code}}" />
             {% endfor %}
           </datalist>
             <div style="margin-left:20px;">
@@ -81,19 +81,19 @@
         </div>
     </div>
     <table class="table table-bordered" id="new-po-customer-table">
-        <thead>
-            <tr>
-                <th width="70px">S No.</th>
-                <th width="160px">Item Name</th>
-                <th>Description</th>
-                <th width="90px">Quantity</th>
-                <th width="80px">Unit</th>
-                <th width="130px">Unit/Price</th>
-                <th width="150px">Remarks</th>
-                <th width="150px">Quote Ref.</th>
-                <th>Action</th>
-            </tr>
-        </thead>
+      <thead>
+          <tr>
+              <th width="70px">S No.</th>
+              <th width="160px">Item Code</th>
+              <th width="160px">Item Name</th>
+              <th>Description</th>
+              <th width="90px">Quantity</th>
+              <th width="80px">Unit</th>
+              <th width="130px">Unit/Price</th>
+              <th width="150px">Remarks</th>
+              <th>Action</th>
+          </tr>
+      </thead>
         <tbody>
         </tbody>
     </table>

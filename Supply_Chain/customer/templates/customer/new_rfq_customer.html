@@ -7,7 +7,7 @@
   <h4>New RFQ Customer</h4>
 </div>
 <ul class="list-group list-group-flush">
-<form id="new-rfq-customer-form" action="" method="post">
+<form id="new-rfq-customer-submit" action="" method="post">
   <li class="list-group-item">
       {% csrf_token %}
       <div class="form-row">
@@ -33,22 +33,31 @@
       </div>
 </li>
 <li class="list-group-item">
-    <div class="table-title">
-        <div class="row">
-            <div style="margin-left:20px;">
-                <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i> Add New</button>
-            </div>
+  <div class="table-title">
+      <div class="row">
+        <div class="form-group col-md-3">
+          <input type="text" list="item" placeholder="Enter Item Code here..." class="form-control form-control-sm" id="item_code">
         </div>
-    </div>
-    <table class="table table-bordered" id="new-rfq-customer-table">
+        <datalist id="item">
+          {% for value in all_item_code %}
+          <option value="{{value.product_code}}" />
+          {% endfor %}
+        </datalist>
+          <div style="margin-left:20px;">
+              <button type="button" class="btn btn-info add-new-rfq-customer"><i class="fa fa-plus"></i>Insert Item</button>
+          </div>
+      </div>
+  </div>
+    <table class="table table-bordered" id="rfq-customer-table">
         <thead>
             <tr>
-                <th width="80px">S NO.</th>
-                <th width="300px">Item Name</th>
-                <th width="400px">Item Description</th>
-                <th>Unit</th>
-                <th>Quantity</th>
-                <th>Action</th>
+              <th width="70px">S NO.</th>
+              <th width="200px">Item Code</th>
+              <th width="200px">Item Name</th>
+              <th width="390px">Item Description</th>
+              <th>Unit</th>
+              <th>Quantity</th>
+              <th>Action</th>
             </tr>
         </thead>
         <tbody>

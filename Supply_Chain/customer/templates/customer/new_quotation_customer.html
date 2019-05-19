@@ -66,11 +66,11 @@
     <div class="table-title">
         <div class="row">
           <div class="form-group col-md-3">
-            <input type="text" list="item" id="get_rfq_no" placeholder="Enter RFQ No here..." class="form-control form-control-sm">
+            <input type="text" list="item" id="item_code_quotation" placeholder="Enter RFQ No here..." class="form-control form-control-sm">
           </div>
           <datalist id="item">
-            {% for value in all_rfq %}
-            <option value="{{value|get_item:'rfq_no'}}"></option>
+            {% for value in all_item_code %}
+            <option value="{{value.product_code}}"></option>
             {% endfor %}
           </datalist>
             <div style="margin-left:20px;">
@@ -80,16 +80,17 @@
     </div>
     <table class="table table-bordered" id="new-quotation-customer-table">
         <thead>
-            <tr>
-                <th width="70px">S No.</th>
-                <th width="200px">Item Name</th>
-                <th>Description</th>
-                <th width="90px">Quantity</th>
-                <th width="80px">Unit</th>
-                <th width="130px">Unit/Price</th>
-                <th width="150px">Remarks</th>
-                <th>Action</th>
-            </tr>
+          <tr>
+              <th width="70px">S No.</th>
+              <th width="150px">Item Code</th>
+              <th width="180px">Item Name</th>
+              <th>Description</th>
+              <th width="90px">Quantity</th>
+              <th width="80px">Unit</th>
+              <th width="100px">Unit/Price</th>
+              <th width="120px">Remarks</th>
+              <th>Action</th>
+          </tr>
         </thead>
         <tbody>
         </tbody>

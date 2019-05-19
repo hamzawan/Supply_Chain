@@ -7,7 +7,7 @@
   <h4>New RFQ Supplier</h4>
 </div>
 <ul class="list-group list-group-flush">
-<form id="myForm" action="{% url 'new-rfq-supplier' %}" method="post">
+<form id="submit-rfq-supplier" action="{% url 'new-rfq-supplier' %}" method="post">
   <li class="list-group-item">
       {% csrf_token %}
       <div class="form-row">
@@ -48,7 +48,7 @@
           </div>
       </div>
   </div>
-    <table class="table table-bordered" id="mytable">
+    <table class="table table-bordered" id="rfq-supplier-table">
         <thead>
             <tr>
                 <th width="70px">S NO.</th>

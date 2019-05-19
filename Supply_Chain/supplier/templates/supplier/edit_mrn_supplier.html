@@ -7,7 +7,7 @@
   <h4>Update MRN Supplier</h4>
 </div>
 <ul class="list-group list-group-flush">
-<form  action="" method="post" id="edit-mrn-supplier-form">
+<form  action="" method="post" id="edit-mrn-supplier-submit">
   <li class="list-group-item">
       <div class="form-row">
         <div class="form-group col-md-2">
@@ -25,23 +25,6 @@
       </div>
   </li>
   <li class="list-group-item">
-    <!-- <div class="table-title">
-        <div class="row">
-          <div class="form-group col-md-3">
-            <input type="text" list="item" placeholder="Enter RFQ No here..." class="form-control form-control-sm">
-          </div>
-          <datalist id="item">
-            <option value="RFQ/SP/101">RFQ/SP/101</option>
-            <option value="RFQ/SP/102">RFQ/SP/102</option>
-            <option value="RFQ/SP/103">RFQ/SP/103</option>
-            <option value="RFQ/SP/104">RFQ/SP/104</option>
-            <option value="RFQ/SP/105">RFQ/SP/105</option>
-          </datalist>
-            <div style="margin-left:20px;">
-                <button type="button" class="btn btn-info add-new"><i class="fa fa-plus"></i>Insert Another Item</button>
-            </div>
-        </div>
-    </div> -->
     <table class="table table-bordered" id="edit-mrn-supplier-table">
         <thead>
             <tr>
@@ -65,7 +48,7 @@
             <td>{{value.quantity}}</td>
             <td>{{value.accepted_quantity}}</td>
             <td>{{value.unit}}</td>
-            <td><a class="add" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a></td>
+            <td><a class="add-mrn" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-mrn" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a></td>
           </tr>
           {% endfor %}
         </tbody>

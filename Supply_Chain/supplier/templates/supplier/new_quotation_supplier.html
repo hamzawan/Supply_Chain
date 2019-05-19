@@ -66,11 +66,11 @@
     <div class="table-title">
         <div class="row">
           <div class="form-group col-md-3">
-            <input type="text" list="item" id="get_rfq_no" placeholder="Enter RFQ No here..." class="form-control form-control-sm">
+            <input type="text" list="item" id="item_code_quotation" placeholder="Enter Item Code Here..." class="form-control form-control-sm">
           </div>
           <datalist id="item">
-            {% for value in all_rfq %}
-            <option value="{{value|get_item:'rfq_no'}}"></option>
+            {% for value in all_item_code %}
+            <option value="{{value.product_code}}" />
             {% endfor %}
           </datalist>
             <div style="margin-left:20px;">
