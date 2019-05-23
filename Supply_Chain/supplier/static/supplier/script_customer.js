@@ -178,7 +178,7 @@ $(document).ready(function(){
 						})
 						.done(function done(){
 							alert("RFQ Submitted");
-							location.href = 'http://localhost:8000/customer/rfq/new/'
+							location.reload();
 						})
 			});
 
@@ -334,7 +334,7 @@ $(document).ready(function(){
 								})
 								.done(function done(){
 									alert("Updated");
-									location.href = `http://localhost:8000/customer/rfq/edit/${edit_id}`
+									location.reload();
 								})
 					});
 
@@ -519,7 +519,7 @@ $(document).ready(function(){
 							})
 							.done(function done(){
 								alert("Quotation Submitted");
-								location.href = 'http://localhost:8000/customer/quotation/new'
+								location.reload();
 							})
 				});
 
@@ -702,7 +702,7 @@ $(document).ready(function(){
 								})
 								.done(function done(){
 									alert("Quotation Updated");
-									location.href = `http://localhost:8000/customer/quotation/edit/${edit_id}`
+									location.reload();
 								})
 					});
 
@@ -887,7 +887,7 @@ $(document).ready(function(){
 						})
 						.done(function done(){
 							alert("Purchase Order Submitted");
-							location.href = 'http://localhost:8000/customer/purchase_order/new'
+							location.reload();
 						})
 			});
 
@@ -1071,7 +1071,7 @@ $(document).ready(function(){
 							})
 							.done(function done(){
 								alert("Purchase Order Updated");
-								location.href = `http://localhost:8000/customer/purchase_order/edit/${edit_id}`
+								location.reload();
 							})
 				});
 
@@ -1239,7 +1239,7 @@ $(document).ready(function(){
 									})
 									.done(function done(){
 										alert("Delivery Challan Submitted");
-										location.href = 'http://localhost:8000/customer/delivery_challan/new'
+										location.reload();
 									})
 						});
 
@@ -1400,7 +1400,7 @@ $(document).ready(function(){
 								})
 								.done(function done(){
 									alert("Delivery Challan Updated");
-									location.href = `http://localhost:8000/customer/delivery_challan/edit/${edit_id}`
+									location.reload();
 								})
 					});
 
@@ -1498,7 +1498,7 @@ $(document).ready(function(){
 										})
 										.done(function done(){
 											alert("Updated");
-											location.href = `http://localhost:8000/customer/mrn/edit/${edit_id}`
+											location.reload();
 										})
 							});
 

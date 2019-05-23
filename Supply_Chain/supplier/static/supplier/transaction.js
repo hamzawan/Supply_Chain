@@ -321,7 +321,7 @@ $(document).ready(function(){
 							})
 							.done(function done(){
 								alert("Purchase Created");
-								location.href = 'http://localhost:8000/transaction/purchase/new/'
+								location.reload();
 							})
 				});
 
@@ -614,7 +614,7 @@ $(document).ready(function(){
 						})
 						.done(function done(){
 							alert("Sales Created");
-							location.href = 'http://localhost:8000/transaction/sale/new/'
+							location.reload();
 						})
 			});
 
@@ -720,7 +720,7 @@ $(document).ready(function(){
 										})
 										.done(function done(){
 											alert("Updated");
-											location.href = `http://localhost:8000/transaction/purchase/return/${edit_id}`
+											location.reload();
 										})
 							});
 
