@@ -16,10 +16,12 @@
         </div>
         <div class="form-group col-md-2">
           <label>Supplier Name</label>
-          <input list="browsers" class="form-control form-control-sm" value="sp1">
-            <datalist id="browsers">
-             <option value="SP1">
-          </datalist>
+          <input list="accounts" class="form-control form-control-sm" value="{{ po_header.account_id.account_title }}"  id="edit_po_supplier">
+            <datalist id="accounts">
+              {% for value in all_accounts %}
+              <option value="{{value.account_title}}">{{value.account_title}}</option>
+              {% endfor %}
+             </datalist>
         </div>
         <div class="form-group col-md-2">
           <label for="">Attn</label>

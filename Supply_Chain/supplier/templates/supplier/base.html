@@ -104,8 +104,8 @@
           <span>Inventory</span>
         </a>
         <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-          <a class="dropdown-item" href="{% url 'item-stock' %}">Stock</a>
-          <a class="dropdown-item" href="{% url 'add-product' %}">Add Product</a>
+          <a class="dropdown-item" href="{% url 'item-stock' %}">Stock <small>(Item Wise)</small> </a>
+          <a class="dropdown-item" href="{% url 'add-product' %}">Add Item</a>
         </div>
       </li>
       <li class="nav-item dropdown">
@@ -147,8 +147,11 @@
           <span>Transaction</span>
         </a>
         <div class="dropdown-menu" aria-labelledby="pagesDropdown">
+          <a class="dropdown-item" href="#">Chart Of Account</a>
           <a class="dropdown-item" href="{% url 'purchase' %}">Purchase</a>
-          <a class="dropdown-item" href="login.html">Sale</a>
+          <a class="dropdown-item" href="{% url 'purchase-return-summary' %}">Purchase Return</a>
+          <a class="dropdown-item" href="{% url 'sale' %}">Sale</a>
+          <a class="dropdown-item" href="{% url 'sale-return-summary' %}">Sale Return</a>
         </div>
       </li>
     </ul>

@@ -12,13 +12,15 @@
       <div class="form-row">
         <div class="form-group col-md-2">
           <label for="">RFQ No</label>
-          <input type="text" class="form-control form-control-sm" value="{{rfq_header.rfq_no}}" id="edit_rfq_customer" readonly>
+          <input type="text" class="form-control form-control-sm" value="{{rfq_header.rfq_no}}" readonly>
         </div>
         <div class="form-group col-md-2">
           <label>Customer Name</label>
-          <input list="browsers" class="form-control form-control-sm" value="cu1">
-            <datalist id="browsers">
-             <option value="Internet Explorer">
+          <input list="account" class="form-control form-control-sm" value="{{rfq_header.account_id.account_title}}" id="edit_rfq_customer">
+            <datalist id="account">
+              {% for value in all_accounts %}
+              <option value="{{value.account_title}}" />
+              {% endfor %}
           </datalist>
         </div>
         <div class="form-group col-md-2">

@@ -1,4 +1,5 @@
 from django.db import models
+from transaction.models import ChartOfAccount
 import datetime
 
 class RfqCustomerHeader(models.Model):
@@ -7,7 +8,7 @@ class RfqCustomerHeader(models.Model):
     attn = models.CharField(max_length = 100)
     follow_up = models.DateField(blank = True)
     show_notification = models.BooleanField(default = True)
-
+    account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 class RfqCustomerDetail(models.Model):
     item_code = models.CharField(max_length = 100, unique = True)
@@ -31,6 +32,7 @@ class QuotationHeaderCustomer(models.Model):
     exchange_rate = models.DecimalField(max_digits = 8, decimal_places = 2)
     follow_up = models.DateField(blank = True)
     show_notification = models.BooleanField(default = True)
+    account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 
 class QuotationDetailCustomer(models.Model):
@@ -58,6 +60,7 @@ class PoHeaderCustomer(models.Model):
     exchange_rate = models.DecimalField(max_digits = 8, decimal_places = 2)
     follow_up = models.DateField(blank = True)
     show_notification = models.BooleanField(default = True)
+    account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 
 class PoDetailCustomer(models.Model):
@@ -75,6 +78,7 @@ class PoDetailCustomer(models.Model):
 class DcHeaderCustomer(models.Model):
     dc_no = models.CharField(max_length = 100)
     date = models.DateField(default = datetime.date.today)
+    account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 class DcDetailCustomer(models.Model):
     item_code = models.CharField(max_length = 100)

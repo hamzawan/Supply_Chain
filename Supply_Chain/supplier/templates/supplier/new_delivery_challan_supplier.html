@@ -14,12 +14,14 @@
           <label for="">DC No</label>
           <input type="text" readonly class="form-control form-control-sm" value="{{get_last_dc_no}}" id="dc_no_supplier">
         </div>
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-2">
           <label>Supplier Name</label>
-          <input list="browsers" class="form-control form-control-sm" id="dc_supplier">
-            <datalist id="browsers">
-             <option value="Internet Explorer">
-          </datalist>
+          <input list="accounts" class="form-control form-control-sm" id="dc_supplier">
+            <datalist id="accounts">
+              {% for value in all_accounts %}
+              <option value="{{value.account_title}}">{{value.account_title}}</option>
+              {% endfor %}
+             </datalist>
         </div>
       </div>
     </li>
@@ -57,7 +59,7 @@
         </tbody>
     </table>
     <div class="text-center">
-      <button type="submit" class="btn btn-outline-primary" name="">Submit <small>(Delivery Challan)</small></button>
+      <button type="submit" class="btn btn-outline-primary">Submit <small>(Delivery Challan)</small></button>
     </div>
   </li>
 </form>

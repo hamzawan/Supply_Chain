@@ -1,0 +1,127 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% load supplier_extras %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Sale Return</h4>
+</div>
+<ul class="list-group list-group-flush">
+<form  action="" id="new-sale-return-submit" autocomplete="off" method="post">
+  <li class="list-group-item">
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label>Sale Name</label>
+          <input list="account"  class="form-control form-control-sm" required id="customer_sale_return" value="{{sale_header.account_id.account_title}}" >
+          <datalist id="account">
+            {% for value in all_accounts %}
+            <option value="{{value.account_title}}">{{value.account_title}}</option>
+            {% endfor %}
+        </datalist>
+        </div>
+        <div class="form-group col-md-2">
+         <label for="sel1">Payment Term:</label>
+         <select class="form-control form-control-sm" id="payment_sale_return">
+           <option>Cash</option>
+           <option>Credit</option>
+         </select>
+        </div>
+        <div class="form-group">
+          <label for="exampleFormControlTextarea2">Description</label>
+          <textarea class="form-control rounded-0" rows="3" id="desc_sale_return">{{sale_header.footer_description}}</textarea>
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item">
+    <!-- <div class="table-title">
+        <div class="row">
+          <div class="form-group col-md-3">
+            <input type="text" list="item" placeholder="Enter Item Code here..." class="form-control form-control-sm" id="item_code_purchase">
+          </div>
+          <datalist id="item">
+            {% for value in all_item_code %}
+            <option value="{{value.product_code}}" />
+            {% endfor %}
+          </datalist>
+            <div style="margin-left:20px;">
+                <button type="button" class="btn btn-info add-item-purchase"><i class="fa fa-plus"></i>Insert Item</button>
+            </div>
+        </div>
+    </div> -->
+    <table class="table table-bordered" id="new-sale-return-table">
+        <thead>
+            <tr>
+                <th width="40px" style="font-size:10px;">S No.</th>
+                <th width="100px">Item Code</th>
+                <th width="70px">Item Name</th>
+                <th width="70px">Desc.</th>
+                <th width="60px">Qty</th>
+                <th width="60px">Unit</th>
+                <th width="70px">Price</th>
+                <th width="90px">Sales Tax in % </th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+          {% for value in sale_detail %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ value.item_code }}</td>
+            <td>{{ value.item_name }}</td>
+            <td>{{ value.item_description }}</td>
+            <td>{{ value.quantity }}</td>
+            <td>{{ value.unit }}</td>
+            <td>{{ value.cost_price }}</td>
+            <td>{{ value.sales_tax }}</td>
+            <td><a class="add-sale-return" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-sale-return" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-sale-return" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+    </li>
+    <!-- <li class="list-group-item">
+      <input type="hidden" name="" value="" id="hidden">
+      <div class="float-right">
+        <div class="form-inline">
+          <div class="form-group">
+            <label for="text" style="font-size:14px;" >Cartage Amount:</label>
+              <input type="text" class="form-control form-control-sm" id="cartage_amount" style="border-top: 0px; border-right:0px; border-left:0px;" required value="0.00">
+          </div>
+        </div>
+        <div class="form-inline">
+          <div class="form-group">
+            <label for="text" style="font-size:14px;">Additional Tax: &nbsp;&nbsp;&nbsp;</label>
+            <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="additional_tax" required value="0.00">
+          </div>
+        </div>
+        <div class="form-inline">
+          <div class="form-group">
+            <label for="text" style="font-size:14px;">Withholding Tax:&nbsp;</label>
+            <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="withholding_tax" required value="0">
+          </div>
+        </div>
+        <div class="form-inline">
+          <div class="form-group">
+            <label for="text" style="font-size:14px;"><b>Grand Total:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <input type="text" readonly class="form-control form-control-sm" id="last_grand_total" style="border-top: 0px; border-right:0px; border-left:0px;">
+          </div>
+        </div>
+      </div>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      </li> -->
+      <br>
+    <div class="text-center">
+      <button type="submit" class="btn btn-outline-primary has_id" id="{{pk}}">Submit <small>(Purchase Return)</small></button>
+    </div>
+    <br>
+</form>
+</ul>
+</div>
+
+
+{% endblock body %}

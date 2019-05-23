@@ -19,7 +19,7 @@
         </button>
       </div>
       <div class="col-md-8">
-        <a role="button" href="{% url 'new-item-stock' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New <small>(manually)</small> </a>
+        <!-- <a role="button" href="{% url 'new-item-stock' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New <small>(manually)</small> </a> -->
       </div>
     </div>
     <br>
@@ -32,29 +32,19 @@
                 <th width="160px">Item Description</th>
                 <th width="160px">Inventory Stock</th>
                 <th>Unit</th>
-                <th>Cost Price</th>
-                <th>Selling Price</th>
                 <td>Action</td>
             </tr>
         </thead>
         <tbody>
-          {% for row in all_rfq %}
+          {% for value in row %}
           <tr>
               <td>{{ forloop.counter }}</td>
-              <td>{{ row.rfq_no }}</td>
-              <td>SP1</td>
-              <td>{{ row.date }}</td>
-              <td> user1 </td>
-              <td>{{ row.attn }}</td>
-              <td>{{ row.follow_up }}</td>
-              <td>
-                {% if row.show_notification == True %}
-                  Yes
-                {% else %}
-                  No
-                {% endif %}
-              </td>
-  			      <td><a class="edit_list" href="#"><i class="material-icons">Sell</i></a><a class="delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+              <td>{{ value.0 }}</td>
+              <td>{{ value.1 }}</td>
+              <td>{{ value.2 }}</td>
+              <td>{{ value.4 }}</td>
+              <td>{{ value.3 }}</td>
+  			      <td><a class="cart" href="#"><i class="fas fa-shopping-cart"></i></a><a class="delete_item_row" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
           </tr>
           {% endfor %}
         </tbody>

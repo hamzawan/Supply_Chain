@@ -1,4 +1,5 @@
 from django.db import models
+from transaction.models import ChartOfAccount
 import datetime
 
 class RfqSupplierHeader(models.Model):
@@ -7,7 +8,7 @@ class RfqSupplierHeader(models.Model):
     attn = models.CharField(max_length = 100)
     follow_up = models.DateField(blank = True)
     show_notification = models.BooleanField(default = True)
-
+    account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 class RfqSupplierDetail(models.Model):
     item_code = models.CharField(max_length = 100)
@@ -31,7 +32,7 @@ class QuotationHeaderSupplier(models.Model):
     exchange_rate = models.DecimalField(max_digits = 8, decimal_places = 2)
     follow_up = models.DateField(blank = True)
     show_notification = models.BooleanField(default = True)
-
+    account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 class QuotationDetailSupplier(models.Model):
     item_code = models.CharField(max_length = 100)
@@ -58,6 +59,7 @@ class PoHeaderSupplier(models.Model):
     exchange_rate = models.DecimalField(max_digits = 8, decimal_places = 2)
     follow_up = models.DateField(blank = True)
     show_notification = models.BooleanField(default = True)
+    account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 
 class PoDetailSupplier(models.Model):
@@ -75,6 +77,7 @@ class PoDetailSupplier(models.Model):
 class DcHeaderSupplier(models.Model):
     dc_no = models.CharField(max_length = 100)
     date = models.DateField(default = datetime.date.today)
+    account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 class DcDetailSupplier(models.Model):
     item_code = models.CharField(max_length = 100)

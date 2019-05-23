@@ -126,6 +126,7 @@ $(document).ready(function(){
 				e.preventDefault();
 				var table = $('#rfq-customer-table');
 				var data = [];
+				var customer = $('#customer_rfq').val();
 				var rfq_no = $('#rfq_no').val();
 				var attn = $('#attn').val();
 				var follow_up = $('#follow_up').val();
@@ -167,6 +168,7 @@ $(document).ready(function(){
 							type: 'POST',
 							url : '/customer/rfq/new/',
 							data:{
+								'customer': customer,
 								'rfq_no': rfq_no,
 								'attn': attn,
 								'follow_up': follow_up,
@@ -280,7 +282,7 @@ $(document).ready(function(){
 					$('#edit-rfq-customer-form').on('submit',function(e){
 						e.preventDefault();
 						var table = $('#edit-rfq-customer-table');
-						var edit_rfq_supplier = $("#edit_rfq_customer").val()
+						var customer = $("#edit_rfq_customer").val()
 						// var edit_rfq_supplier_name = $("#edit_rfq_supplier_name").val()
 						var edit_rfq_attn = $("#edit_rfq_attn").val()
 						var edit_rfq_follow_up = $("#edit_rfq_follow_up").val()
@@ -323,6 +325,7 @@ $(document).ready(function(){
 									url : `/customer/rfq/edit/${edit_id}`,
 									data:{
 										// 'edit_rfq_supplier':edit_rfq_supplier,
+										'customer': customer,
 										'edit_rfq_attn':edit_rfq_attn,
 										'edit_rfq_follow_up':edit_rfq_follow_up,
 										'items': JSON.stringify(data),
@@ -444,7 +447,7 @@ $(document).ready(function(){
 					var table = $('#new-quotation-customer-table');
 					var data = [];
 
-					var customer = $('#quotation_customer').val();
+					var customer = $('#customer_quotation').val();
 					var attn = $('#quotation_customer_attn').val();
 					var prcbasis = $('#quotation_customer_prcbasis').val();
 					var leadtime = $('#quotation_customer_leadtime').val();
@@ -500,6 +503,7 @@ $(document).ready(function(){
 								type: 'POST',
 								url : '/customer/quotation/new',
 								data:{
+									'customer':customer,
 									'attn': attn,
 									'prcbasis': prcbasis,
 									'leadtime': leadtime,
@@ -626,7 +630,7 @@ $(document).ready(function(){
 						e.preventDefault();
 						var table = $('#edit-quotation-customer-table');
 						var data = [];
-
+						var customer = $('#quotation_customer_edit').val();
 						var attn = $('#edit_quotation_attn').val();
 						var prcbasis = $('#edit_quotation_prcbasis').val();
 						var leadtime = $('#edit_quotation_leadtime').val();
@@ -682,6 +686,7 @@ $(document).ready(function(){
 									type: 'POST',
 									url : `/customer/quotation/edit/${edit_id}`,
 									data:{
+										'customer': customer,
 										'attn': attn,
 										'prcbasis': prcbasis,
 										'leadtime': leadtime,
@@ -810,7 +815,7 @@ $(document).ready(function(){
 				e.preventDefault();
 				var table = $('#new-po-customer-table');
 				var data = [];
-
+				var customer = $('#po_customer').val();
 	  		var attn = $('#po_customer_attn').val();
 	  		var prcbasis = $('#po_customer_prcbasis').val();
 	  		var leadtime = $('#po_customer_leadtime').val();
@@ -866,6 +871,7 @@ $(document).ready(function(){
 							type: 'POST',
 							url : '/customer/purchase_order/new',
 							data:{
+								'customer':customer,
 								'attn': attn,
 								'prcbasis': prcbasis,
 								'leadtime': leadtime,
@@ -993,6 +999,7 @@ $(document).ready(function(){
 					var table = $('#edit-po-customer-table');
 					var data = [];
 
+					var customer = $('#edit_po_customer').val();
 					var attn = $('#edit_po_attn').val();
 					var prcbasis = $('#edit_po_prcbasis').val();
 					var leadtime = $('#edit_po_leadtime').val();
@@ -1048,6 +1055,7 @@ $(document).ready(function(){
 								type: 'POST',
 								url : `/customer/purchase_order/edit/${edit_id}`,
 								data:{
+									'customer':customer,
 									'attn': attn,
 									'prcbasis': prcbasis,
 									'leadtime': leadtime,
@@ -1177,6 +1185,8 @@ $(document).ready(function(){
 							var table = $('#new-dc-customer-table');
 							var data = [];
 
+							var customer = $('#dc_customer').val();
+
 							table.find('tr').each(function (i, el){
 								if(i != 0)
 								{
@@ -1222,6 +1232,7 @@ $(document).ready(function(){
 										type: 'POST',
 										url : '/customer/delivery_challan/new',
 										data:{
+											'customer':customer,
 											'items': JSON.stringify(data),
 										},
 										dataType: 'json'
@@ -1334,6 +1345,7 @@ $(document).ready(function(){
 					$('#edit-customer-dc-submit').on('submit',function(e){
 						e.preventDefault();
 						var table = $('#edit-dc-customer-table');
+						var customer = $('#edit_dc').val();
 						var data = [];
 
 						table.find('tr').each(function (i, el){
@@ -1381,7 +1393,7 @@ $(document).ready(function(){
 									type: 'POST',
 									url : `/customer/delivery_challan/edit/${edit_id}`,
 									data:{
-
+										'customer':customer,
 										'items': JSON.stringify(data),
 									},
 									dataType: 'json'

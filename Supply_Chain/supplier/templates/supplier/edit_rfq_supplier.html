@@ -16,9 +16,11 @@
         </div>
         <div class="form-group col-md-2">
           <label>Supplier Name</label>
-          <input list="browsers" class="form-control form-control-sm" value="sp1" value="edit_rfq_supplier_name">
+          <input list="browsers" class="form-control form-control-sm" value="{{rfq_header.account_id.account_title}}" id="edit_rfq_supplier_name">
             <datalist id="browsers">
-             <option value="Internet Explorer">
+              {% for value in all_accounts %}
+              <option value="{{value.account_title}}">{{value.account_title}}</option>
+              {% endfor %}
           </datalist>
         </div>
         <div class="form-group col-md-2">

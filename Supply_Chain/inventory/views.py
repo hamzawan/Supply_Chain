@@ -1,12 +1,32 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from .models import (Add_products)
+from transaction.models import (PurchaseDetail, SaleDetail)
+from itertools import chain
 import json
-
+from django.db import connection
 
 def item_stock(request):
-    
-    return render(request, 'inventory/item_stock.html')
+    cursor = connection.cursor()
+    cursor.execute('''Select item_code, item_name,Item_description,Unit,SUM(quantity) As qty From (
+Select 'Purchase' As TranType,Item_Code,Item_name,Item_description,unit,Quantity From transaction_purchasedetail
+union All
+Select 'Purchase Return' As TranType,Item_Code,Item_name,Item_description,unit,Quantity * -1 From transaction_purchasereturndetail
+union All
+Select 'Sale' As TranType,Item_Code,Item_name,Item_description,unit,Quantity * -1 From transaction_saledetail
+union All
+Select 'Sale Return' As TranType,Item_Code,Item_name,Item_description,unit,Quantity  From transaction_salereturndetail
+) As tblTemp
+Group by Item_Code''')
+    row = cursor.fetchall()
+    print(row)
+    for value in row:
+        print(value[0])
+        print(value[1])
+        print(value[2])
+        print(value[3])
+        print(value[4])
+    return render(request, 'inventory/item_stock.html',{'row':row})
 
 def new_item_stock(request):
     return render(request, 'inventory/new_item_stock.html')
@@ -36,7 +56,7 @@ def add_product(request):
             type = value["type"][:3]
             size = value["size"][:3]
             item_code = type+"-"+size+"-"+str(serial_no)
-            new_products = Add_products(product_code = item_code, product_name = value["product_name"], product_desc = value["product_desc"])
+            new_products = Add_products(product_code = item_code, product_name = value["item_name"], product_desc = value["item_desc"])
             new_products.save()
             serial_no = serial_no + 1
         return JsonResponse({"result":"success"})

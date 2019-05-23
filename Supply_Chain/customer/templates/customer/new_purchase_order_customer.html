@@ -16,9 +16,11 @@
         </div>
         <div class="form-group col-md-2">
           <label>Customer Name</label>
-          <input list="browsers" class="form-control form-control-sm" required id="po_customer">
-            <datalist id="browsers">
-             <option value="Internet Explorer">
+          <input list="account" class="form-control form-control-sm" required id="po_customer">
+          <datalist id="account">
+            {% for value in all_accounts %}
+            <option value="{{value.account_title}}" />
+            {% endfor %}
           </datalist>
         </div>
         <div class="form-group col-md-2">

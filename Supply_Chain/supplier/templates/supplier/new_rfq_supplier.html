@@ -7,7 +7,7 @@
   <h4>New RFQ Supplier</h4>
 </div>
 <ul class="list-group list-group-flush">
-<form id="submit-rfq-supplier" action="{% url 'new-rfq-supplier' %}" method="post">
+<form id="submit-rfq-supplier" action="{% url 'new-rfq-supplier' %}" method="post" autocomplete="off">
   <li class="list-group-item">
       {% csrf_token %}
       <div class="form-row">
@@ -17,9 +17,11 @@
         </div>
         <div class="form-group col-md-3">
           <label>Supplier Name</label>
-          <input list="browsers" class="form-control form-control-sm" required id="suppliers">
-            <datalist id="browsers">
-             <option value="Internet Explorer">
+          <input list="accounts" class="form-control form-control-sm" required id="suppliers">
+            <datalist id="accounts">
+              {% for value in all_accounts %}
+              <option value="{{value.account_title}}">{{value.account_title}}</option>
+              {% endfor %}
           </datalist>
         </div>
         <div class="form-group col-md-3">

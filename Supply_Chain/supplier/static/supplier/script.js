@@ -126,6 +126,7 @@ $(document).ready(function(){
 				e.preventDefault();
 				var table = $('#rfq-supplier-table');
 				var data = [];
+				var supplier = $('#suppliers').val();
 				var rfq_no = $('#rfq_no').val();
 				var attn = $('#attn').val();
 				var follow_up = $('#follow_up').val();
@@ -167,6 +168,7 @@ $(document).ready(function(){
 							type: 'POST',
 							url : '/supplier/rfq/new/',
 							data:{
+								'supplier': supplier,
 								'rfq_no': rfq_no,
 								'attn': attn,
 								'follow_up': follow_up,
@@ -281,7 +283,7 @@ $(document).ready(function(){
 						e.preventDefault();
 						var table = $('#edit-rfq-supplier-table');
 						var edit_rfq_supplier = $("#edit_rfq_supplier").val()
-						// var edit_rfq_supplier_name = $("#edit_rfq_supplier_name").val()
+						var edit_rfq_supplier_name = $("#edit_rfq_supplier_name").val()
 						var edit_rfq_attn = $("#edit_rfq_attn").val()
 						var edit_rfq_follow_up = $("#edit_rfq_follow_up").val()
 						var data = [];
@@ -322,7 +324,7 @@ $(document).ready(function(){
 									type: 'POST',
 									url : `/supplier/rfq/edit/${edit_id}`,
 									data:{
-										// 'edit_rfq_supplier':edit_rfq_supplier,
+										'edit_rfq_supplier_name' :edit_rfq_supplier_name,
 										'edit_rfq_attn':edit_rfq_attn,
 										'edit_rfq_follow_up':edit_rfq_follow_up,
 										'items': JSON.stringify(data),
@@ -446,6 +448,7 @@ $(document).ready(function(){
 					var table = $('#new-quotation-supplier-table');
 					var data = [];
 
+					var supplier = $('#suppliers').val();
 					var supplier = $('#quotation_supplier').val();
 					var attn = $('#quotation_supplier_attn').val();
 					var prcbasis = $('#quotation_supplier_prcbasis').val();
@@ -502,6 +505,7 @@ $(document).ready(function(){
 								type: 'POST',
 								url : '/supplier/quotation/new',
 								data:{
+									'supplier': supplier,
 									'attn': attn,
 									'prcbasis': prcbasis,
 									'leadtime': leadtime,
@@ -629,8 +633,8 @@ $(document).ready(function(){
 						var table = $('#edit-quotation-supplier-table');
 						var data = [];
 
+						var supplier = $('#quotation_supplier').val();
 						var attn = $('#edit_quotation_attn').val();
-						console.log(attn);
 						var prcbasis = $('#edit_quotation_prcbasis').val();
 						var leadtime = $('#edit_quotation_leadtime').val();
 						var validity = $('#edit_quotation_validity').val();
@@ -685,6 +689,7 @@ $(document).ready(function(){
 									type: 'POST',
 									url : `/supplier/quotation/edit/${edit_id}`,
 									data:{
+										'supplier': supplier,
 										'attn': attn,
 										'prcbasis': prcbasis,
 										'leadtime': leadtime,
@@ -814,7 +819,7 @@ $(document).ready(function(){
 				var table = $('#new-po-supplier-table');
 				var data = [];
 
-				// var supplier = $('#quotation_supplier').val();
+				var supplier = $('#po_supplier').val();
 				var attn = $('#po_supplier_attn').val();
 				var prcbasis = $('#po_supplier_prcbasis').val();
 				var leadtime = $('#po_supplier_leadtime').val();
@@ -870,6 +875,7 @@ $(document).ready(function(){
 							type: 'POST',
 							url : '/supplier/purchase_order/new',
 							data:{
+								'supplier': supplier,
 								'attn': attn,
 								'prcbasis': prcbasis,
 								'leadtime': leadtime,
@@ -996,6 +1002,7 @@ $(document).ready(function(){
 					var table = $('#edit-po-supplier-table');
 					var data = [];
 
+					var supplier = $('#edit_po_supplier').val();
 					var attn = $('#edit_po_attn').val();
 					var prcbasis = $('#edit_po_prcbasis').val();
 					var leadtime = $('#edit_po_leadtime').val();
@@ -1051,6 +1058,7 @@ $(document).ready(function(){
 								type: 'POST',
 								url : `/supplier/purchase_order/edit/${edit_id}`,
 								data:{
+									'supplier': supplier,
 									'attn': attn,
 									'prcbasis': prcbasis,
 									'leadtime': leadtime,
@@ -1180,6 +1188,8 @@ $(document).ready(function(){
 							var table = $('#new-dc-supplier-table');
 							var data = [];
 
+							var supplier = $('#dc_supplier').val()
+
 							table.find('tr').each(function (i, el){
 								if(i != 0)
 								{
@@ -1225,6 +1235,7 @@ $(document).ready(function(){
 										type: 'POST',
 										url : '/supplier/delivery_challan/new',
 										data:{
+											'supplier': supplier,
 											'items': JSON.stringify(data),
 										},
 										dataType: 'json'
@@ -1339,6 +1350,8 @@ $(document).ready(function(){
 						var table = $('#edit-dc-supplier-table');
 						var data = [];
 
+							var supplier = $('#edit_dc_supplier').val()
+
 						table.find('tr').each(function (i, el){
 							if(i != 0)
 							{
@@ -1384,7 +1397,7 @@ $(document).ready(function(){
 									type: 'POST',
 									url : `/supplier/delivery_challan/edit/${edit_id}`,
 									data:{
-
+										'supplier':supplier,
 										'items': JSON.stringify(data),
 									},
 									dataType: 'json'
@@ -1495,5 +1508,304 @@ $(document).ready(function(){
 							});
 
 //=======================================================================================
+
+					//ADD ITEM
+
+					$(".add-new-row").click(function(){
+						var type = $('#type').val();
+						var size = $('#size').val();
+						var product_name = $('#product_name').val();
+						var product_desc = $('#product_desc').val();
+						req =	$.ajax({
+							 headers: { "X-CSRFToken": getCookie("csrftoken") },
+							 type: 'POST',
+							 url : '/inventory/add_product/',
+							 data:{
+								 'type': type,
+								 'size': size,
+								 'product_name': product_name,
+								 'product_desc': product_desc,
+							 },
+							 dataType: 'json'
+						 })
+						 .done(function done(data){
+								 var index = $("table tbody tr:last-child").index();
+										 var row = '<tr>' +
+												 '<td>'+count+'</td>' +
+												 '<td>'+ data.product_name +'</td>' +
+												 '<td>'+data.product_desc+'</td>' +
+												 '<td><pre>'+data.type+'</pre></td>' +
+												 '<td>'+data.size+'</td>' +
+									 '<td><a class="add-item" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-item" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-item" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+										 '</tr>';
+									 $("table").append(row);
+								 $("table tbody tr").eq(index + 1).find(".add-item, .edit-item").toggle();
+										 $('[data-toggle="tooltip"]').tooltip();
+						 })
+					});
+
+
+					// Add row on add button click
+					$(document).on("click", ".add-item", function(){
+					var empty = false;
+					var input = $(this).parents("tr").find('input[type="text"]');
+							input.each(function(){
+						if(!$(this).val()){
+							$(this).addClass("error");
+							empty = true;
+						}
+						else{
+								$(this).removeClass("error");
+								}
+					});
+					$(this).parents("tr").find(".error").first().focus();
+					if(!empty){
+						input.each(function(){
+							$(this).parent("td").html($(this).val());
+						});
+						$(this).parents("tr").find(".add-item, .edit-item").toggle();
+						$(".add-new-row").removeAttr("disabled");
+					}
+					});
+
+
+					// Edit row on edit button click
+					$(document).on("click", ".edit-item", function(){
+							$(this).parents("tr").find("td:not(:last-child)").each(function(i){
+							$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
+					});
+					$(this).parents("tr").find(".add-item, .edit-item").toggle();
+					$(".add-new-row").attr("disabled", "disabled");
+					});
+
+					// Delete row on delete button click
+					$(document).on("click", ".delete-item", function(){
+						var row =  $(this).closest('tr');
+						var siblings = row.siblings();
+						siblings.each(function(index) {
+						$(this).children('td').first().text(index + 1);
+						});
+						$(this).parents("tr").remove();
+						$(".add-new-row").removeAttr("disabled");
+					});
+
+
+						//SUBMIT DC SUPPLIER
+
+						//inserting data into supplier dc using ajax request
+						$('#add-item-form').on('submit',function(e){
+							e.preventDefault();
+							var table = $('#add-item-table');
+							var data = [];
+
+							table.find('tr').each(function (i, el){
+								if(i != 0)
+								{
+									var $tds = $(this).find('td');
+									var row = {
+										'item_name' : "",
+										'item_desc' : "",
+										'type' : "",
+										'size' : "",
+									};
+									$tds.each(function(i, el){
+										if (i === 1) {
+												row["item_name"] = ($(this).text());
+										}
+										if (i === 2) {
+												row["item_desc"] = ($(this).text());
+										}
+										else if (i === 3) {
+												row["type"] = ($(this).text());
+										}
+										else if (i === 4) {
+												row["size"] = ($(this).text());
+										}
+									});
+									data.push(row);
+								}
+							});
+
+								 req =	$.ajax({
+										headers: { "X-CSRFToken": getCookie("csrftoken") },
+										type: 'POST',
+										url : '/inventory/add_product/',
+										data:{
+											'items': JSON.stringify(data),
+										},
+										dataType: 'json'
+									})
+									.done(function done(){
+										alert("Item Added");
+										location.reload();
+									})
+						});
+
+							// EDIT DC SUPPLIER
+
+							// edit data to rfq table from product
+								$(".edit-dc-supplier").click(function(){
+									var item_code = $('#edit_item_code').val();
+									req =	$.ajax({
+										 headers: { "X-CSRFToken": getCookie("csrftoken") },
+										 type: 'POST',
+										 url : `/supplier/delivery_challan/edit/${edit_id}`,
+										 data:{
+											 'item_code': item_code,
+										 },
+										 dataType: 'json'
+									 })
+									 .done(function done(data){
+										 if (data.row) {
+											 var type = JSON.parse(data.row);
+											 for (var i = 0; i < type.length; i++) {
+											 var index = $("table tbody tr:last-child").index();
+													 var row = '<tr>' +
+															 '<td><input type="text" readonly class="form-control" value='+count+'></td>' +
+															 '<td>'+ type[i].fields['product_code'] +'</td>' +
+															 '<td>'+ type[i].fields['product_name'] +'</td>' +
+															 '<td>'+ type[i].fields['product_desc'] +'</td>' +
+															 '<td><input type="text" class="form-control" required ></td>' +
+															 '<td><input type="text" class="form-control" required ></td>' +
+															 '<td><input type="text" class="form-control" required ></td>' +
+															 '<td><input type="text" class="form-control" required ></td>' +
+												 '<td><a class="add-dc-edit" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-dc-edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-dc-edit" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+													 '</tr>';
+													 count++;
+												 $("table").append(row);
+											 $("table tbody tr").eq(index + 1).find(".add-dc-edit, .edit-dc-edit").toggle();
+													 $('[data-toggle="tooltip"]').tooltip();
+												 }
+										 }
+										 else{
+											 alert(data.message)
+										 }
+									 });
+								});
+
+								// Add row on add button click
+								$(document).on("click", ".add-dc-edit", function(){
+								var empty = false;
+								var input = $(this).parents("tr").find('input[type="text"]');
+										input.each(function(){
+									if(!$(this).val()){
+										$(this).addClass("error");
+										empty = true;
+									}
+									else{
+											$(this).removeClass("error");
+											}
+								});
+								$(this).parents("tr").find(".error").first().focus();
+								if(!empty){
+									input.each(function(){
+										$(this).parent("td").html($(this).val());
+									});
+									$(this).parents("tr").find(".add-dc-edit, .edit-dc-edit").toggle();
+									$(".edit-dc-supplier").removeAttr("disabled");
+								}
+								});
+
+
+								// Edit row on edit button click
+								$(document).on("click", ".edit-dc-edit", function(){
+										$(this).parents("tr").find("td:not(:last-child)").each(function(i){
+											if (i === 4 ) {
+												$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
+											}
+											if (i === 5) {
+												$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
+											}
+											if (i === 6) {
+												$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
+											}
+											if (i === 7) {
+												$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
+											}
+								});
+								$(this).parents("tr").find(".add-dc-edit, .edit-dc-edit").toggle();
+								$(".edit-dc-supplier").attr("disabled", "disabled");
+								});
+
+								// Delete row on delete button click
+								$(document).on("click", ".delete-dc-edit", function(){
+									var row =  $(this).closest('tr');
+									var siblings = row.siblings();
+									siblings.each(function(index) {
+									$(this).children('td').first().text(index + 1);
+									});
+									$(this).parents("tr").remove();
+									$(".edit-dc-supplier").removeAttr("disabled");
+								});
+
+
+					//inserting data into supplier dc using ajax request
+					$('#edit-supplier-dc-submit').on('submit',function(e){
+						e.preventDefault();
+						var table = $('#edit-dc-supplier-table');
+						var data = [];
+
+							var supplier = $('#edit_dc_supplier').val()
+
+						table.find('tr').each(function (i, el){
+							if(i != 0)
+							{
+								var $tds = $(this).find('td');
+								var row = {
+									'item_code' : "",
+									'item_name' : "",
+									'item_description' : "",
+									'quantity' : "",
+									'unit' : "",
+									'unit_price': "",
+									'remarks':""
+								};
+								$tds.each(function(i, el){
+									if (i === 1) {
+											row["item_code"] = ($(this).text());
+									}
+									if (i === 2) {
+											row["item_name"] = ($(this).text());
+									}
+									else if (i === 3) {
+											row["item_description"] = ($(this).text());
+									}
+									else if (i === 4) {
+											row["quantity"] = ($(this).text());
+									}
+									else if (i === 5) {
+											row["unit"] = ($(this).text());
+									}
+									else if (i === 6) {
+											row["unit_price"] = ($(this).text());
+									}
+									else if (i === 7) {
+											row["remarks"] = ($(this).text());
+									}
+								});
+								data.push(row);
+							}
+						});
+
+							 req =	$.ajax({
+									headers: { "X-CSRFToken": getCookie("csrftoken") },
+									type: 'POST',
+									url : `/supplier/delivery_challan/edit/${edit_id}`,
+									data:{
+										'supplier':supplier,
+										'items': JSON.stringify(data),
+									},
+									dataType: 'json'
+								})
+								.done(function done(){
+									alert("Delivery Challan Updated");
+									location.href = `http://localhost:8000/supplier/delivery_challan/edit/${edit_id}`
+								})
+					});
+
+
+							// END EDIT DC SUPPLIER
+
+
 
 });
