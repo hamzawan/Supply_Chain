@@ -1,0 +1,152 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Chart Of Account</h4>
+</div>
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">
+    <form class="" action="{% url 'chart-of-account' %}" method="post" autocomplete="off">
+      {% csrf_token %}
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul id="tree1">
+                            <li><a href="#">Chart Of Account</a>
+                                <ul>
+                                    <li><a href="#">Asset</a>
+                                        <ul>
+                                            <li><a href="#">Accounts Receivable</a>
+                                                <ul>
+                                                  <li><a href="#">Customers</a>
+                                                    {% for accounts in customer_accounts %}
+                                                      <ul>
+                                                          <li>{{ accounts.account_title }}</li>
+                                                      </ul>
+                                                    {% endfor %}
+                                                  </li>
+                                                </ul>
+                                            </li>
+
+                                        </ul>
+                                    </li>
+                                    <li><a href="#">Liablities</a>
+                                        <ul>
+                                            <li><a href="#">Accounts Payable</a>
+                                                <ul>
+                                                  <li><a href="#">Suppliers</a>
+                                                    {% for accounts in supplier_accounts %}
+                                                      <ul>
+                                                          <li>{{ accounts.account_title }}</li>
+                                                      </ul>
+                                                    {% endfor %}
+                                                  </li>
+
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="#">Expenses</a>
+                                        <ul>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body">
+          <div class="float-right">
+            <form>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Account Title:</label>
+                <div class="col-sm-8">
+                  <input type="select" class="form-control form-control-sm" name="account_title" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Account Type:</label>
+                <div class="col-sm-8">
+                  <select class="form-control" name="account_type">
+                    <option value="1">Customer</option>
+                    <option value="2">Supplier</option>
+                    <option value="3">Expense</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label" >Opening Balance:</label>
+                <div class="col-sm-4">
+                  <input type="text" class="form-control form-control-sm" name="opening_balance" placeholder="">
+                </div>
+                <div class="col-md-4">
+                  <label><input type="radio" name="optradio" checked>Dr.</label>&nbsp;
+                  <label><input type="radio" name="optradio">Cr.</label>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Phone No:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="phone_no" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Email Address:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="email_address" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">NTN:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="ntn" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Address:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="address" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Remarks:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="remarks" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label"></label>
+                <div class="col-sm-8">
+                  <input type="submit" class="btn btn-outline-primary form-control" placeholder="" value="Create">
+                </div>
+              </div>
+            </form>
+              </div>
+              </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+    </div>
+    </form>
+  </li>
+  </ul>
+</div>
+
+
+
+{% endblock body %}

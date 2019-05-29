@@ -1,0 +1,46 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Purchases Return</h4>
+</div>
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">
+    <!-- <div class="form-row">
+      <input type="text" name=""class="form-control col-md-2" value="">
+    </div> -->
+    <br>
+    <div class="table table-responsive content-loader">
+      <table class="table table-bordered" id="dataTable">
+          <thead>
+              <tr>
+                  <th width="70px">S No.</th>
+                  <th width="170px">Purchase Return ID</th>
+                  <th >Date</th>
+                  <th >Supplier</th>
+                  <th >From</th>
+                  <th >Action</th>
+              </tr>
+          </thead>
+          <tbody>
+            {% for value in all_purchase_return reversed %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ value.purchase_no }}</td>
+                <td>{{ value.date }}</td>
+                <td>{{ value.account_id.account_title }}</td>
+                <td>user1</td>
+                <td><a class="edit_list" href="{% url 'edit-purchase-return' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a class="delete"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+    </div>
+  </li>
+</ul>
+</div>
+
+
+{% endblock body %}

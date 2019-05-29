@@ -1,0 +1,59 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% load supplier_extras %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Reports</h4>
+</div>
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col-md-3 col-sm-12 col-xs-12"><button type="button" class="btn btn-primary btn-block" name="button">Stock Ledger</button></div>
+      <div class="col-md-3 col-sm-12"><button type="button" class="btn btn-primary btn-block" name="button">Stock Position</button></div>
+      <div class="col-md-3 col-sm-12"><button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#accountLedgerModal" name="button">Account Ledger</button></div>
+      <div class="col-md-3 col-sm-12"><button type="button" class="btn btn-primary btn-block" name="button">Trial Balance</button></div>
+    </div>
+  </li>
+</ul>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="accountLedgerModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Account Ledger</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group col-md-12">
+            <label for="">From</label>
+            <input type="date" name="" class="col-md-4" value="">
+            <label for="">To</label>
+            <input type="date" name="" class="col-md-4" value="">
+          </div>
+          <div class="form-group col-md-12">
+            <label for="">Select Account</label>
+            <select class="form-control" name="">
+              {% for account in all_accounts %}
+              <option value="{{account.id}}">{{account.account_title}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Generate</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock body %}

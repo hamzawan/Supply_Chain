@@ -1,0 +1,68 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Quotation Supplier</h4>
+</div>
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">
+    <div class="input-group">
+      <input type="text" class="form-control col-md-4" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+      <div class="input-group-append">
+        <button class="btn btn-primary" type="button">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+      <div class="col-md-8">
+        <a role="button" href="{% url 'new-quotation-supplier' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
+      </div>
+    </div>
+    <br>
+    <div class="table table-responsive content-loader">
+      <table class="table table-bordered" id="dataTable">
+          <thead>
+              <tr>
+                  <th width="70px" >S NO.</th>
+                  <th >Quotation no</th>
+                  <th >Supplier</th>
+                  <th >Date</th>
+                  <th >From</th>
+                  <th >Currency Unit</th>
+                  <th >Exchange Rate</th>
+                  <th >Follow Up</th>
+                  <th >Notify Me</th>
+                  <th >Action</th>
+              </tr>
+          </thead>
+          <tbody>
+          {% for value in all_quotation reversed %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td> {{ value.quotation_no }} </td>
+                <td> {{ value.account_id.account_title }} </td>
+                <td> {{ value.date }} </td>
+                <td> User1  </td>
+                <td> {{ value.currency }} </td>
+                <td> {{ value.exchange_rate }} </td>
+                <td> {{ value.follow_up }} </td>
+                <td>
+                  {% if value.show_notification == True %}
+                    Yes
+                  {% else %}
+                    No
+                  {% endif %}
+                </td>
+                <td><a class="edit_list" href="{% url 'edit-quotation-supplier' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a class="delete-all"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+      </table>
+    </div>
+  </li>
+</ul>
+</div>
+
+
+{% endblock body %}

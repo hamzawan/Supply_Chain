@@ -1,0 +1,68 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Update MRN Supplier</h4>
+</div>
+<ul class="list-group list-group-flush">
+<form  action="" method="post" id="edit-mrn-supplier-submit">
+  {% csrf_token %}
+  <li class="list-group-item">
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label for="">DC No</label>
+          <input type="text" readonly class="form-control form-control-sm" value="{{dc_header.dc_no}}">
+        </div>
+        <div class="form-group col-md-2">
+          <label>Supplier Name</label>
+          <input list="browsers" readonly class="form-control form-control-sm" value="{{dc_header.account_id.account_title}}">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Follow Up</label>
+          <input type="date" class="form-control form-control-sm" value="{{dc_header.follow_up}}">
+        </div>
+      </div>
+  </li>
+  <li class="list-group-item">
+    <div class="table table-responsive">
+      <table class="table table-bordered" id="edit-mrn-supplier-table">
+          <thead>
+              <tr>
+                  <th width="70px">S No.</th>
+                  <th width="">Item Code</th>
+                  <th width="">Item Name</th>
+                  <th>Description</th>
+                  <th width="">Total Quantity</th>
+                  <th width="">Accepted Quantity</th>
+                  <th width="">Unit</th>
+                  <th>Action</th>
+              </tr>
+          </thead>
+          <tbody>
+            {% for value in dc_detail %}
+            <tr>
+              <td>{{forloop.counter}}</td>
+              <td>{{value.item_code}}</td>
+              <td>{{value.item_name}}</td>
+              <td>{{value.item_description}}</td>
+              <td>{{value.quantity}}</td>
+              <td>{{value.accepted_quantity}}</td>
+              <td>{{value.unit}}</td>
+              <td><a class="add-mrn" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-mrn" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+    </div>
+    <div class="text-center">
+      <button type="submit" class="btn btn-outline-primary has_id" id="{{pk}}" name="">Update <small>(MRN)</small></button>
+    </div>
+  </li>
+</form>
+</ul>
+</div>
+
+
+{% endblock body %}

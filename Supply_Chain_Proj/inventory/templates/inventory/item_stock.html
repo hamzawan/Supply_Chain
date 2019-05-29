@@ -1,0 +1,60 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Item Stock</h4>
+</div>
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">
+    <!-- <div class="form-row">
+      <input type="text" name=""class="form-control col-md-2" value="">
+    </div> -->
+    <div class="input-group">
+      <input type="text" class="form-control col-md-4" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+      <div class="input-group-append">
+        <button class="btn btn-primary" type="button">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+      <div class="col-md-8">
+        <!-- <a role="button" href="{% url 'new-item-stock' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New <small>(manually)</small> </a> -->
+      </div>
+    </div>
+    <br>
+    <div class="table table-responsive">
+
+    </div>
+    <table class="table table-bordered" id="dataTable">
+        <thead>
+            <tr>
+                <th width="80px">S NO.</th>
+                <th >Item Code</th>
+                <th>Item Name</th>
+                <th width="160px">Item Description</th>
+                <th width="160px">Inventory Stock</th>
+                <th width="160px">Unit</th>
+                <td>Action</td>
+            </tr>
+        </thead>
+        <tbody>
+          {% for value in row %}
+          <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ value.0 }}</td>
+              <td>{{ value.1 }}</td>
+              <td>{{ value.2 }}</td>
+              <td>{{ value.4 }}</td>
+              <td>{{ value.3 }}</td>
+  			      <td><a class="cart" href="#"><i class="fas fa-shopping-cart"></i></a><a class="delete_item_row" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+  </li>
+</ul>
+</div>
+
+
+{% endblock body %}

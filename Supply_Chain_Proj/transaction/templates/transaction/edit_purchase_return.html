@@ -1,0 +1,89 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% load supplier_extras %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Edit Purchase Return</h4>
+</div>
+<ul class="list-group list-group-flush">
+<form  action="" id="edit-purchase-return-submit" autocomplete="off" method="post">
+  {% csrf_token %}
+  <li class="list-group-item">
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label>Purchase Return Id</label>
+          <input class="form-control form-control-sm" required id="purchase_return_id" readonly value="{{purchase_header.purchase_no}}" >
+        </div>
+        <div class="form-group col-md-2">
+          <label>Supplier Name</label>
+          <input list="account"  class="form-control form-control-sm" required id="supplier_purchase_return_name" value="{{purchase_header.account_id.account_title}}" >
+          <datalist id="account">
+            {% for value in all_accounts %}
+            <option value="{{value.account_title}}">{{value.account_title}}</option>
+            {% endfor %}
+        </datalist>
+        </div>
+        <div class="form-group col-md-2">
+         <label for="sel1">Payment Term:</label>
+         <select class="form-control form-control-sm" id="payment_method">
+           <option selected>{{purchase_header.payment_method}}</option>
+           {% if purchase_header.payment_method == "Cash" %}
+              <option>Credit</option>
+           {% else %}
+              <option>Cash</option>
+           {% endif %}
+         </select>
+        </div>
+        <div class="form-group">
+          <label for="exampleFormControlTextarea2">Description</label>
+          <textarea class="form-control rounded-0" rows="3" id="desc_purchase_return">{{purchase_header.footer_description}}</textarea>
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item">
+      <div class="table table-responsive">
+        <table class="table table-bordered" id="new-purchase-return-table">
+            <thead>
+                <tr>
+                    <th width="40px" style="font-size:10px;">S No.</th>
+                    <th width="100px">Item Code</th>
+                    <th width="70px">Item Name</th>
+                    <th width="70px">Desc.</th>
+                    <th width="60px">Qty</th>
+                    <th width="60px">Unit</th>
+                    <th width="70px">Price</th>
+                    <th width="90px">Sales Tax in % </th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+              {% for value in purchase_detail %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ value.item_code }}</td>
+                <td>{{ value.item_name }}</td>
+                <td>{{ value.item_description }}</td>
+                <td>{{ value.quantity }}</td>
+                <td>{{ value.unit }}</td>
+                <td>{{ value.cost_price }}</td>
+                <td>{{ value.sales_tax }}</td>
+                <td><a class="add-purchase-return" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-purchase-return" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-purchase-return" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+        </table>
+      </div>
+    </li>
+      <br>
+    <div class="text-center">
+      <button type="submit" class="btn btn-outline-primary has_id" id="{{pk}}">Submit <small>(Purchase Return)</small></button>
+    </div>
+    <br>
+</form>
+</ul>
+</div>
+
+
+{% endblock body %}
