@@ -4,12 +4,15 @@ from .models import (RfqCustomerHeader, RfqCustomerDetail,
                     QuotationHeaderCustomer, QuotationDetailCustomer,
                     PoHeaderCustomer, PoDetailCustomer,
                     DcHeaderCustomer, DcDetailCustomer)
+from supplier.models import Company_info
 from inventory.models import Add_products
 from transaction.models import ChartOfAccount
 from django.core import serializers
 from django.forms.models import model_to_dict
 import json
 import datetime
+from supplier.utils import render_to_pdf
+from django.template.loader import get_template
 
 
 def rfq_customer(request):
@@ -190,6 +193,31 @@ def edit_quotation_customer(request,pk):
     return render(request,'customer/edit_quotation_customer.html',{'quotation_header':quotation_header,'pk':pk,'quotation_detail':quotation_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts})
 
 
+def print_quotation_customer(request,pk):
+    lines = 0
+    total_amount = 0
+    company_info = Company_info.objects.all()
+    image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+    header = QuotationHeaderCustomer.objects.filter(id = pk).first()
+    detail = QuotationDetailCustomer.objects.filter(quotation_id = pk).all()
+    for value in detail:
+        lines = lines + len(value.item_description.split('\n'))
+        amount = float(value.unit_price * value.quantity)
+        total_amount = total_amount + amount
+    print(total_amount)
+    lines = lines + len(detail) + len(detail)
+    total_lines = 36 - lines
+    pdf = render_to_pdf('customer/quotation_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount})
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "Quotation_Supplier_%s.pdf" %("123")
+        content = "inline; filename='%s'" %(filename)
+        response['Content-Disposition'] = content
+        return response
+    return HttpResponse("Not found")
+
+
+
 def purchase_order_customer(request):
     all_po = PoHeaderCustomer.objects.all()
     return render(request, 'customer/purchase_order_customer.html',{'all_po':all_po})
@@ -294,6 +322,29 @@ def edit_purchase_order_customer(request,pk):
         return JsonResponse({"result":"success"})
     return render(request,'customer/edit_purchase_order_customer.html',{'po_header':po_header,'pk':pk,'po_detail':po_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts})
 
+def print_po_customer(request,pk):
+    lines = 0
+    total_amount = 0
+    company_info = Company_info.objects.all()
+    image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+    header = PoHeaderCustomer.objects.filter(id = pk).first()
+    detail = PoDetailCustomer.objects.filter(po_id = pk).all()
+    for value in detail:
+        lines = lines + len(value.item_description.split('\n'))
+        amount = float(value.unit_price * value.quantity)
+        total_amount = total_amount + amount
+    print(total_amount)
+    lines = lines + len(detail) + len(detail)
+    total_lines = 36 - lines
+    pdf = render_to_pdf('customer/po_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount})
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "Quotation_Supplier_%s.pdf" %("123")
+        content = "inline; filename='%s'" %(filename)
+        response['Content-Disposition'] = content
+        return response
+    return HttpResponse("Not found")
+
 
 def delivery_challan_customer(request):
     all_dc = DcHeaderCustomer.objects.all()
@@ -364,6 +415,30 @@ def edit_delivery_challan_customer(request,pk):
             dc_detail_update.save()
         return JsonResponse({"result":"success"})
     return render(request,'customer/edit_delivery_challan_customer.html',{'dc_header':dc_header,'pk':pk,'dc_detail':dc_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts})
+
+
+def print_dc_customer(request,pk):
+    lines = 0
+    total_amount = 0
+    company_info = Company_info.objects.all()
+    image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+    header = DcHeaderCustomer.objects.filter(id = pk).first()
+    detail = DcDetailCustomer.objects.filter(dc_id = pk).all()
+    for value in detail:
+        lines = lines + len(value.item_description.split('\n'))
+        amount = float(value.unit_price * value.quantity)
+        total_amount = total_amount + amount
+    print(total_amount)
+    lines = lines + len(detail) + len(detail)
+    total_lines = 36 - lines
+    pdf = render_to_pdf('customer/dc_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount})
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "DC_Customer_%s.pdf" %(header.dc_no)
+        content = "inline; filename='%s'" %(filename)
+        response['Content-Disposition'] = content
+        return response
+    return HttpResponse("Not found")
 
 
 def mrn_customer(request):

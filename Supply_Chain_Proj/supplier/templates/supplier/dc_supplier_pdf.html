@@ -1,0 +1,118 @@
+{% load mathfilters %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{header.dc_no}}</title>
+        <style type="text/css">
+        @page {
+                  size: A4;
+                  margin: 6mm 10mm;
+              }
+          table > thead > tr > th {
+            text-align: center;
+            font-family: "Times New Roman", Times, serif;
+          }
+          table > thead > tr > td {
+            text-align: center;
+            font-family: "Times New Roman", Times, serif;
+          }
+          .no-bottom-border{
+              border-bottom:none;
+          }
+          .heading_row{
+            border:1px solid black;
+          }
+        </style>
+    </head>
+    <body>
+      <div id="#header_content">
+        <div>
+         <img style="width:150px; height:100px;" src="{{image.company_logo}}" align="right"/>
+         {% for value in company_info %}
+         <font size="25px" color="#0a012c" ><b>{{value.company_name}}</b></font><br>
+         <font size="11px" color="#0a012c" >33 Amina Mansion, Belasis Street,</font><br>
+         <font size="11px" color="#0a012c" >New Chali Karachi Pakistan</font><br>
+         <font size="11px" color="#0a012c" >{{ value.phone_no }}</font><br>
+         <font size="11px" color="#0a012c" >{{ value.mobile_no }}</font><br>
+         <font size="11px" color="#0a012c" >{{ value.email }}</font><br>
+         <font size="11px" color="#0a012c" >{{ value.website }}</font>
+         {% endfor %}
+       </div>
+       <br>
+       <br>
+       <font size="22px" color="#0a012c"><b>Delivery Challan</b></font>
+       <br>
+       <br>
+      </div>
+        <header>
+          <table style="border-bottom:1px solid black; border-spacing: 40px 10px;" cellpadding="3" bgcolor="#f7f7f7">
+          <thead>
+            <tr>
+              <th align="left" style="width: 130px;"><font size="14px" color="#0a012c">DC NO:</font></th>
+              <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.dc_no}}</font></td>
+              <th align="left" style="width: 130px;"><font size="14px" color="#0a012c">To:</font</th>
+              <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.account_title}}</font></td>
+            </tr>
+            <tr>
+              <th align="left"><font size="14px" color="#0a012c">Date:</font</th>
+              <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.date}}</font></td>
+          </thead>
+          </table>
+        </header>
+        <br>
+        <br>
+        <div class="body">
+          <table cellpadding="3" id="item_table" repeat="1">
+            <thead>
+              <tr class="heading_row">
+                <th align="center" style="width: 70px;"><font size="14px">S No.</font></th>
+                <th style="width:700px;"><font size="14px">Part Name & Description</font></th>
+                <th><font size="14px">Unit</font></th>
+                <th><font size="14px">Qty</font></th>
+              </tr>
+              <tr class="heading_row">
+                <th style="width: 70px;"></th>
+                <th style="width:400px;"></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for detail in detail %}
+              <tr>
+                <td style="padding:10px; width: 70px; text-align: center; border-left:1px solid black; border-right:1px solid black;"><font style="margin-top:-100px;">{{forloop.counter}}</font></td>
+                <td style="border-left:1px solid black; width:700px; border-right:1px solid black;"><font>{{detail.item_name}}<font>
+                    <pre style="padding:0px; margin-top:-100px;">{{detail.item_description}}</pre>
+                </td>
+                <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;">{{detail.unit}}</td>
+                <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;">{{detail.quantity}}</td>
+              </tr>
+              {% endfor %}
+              {% for i in i|rjust:total_lines %}
+              <tr style="height:10px;">
+                  <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
+                  <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
+                  <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
+                  <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
+              </tr>
+              {% endfor %}
+            <tr class="heading_row">
+              <td style="width: 70px;"></td>
+              <td style="width:700px;"></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        <br>
+    </div>
+      <div class="footer">
+        <div>
+          <pre>Lorem ipsum dolor sit amet
+Lorem ipsum dolor sit amet
+Lorem ipsum dolor sit amet
+          </pre>
+          <h1 style="text-align:right;">for {{image.company_name}}</h1>
+        </div>
+
+      </div>
+    </body>
+</html>

@@ -201,6 +201,30 @@ def edit_quotation_supplier(request,pk):
     return render(request,'supplier/edit_quotation_supplier.html',{'quotation_header':quotation_header,'pk':pk,'quotation_detail':quotation_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts})
 
 
+def print_quotation_supplier(request,pk):
+    lines = 0
+    total_amount = 0
+    company_info = Company_info.objects.all()
+    image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+    quotation_header = QuotationHeaderSupplier.objects.filter(id = pk).first()
+    quotation_detail = QuotationDetailSupplier.objects.filter(quotation_id = pk).all()
+    for value in quotation_detail:
+        lines = lines + len(value.item_description.split('\n'))
+        amount = float(value.unit_price * value.quantity)
+        total_amount = total_amount + amount
+    print(total_amount)
+    lines = lines + len(quotation_detail) + len(quotation_detail)
+    total_lines = 36 - lines
+    pdf = render_to_pdf('supplier/quotation_supplier_pdf.html', {'company_info':company_info,'image':image,'quotation_header':quotation_header, 'quotation_detail':quotation_detail,'total_lines':total_lines,'total_amount':total_amount})
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "Quotation_Supplier_%s.pdf" %("123")
+        content = "inline; filename='%s'" %(filename)
+        response['Content-Disposition'] = content
+        return response
+    return HttpResponse("Not found")
+
+
 def purchase_order_supplier(request):
     all_po = PoHeaderSupplier.objects.all()
     return render(request, 'supplier/purchase_order_supplier.html',{'all_po':all_po})
@@ -299,6 +323,29 @@ def edit_purchase_order_supplier(request,pk):
         return JsonResponse({"result":"success"})
     return render(request,'supplier/edit_purchase_order_supplier.html',{'po_header':po_header,'pk':pk,'po_detail':po_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts})
 
+def print_po_supplier(request,pk):
+    lines = 0
+    total_amount = 0
+    company_info = Company_info.objects.all()
+    image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+    header = PoHeaderSupplier.objects.filter(id = pk).first()
+    detail = PoDetailSupplier.objects.filter(po_id = pk).all()
+    for value in detail:
+        lines = lines + len(value.item_description.split('\n'))
+        amount = float(value.unit_price * value.quantity)
+        total_amount = total_amount + amount
+    print(total_amount)
+    lines = lines + len(detail) + len(detail)
+    total_lines = 40 - lines
+    pdf = render_to_pdf('supplier/po_supplier_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount})
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "Po_Supplier_%s.pdf" %(header.po_no)
+        content = "inline; filename='%s'" %(filename)
+        response['Content-Disposition'] = content
+        return response
+    return HttpResponse("Not found")
+
 
 def delivery_challan_supplier(request):
     all_dc = DcHeaderSupplier.objects.all()
@@ -368,6 +415,27 @@ def edit_delivery_challan_supplier(request,pk):
     return render(request,'supplier/edit_delivery_challan_supplier.html',{'dc_header':dc_header,'pk':pk,'dc_detail':dc_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts})
 
 
+def print_dc_supplier(request,pk):
+    lines = 0
+    company_info = Company_info.objects.all()
+    image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+    header = DcHeaderSupplier.objects.filter(id = pk).first()
+    detail = DcDetailSupplier.objects.filter(dc_id = pk).all()
+    for value in detail:
+        lines = lines + len(value.item_description.split('\n'))
+    lines = lines + len(detail) + len(detail)
+    total_lines = 40 - lines
+    pdf = render_to_pdf('supplier/dc_supplier_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines})
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "Po_Supplier_%s.pdf" %(header.dc_no)
+        content = "inline; filename='%s'" %(filename)
+        response['Content-Disposition'] = content
+        return response
+    return HttpResponse("Not found")
+
+
+
 def mrn_supplier(request):
     all_dc = DcHeaderSupplier.objects.all()
     return render(request, 'supplier/mrn_supplier.html',{'all_dc':all_dc})
@@ -383,17 +451,3 @@ def edit_mrn_supplier(request,pk):
             value.save()
         return JsonResponse({"result":"success"})
     return render(request, 'supplier/edit_mrn_supplier.html',{'dc_header':dc_header,'dc_detail':dc_detail,'pk':pk})
-
-
-class GeneratePdf(View):
-    def get(self, request, *args, **kwargs):
-        company_info = Company_info.objects.all()
-        image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
-        pdf = render_to_pdf('supplier/rfq_pdf.html', {'company_info':company_info,'image':image})
-        if pdf:
-            response = HttpResponse(pdf, content_type='application/pdf')
-            filename = "Rfq_Supplier_%s.pdf" %("123")
-            content = "inline; filename='%s'" %(filename)
-            response['Content-Disposition'] = content
-            return response
-        return HttpResponse("Not found")
