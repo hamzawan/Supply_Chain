@@ -44,14 +44,15 @@ def new_rfq_customer(request):
         print(customer)
         attn = request.POST.get('attn',False)
         follow_up = request.POST.get('follow_up',False)
+        footer_remarks = request.POST.get('footer_remarks',False)
         items = json.loads(request.POST.get('items'))
         account_id = ChartOfAccount.objects.get(account_title = customer)
         date = datetime.date.today()
-        rfq_header = RfqCustomerHeader(rfq_no = get_last_rfq_no, date = date , attn = attn, follow_up = follow_up, account_id = account_id)
+        rfq_header = RfqCustomerHeader(rfq_no = get_last_rfq_no, date = date , attn = attn, follow_up = follow_up, footer_remarks = footer_remarks ,account_id = account_id)
         rfq_header.save()
         header_id = RfqCustomerHeader.objects.get(rfq_no=get_last_rfq_no)
         for value in items:
-            rfq_detail = RfqCustomerDetail(item_name = value["item_name"], item_description = value["item_description"],
+            rfq_detail = RfqCustomerDetail(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"],
                                             quantity = value["quantity"], unit = value["unit"], rfq_id = header_id)
             rfq_detail.save()
         return JsonResponse({"result": "success"})
@@ -77,11 +78,13 @@ def edit_rfq_customer(request,pk):
             edit_rfq_customer = request.POST.get('customer',False)
             edit_rfq_attn = request.POST.get('edit_rfq_attn',False)
             edit_rfq_follow_up = request.POST.get('edit_rfq_follow_up',False)
+            footer_remarks = request.POST.get('footer_remarks')
             account_id = ChartOfAccount.objects.get(account_title = edit_rfq_customer)
 
             rfq_header.account_id = account_id
             rfq_header.attn = edit_rfq_attn
-            # rfq_header.follow_up = edit_rfq_follow_up
+            rfq_header.follow_up = edit_rfq_follow_up
+            rfq_header.footer_remarks = footer_remarks
             rfq_header.save();
             header_id = RfqCustomerHeader.objects.get(id = pk)
             items = json.loads(request.POST.get('items'))
@@ -127,11 +130,12 @@ def new_quotation_customer(request):
         currency = request.POST.get('currency',False)
         exchange_rate = request.POST.get('exchange_rate',False)
         follow_up = request.POST.get('follow_up',False)
+        footer_remarks = request.POST.get('footer_remarks',False)
         account_id = ChartOfAccount.objects.get(account_title = customer)
         date = datetime.date.today()
         quotation_header = QuotationHeaderCustomer(quotation_no = get_last_quotation_no, date = date, attn = attn, prc_basis = prcbasis,
                                                 leadtime = leadtime, validity = validity, payment = payment, remarks = remarks, currency = currency,
-                                                exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, account_id = account_id)
+                                                exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, footer_remarks = footer_remarks ,account_id = account_id)
         quotation_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = QuotationHeaderCustomer.objects.get(quotation_no = get_last_quotation_no)
@@ -168,6 +172,7 @@ def edit_quotation_customer(request,pk):
         edit_quotation_currency_rate = request.POST.get('currency',False)
         edit_quotation_exchange_rate = request.POST.get('exchange_rate',False)
         edit_quotation_follow_up = request.POST.get('follow_up',False)
+        footer_remarks = request.POST.get('footer_remarks',False)
 
         account_id = ChartOfAccount.objects.get(account_title = edit_quotation)
 
@@ -180,6 +185,8 @@ def edit_quotation_customer(request,pk):
         quotation_header.currency = edit_quotation_currency_rate
         quotation_header.exchange_rate = edit_quotation_exchange_rate
         quotation_header.account_id = account_id
+        quotation_header.follow_up = edit_quotation_follow_up
+        quotation_header.footer_remarks = footer_remarks
 
         quotation_header.save();
 
@@ -251,13 +258,13 @@ def new_purchase_order_customer(request):
         currency = request.POST.get('currency',False)
         exchange_rate = request.POST.get('exchange_rate',False)
         follow_up = request.POST.get('follow_up',False)
-
+        footer_remarks = request.POST.get('footer_remarks',False)
         account_id = ChartOfAccount.objects.get(account_title = customer)
 
         date = datetime.date.today()
         po_header = PoHeaderCustomer(po_no = get_last_po_no, date = date, attn = attn, prc_basis = prcbasis,
                                                 leadtime = leadtime, validity = validity, payment = payment, remarks = remarks, currency = currency,
-                                                exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, account_id = account_id)
+                                                exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, footer_remarks = footer_remarks ,account_id = account_id)
         po_header.save()
         items = json.loads(request.POST.get('items'))
         print(items)
@@ -298,6 +305,7 @@ def edit_purchase_order_customer(request,pk):
         edit_po_currency_rate = request.POST.get('currency',False)
         edit_po_exchange_rate = request.POST.get('exchange_rate',False)
         edit_po_follow_up = request.POST.get('follow_up',False)
+        footer_remarks = request.POST.get('footer_remarks',False)
 
         account_id = ChartOfAccount.objects.get(account_title = edit_po_customer)
 
@@ -310,6 +318,8 @@ def edit_purchase_order_customer(request,pk):
         po_header.currency = edit_po_currency_rate
         po_header.exchange_rate = edit_po_exchange_rate
         po_header.account_id = account_id
+        po_header.follow_up = edit_po_follow_up
+        po_header.footer_remarks = footer_remarks
 
         po_header.save();
 
@@ -371,10 +381,12 @@ def new_delivery_challan_customer(request):
         row = serializers.serialize('json',data)
         return HttpResponse(json.dumps({'row':row}))
     if request.method == 'POST':
-        dc_customer = request.POST.get('customer',False)
+        dc_customer = request.POST.get('customer', False)
+        follow_up = request.POST.get('follow_up', False)
+        footer_remarks = request.POST.get('footer_remarks', False)
         account_id = ChartOfAccount.objects.get(account_title = dc_customer)
         date = datetime.date.today()
-        dc_header = DcHeaderCustomer(dc_no = get_last_dc_no, date = date, account_id = account_id)
+        dc_header = DcHeaderCustomer(dc_no = get_last_dc_no, date = date, follow_up = follow_up, footer_remarks = footer_remarks ,account_id = account_id)
         dc_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = DcHeaderCustomer.objects.get(dc_no = get_last_dc_no)
@@ -403,10 +415,14 @@ def edit_delivery_challan_customer(request,pk):
         dc_detail.delete()
 
         edit_dc_customer =  request.POST.get('customer')
+        follow_up = request.POST.get('follow_up')
+        footer_remarks = request.POST.get('footer_remarks')
         account_id = ChartOfAccount.objects.get(account_title = edit_dc_customer)
         header_id = DcHeaderCustomer.objects.get(id = pk)
 
         dc_header.account_id = account_id
+        dc_header.follow_up = follow_up
+        dc_header.footer_remarks = footer_remarks
         dc_header.save()
 
         items = json.loads(request.POST.get('items'))
@@ -450,6 +466,9 @@ def edit_mrn_customer(request,pk):
     dc_header = DcHeaderCustomer.objects.filter(id=pk).first()
     dc_detail = DcDetailCustomer.objects.filter(dc_id=pk).all()
     if request.method == 'POST':
+        follow_up = request.POST.get('follow_up', False)
+        dc_header.follow_up = follow_up
+        dc_header.save()
         items = json.loads(request.POST.get('items'))
         for i,value in enumerate(dc_detail):
             value.accepted_quantity = items[i]["accepted_quantity"]

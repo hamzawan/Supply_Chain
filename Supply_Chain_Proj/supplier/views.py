@@ -47,11 +47,15 @@ def new_rfq_supplier(request):
         supplier = request.POST.get('supplier',False)
         attn = request.POST.get('attn',False)
         follow_up = request.POST.get('follow_up',False)
+        footer_remarks = request.POST.get('footer_remarks',False)
         items = json.loads(request.POST.get('items'))
-        account_id = ChartOfAccount.objects.get(account_title = supplier)
+        try:
+            account_id = ChartOfAccount.objects.get(account_title = supplier)
+        except ChartOfAccount.DoesNotExist:
+            return JsonResponse({"result":"No Account Found "+supplier+""})
         print(account_id.account_title)
         date = datetime.date.today()
-        rfq_header = RfqSupplierHeader(rfq_no = get_last_rfq_no, date = date , attn = attn, follow_up = follow_up, account_id = account_id)
+        rfq_header = RfqSupplierHeader(rfq_no = get_last_rfq_no, date = date , attn = attn, follow_up = follow_up, footer_remarks = footer_remarks ,account_id = account_id)
         rfq_header.save()
         header_id = RfqSupplierHeader.objects.get(rfq_no=get_last_rfq_no)
         for value in items:
@@ -82,10 +86,15 @@ def edit_rfq_supplier(request,pk):
             edit_rfq_supplier_name = request.POST.get('edit_rfq_supplier_name',False)
             edit_rfq_attn = request.POST.get('edit_rfq_attn',False)
             edit_rfq_follow_up = request.POST.get('edit_rfq_follow_up',False)
-            account_id = ChartOfAccount.objects.get(account_title = edit_rfq_supplier_name)
+            edit_footer_remarks = request.POST.get('edit_footer_remarks',False)
+            try:
+                account_id = ChartOfAccount.objects.get(account_title = edit_rfq_supplier_name)
+            except ChartOfAccount.DoesNotExist:
+                return JsonResponse({"result":"No Account Found "+edit_rfq_supplier_name+""})
             rfq_header.attn = edit_rfq_attn
             rfq_header.follow_up = edit_rfq_follow_up
             rfq_header.account_id = account_id
+            rfq_header.footer_remarks = edit_footer_remarks
             rfq_header.save();
             header_id = RfqSupplierHeader.objects.get(id = pk)
             items = json.loads(request.POST.get('items'))
@@ -133,11 +142,15 @@ def new_quotation_supplier(request):
         currency = request.POST.get('currency',False)
         exchange_rate = request.POST.get('exchange_rate',False)
         follow_up = request.POST.get('follow_up',False)
-        account_id = ChartOfAccount.objects.get(account_title = supplier)
+        footer_remarks = request.POST.get('footer_remarks',False)
+        try:
+            account_id = ChartOfAccount.objects.get(account_title = supplier)
+        except ChartOfAccount.DoesNotExist:
+            return JsonResponse({"result":"No Account Found "+supplier+""})
         date = datetime.date.today()
         quotation_header = QuotationHeaderSupplier(quotation_no = get_last_quotation_no, date = date, attn = attn, prc_basis = prcbasis,
                                                 leadtime = leadtime, validity = validity, payment = payment, remarks = remarks, currency = currency,
-                                                exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, account_id = account_id)
+                                                exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, footer_remarks = footer_remarks, account_id = account_id)
         quotation_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = QuotationHeaderSupplier.objects.get(quotation_no = get_last_quotation_no)
@@ -176,8 +189,13 @@ def edit_quotation_supplier(request,pk):
         edit_quotation_currency_rate = request.POST.get('currency',False)
         edit_quotation_exchange_rate = request.POST.get('exchange_rate',False)
         edit_quotation_follow_up = request.POST.get('follow_up',False)
+        edit_footer_remarks = request.POST.get('edit_footer_remarks',False)
 
-        account_id = ChartOfAccount.objects.get(account_title = edit_supplier)
+
+        try:
+            account_id = ChartOfAccount.objects.get(account_title = edit_supplier)
+        except ChartOfAccount.DoesNotExist:
+            return JsonResponse({"result":"No Account Found "+edit_supplier+""})
 
         quotation_header.attn = edit_quotation_attn
         quotation_header.prc_basis = edit_quotation_prcbasis
@@ -188,7 +206,8 @@ def edit_quotation_supplier(request,pk):
         quotation_header.currency = edit_quotation_currency_rate
         quotation_header.exchange_rate = edit_quotation_exchange_rate
         quotation_header.account_id = account_id
-
+        quotation_header.follow_up = edit_quotation_follow_up
+        quotation_header.footer_remarks = edit_footer_remarks
         quotation_header.save();
 
         header_id = QuotationHeaderSupplier.objects.get(id = pk)
@@ -206,16 +225,16 @@ def print_quotation_supplier(request,pk):
     total_amount = 0
     company_info = Company_info.objects.all()
     image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
-    quotation_header = QuotationHeaderSupplier.objects.filter(id = pk).first()
-    quotation_detail = QuotationDetailSupplier.objects.filter(quotation_id = pk).all()
-    for value in quotation_detail:
+    header = QuotationHeaderSupplier.objects.filter(id = pk).first()
+    detail = QuotationDetailSupplier.objects.filter(quotation_id = pk).all()
+    for value in detail:
         lines = lines + len(value.item_description.split('\n'))
         amount = float(value.unit_price * value.quantity)
         total_amount = total_amount + amount
     print(total_amount)
-    lines = lines + len(quotation_detail) + len(quotation_detail)
+    lines = lines + len(detail) + len(detail)
     total_lines = 36 - lines
-    pdf = render_to_pdf('supplier/quotation_supplier_pdf.html', {'company_info':company_info,'image':image,'quotation_header':quotation_header, 'quotation_detail':quotation_detail,'total_lines':total_lines,'total_amount':total_amount})
+    pdf = render_to_pdf('supplier/quotation_supplier_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "Quotation_Supplier_%s.pdf" %("123")
@@ -260,11 +279,15 @@ def new_purchase_order_supplier(request):
         currency = request.POST.get('currency',False)
         exchange_rate = request.POST.get('exchange_rate',False)
         follow_up = request.POST.get('follow_up',False)
-        account_id = ChartOfAccount.objects.get(account_title = supplier)
+        footer_remarks = request.POST.get('footer_remarks',False)
+        try:
+            account_id = ChartOfAccount.objects.get(account_title = supplier)
+        except ChartOfAccount.DoesNotExist:
+            return JsonResponse({"result":"No Account Found "+supplier+""})
         date = datetime.date.today()
         po_header = PoHeaderSupplier(po_no = get_last_po_no, date = date, attn = attn, prc_basis = prcbasis,
                                                 leadtime = leadtime, validity = validity, payment = payment, remarks = remarks, currency = currency,
-                                                exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, account_id = account_id)
+                                                exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, footer_remarks = footer_remarks ,account_id = account_id)
         po_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = PoHeaderSupplier.objects.get(po_no = get_last_po_no)
@@ -301,8 +324,12 @@ def edit_purchase_order_supplier(request,pk):
         edit_po_currency_rate = request.POST.get('currency',False)
         edit_po_exchange_rate = request.POST.get('exchange_rate',False)
         edit_po_follow_up = request.POST.get('follow_up',False)
+        edit_footer_remarks = request.POST.get('edit_footer_remarks',False)
 
-        account_id = ChartOfAccount.objects.get(account_title = edit_po_supplier)
+        try:
+            account_id = ChartOfAccount.objects.get(account_title = edit_po_supplier)
+        except ChartOfAccount.DoesNotExist:
+            return JsonResponse({"result":"No Account Found "+edit_po_supplier+""})
 
         po_header.attn = edit_po_attn
         po_header.prc_basis = edit_po_prcbasis
@@ -312,6 +339,8 @@ def edit_purchase_order_supplier(request,pk):
         po_header.remarks = edit_po_remarks
         po_header.currency = edit_po_currency_rate
         po_header.exchange_rate = edit_po_exchange_rate
+        po_header.footer_remarks = edit_footer_remarks
+        po_header.follow_up = edit_po_follow_up
         po_header.account_id = account_id
         po_header.save();
 
@@ -329,6 +358,7 @@ def print_po_supplier(request,pk):
     company_info = Company_info.objects.all()
     image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
     header = PoHeaderSupplier.objects.filter(id = pk).first()
+    print(header)
     detail = PoDetailSupplier.objects.filter(po_id = pk).all()
     for value in detail:
         lines = lines + len(value.item_description.split('\n'))
@@ -373,9 +403,13 @@ def new_delivery_challan_supplier(request):
         return HttpResponse(json.dumps({'row':row}))
     if request.method == 'POST':
         dc_supplier = request.POST.get('supplier')
-        account_id = ChartOfAccount.objects.get(account_title = dc_supplier)
+        footer_remarks = request.POST.get('footer_remarks')
+        try:
+            account_id = ChartOfAccount.objects.get(account_title = dc_supplier)
+        except ChartOfAccount.DoesNotExist:
+            return JsonResponse({"result":"No Account Found "+dc_supplier+""})
         date = datetime.date.today()
-        dc_header = DcHeaderSupplier(dc_no = get_last_dc_no, date = date, account_id = account_id)
+        dc_header = DcHeaderSupplier(dc_no = get_last_dc_no, date = date, footer_remarks = footer_remarks, account_id = account_id)
         dc_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = DcHeaderSupplier.objects.get(dc_no = get_last_dc_no)
@@ -403,8 +437,13 @@ def edit_delivery_challan_supplier(request,pk):
     if request.method == 'POST':
         dc_detail.delete()
         dc_supplier = request.POST.get('supplier')
-        account_id = ChartOfAccount.objects.get(account_title = dc_supplier)
+        edit_footer_remarks = request.POST.get('edit_footer_remarks')
+        try:
+            account_id = ChartOfAccount.objects.get(account_title = dc_supplier)
+        except ChartOfAccount.DoesNotExist:
+            return JsonResponse({"result":"No Account Found "+dc_supplier+""})
         dc_header.account_id = account_id
+        dc_header.footer_remarks = edit_footer_remarks
         dc_header.save()
         header_id = DcHeaderSupplier.objects.get(id = pk)
         items = json.loads(request.POST.get('items'))
@@ -445,6 +484,9 @@ def edit_mrn_supplier(request,pk):
     dc_header = DcHeaderSupplier.objects.filter(id=pk).first()
     dc_detail = DcDetailSupplier.objects.filter(dc_id=pk).all()
     if request.method == 'POST':
+        follow_up = request.POST.get('follow_up', False)
+        dc_header.follow_up = follow_up
+        dc_header.save()
         items = json.loads(request.POST.get('items'))
         for i,value in enumerate(dc_detail):
             value.accepted_quantity = items[i]["accepted_quantity"]

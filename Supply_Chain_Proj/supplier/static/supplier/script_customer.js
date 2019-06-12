@@ -129,6 +129,7 @@ $(document).ready(function(){
 				var customer = $('#customer_rfq').val();
 				var rfq_no = $('#rfq_no').val();
 				var attn = $('#attn').val();
+				var footer_remarks = $('#footer_remarks').val();
 				var follow_up = $('#follow_up').val();
 
 				table.find('tr').each(function (i, el){
@@ -171,6 +172,7 @@ $(document).ready(function(){
 								'customer': customer,
 								'rfq_no': rfq_no,
 								'attn': attn,
+								'footer_remarks': footer_remarks,
 								'follow_up': follow_up,
 								'items': JSON.stringify(data),
 							},
@@ -283,7 +285,7 @@ $(document).ready(function(){
 						e.preventDefault();
 						var table = $('#edit-rfq-customer-table');
 						var customer = $("#edit_rfq_customer").val()
-						// var edit_rfq_supplier_name = $("#edit_rfq_supplier_name").val()
+						var footer_remarks = $('#footer_remarks').val()
 						var edit_rfq_attn = $("#edit_rfq_attn").val()
 						var edit_rfq_follow_up = $("#edit_rfq_follow_up").val()
 						var data = [];
@@ -324,7 +326,7 @@ $(document).ready(function(){
 									type: 'POST',
 									url : `/customer/rfq/edit/${edit_id}`,
 									data:{
-										// 'edit_rfq_supplier':edit_rfq_supplier,
+										'footer_remarks': footer_remarks,
 										'customer': customer,
 										'edit_rfq_attn':edit_rfq_attn,
 										'edit_rfq_follow_up':edit_rfq_follow_up,
@@ -457,6 +459,7 @@ $(document).ready(function(){
 					var currency = $('#quotation_customer_currency').val();
 					var exchange_rate = $('#quotation_customer_exchange_rate').val();
 					var follow_up = $('#quotation_customer_follow_up').val();
+					var footer_remarks = $('#footer_remarks').val();
 
 					table.find('tr').each(function (i, el){
 						if(i != 0)
@@ -513,6 +516,7 @@ $(document).ready(function(){
 									'currency': currency,
 									'exchange_rate':exchange_rate,
 									'follow_up': follow_up,
+									'footer_remarks': footer_remarks,
 									'items': JSON.stringify(data),
 								},
 								dataType: 'json'
@@ -640,6 +644,7 @@ $(document).ready(function(){
 						var currency = $('#edit_quotation_currency_rate').val();
 						var exchange_rate = $('#edit_quotation_exchange_rate').val();
 						var follow_up = $('#edit_quotation_follow_up').val();
+						var footer_remarks = $('#footer_remarks').val();
 
 						table.find('tr').each(function (i, el){
 							if(i != 0)
@@ -696,6 +701,7 @@ $(document).ready(function(){
 										'currency': currency,
 										'exchange_rate':exchange_rate,
 										'follow_up': follow_up,
+										'footer_remarks': footer_remarks,
 										'items': JSON.stringify(data),
 									},
 									dataType: 'json'
@@ -825,6 +831,7 @@ $(document).ready(function(){
 	  		var currency = $('#po_customer_currency').val();
 	  		var exchange_rate = $('#po_customer_exchange_rate').val();
 	  		var follow_up = $('#po_customer_follow_up').val();
+				var footer_remarks = $('#footer_remarks').val();
 
 				table.find('tr').each(function (i, el){
 					if(i != 0)
@@ -881,6 +888,7 @@ $(document).ready(function(){
 								'currency': currency,
 								'exchange_rate':exchange_rate,
 								'follow_up': follow_up,
+								'footer_remarks': footer_remarks,
 								'items': JSON.stringify(data),
 							},
 							dataType: 'json'
@@ -1009,6 +1017,7 @@ $(document).ready(function(){
 					var currency = $('#edit_po_currency_rate').val();
 					var exchange_rate = $('#edit_po_exchange_rate').val();
 					var follow_up = $('#edit_po_follow_up').val();
+					var footer_remarks = $('#footer_remarks').val();
 
 					table.find('tr').each(function (i, el){
 						if(i != 0)
@@ -1065,6 +1074,7 @@ $(document).ready(function(){
 									'currency': currency,
 									'exchange_rate':exchange_rate,
 									'follow_up': follow_up,
+									'footer_remarks': footer_remarks,
 									'items': JSON.stringify(data),
 								},
 								dataType: 'json'
@@ -1186,6 +1196,8 @@ $(document).ready(function(){
 							var data = [];
 
 							var customer = $('#dc_customer').val();
+							var follow_up = $('#follow_up').val();
+							var footer_remarks = $('#footer_remarks').val();
 
 							table.find('tr').each(function (i, el){
 								if(i != 0)
@@ -1233,6 +1245,8 @@ $(document).ready(function(){
 										url : '/customer/delivery_challan/new',
 										data:{
 											'customer':customer,
+											'follow_up': follow_up,
+											'footer_remarks': footer_remarks,
 											'items': JSON.stringify(data),
 										},
 										dataType: 'json'
@@ -1243,9 +1257,8 @@ $(document).ready(function(){
 									})
 						});
 
-							// EDIT DC SUPPLIER
 
-							// edit data to rfq table from product
+
 								$(".edit-dc-customer").click(function(){
 									var item_code = $('#edit_item_code').val();
 									req =	$.ajax({
@@ -1310,7 +1323,7 @@ $(document).ready(function(){
 
 
 								// Edit row on edit button click
-								$(document).on("click", ".edit-dc-edit-customer", function(){
+								$(document).on("click", ".edit-dc-edit", function(){
 										$(this).parents("tr").find("td:not(:last-child)").each(function(i){
 											if (i === 4 ) {
 												$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
@@ -1325,8 +1338,8 @@ $(document).ready(function(){
 												$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
 											}
 								});
-								$(this).parents("tr").find(".add-dc-edit-customer, .edit-dc-edit-customer").toggle();
-								$(".edit-dc-customer").attr("disabled", "disabled");
+								$(this).parents("tr").find(".add-dc-edit, .edit-dc-edit").toggle();
+								$(".edit-dc-supplier").attr("disabled", "disabled");
 								});
 
 								// Delete row on delete button click
@@ -1346,6 +1359,8 @@ $(document).ready(function(){
 						e.preventDefault();
 						var table = $('#edit-dc-customer-table');
 						var customer = $('#edit_dc').val();
+						var follow_up = $('#follow_up').val()
+						var footer_remarks = $('#footer_remarks').val()
 						var data = [];
 
 						table.find('tr').each(function (i, el){
@@ -1394,6 +1409,8 @@ $(document).ready(function(){
 									url : `/customer/delivery_challan/edit/${edit_id}`,
 									data:{
 										'customer':customer,
+										'footer_remarks': footer_remarks,
+										'follow_up': follow_up,
 										'items': JSON.stringify(data),
 									},
 									dataType: 'json'
@@ -1449,6 +1466,7 @@ $(document).ready(function(){
 								console.log(edit_id);
 								e.preventDefault();
 								var table = $('#edit-mrn-customer-table');
+								var follow_up = $('#follow_up').val()
 								var data = [];
 								table.find('tr').each(function (i, el){
 									if(i != 0)
@@ -1492,6 +1510,7 @@ $(document).ready(function(){
 											type: 'POST',
 											url : `/customer/mrn/edit/${edit_id}`,
 											data:{
+												'follow_up': follow_up,
 												'items': JSON.stringify(data),
 											},
 											dataType: 'json'

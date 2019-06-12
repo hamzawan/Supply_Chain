@@ -1,11 +1,16 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from .models import PurchaseHeader, PurchaseDetail, SaleHeader, SaleDetail, ChartOfAccount, PurchaseReturnHeader, PurchaseReturnDetail, SaleReturnHeader, SaleReturnDetail, Transactions
+from .models import (PurchaseHeader, PurchaseDetail, SaleHeader, SaleDetail, ChartOfAccount,
+                    PurchaseReturnHeader, PurchaseReturnDetail, SaleReturnHeader, SaleReturnDetail,
+                    Transactions)
+from supplier.models import Company_info
 from inventory.models import Add_products
 from django.core import serializers
 from django.db.models import Q
 import json, datetime
-
+from supplier.utils import render_to_pdf
+from django.template.loader import get_template
+from django.db import connection
 
 
 def purchase(request):
@@ -64,7 +69,11 @@ def new_purchase(request):
         item_amount = item_amount + float(cartage_amount) + float(additional_tax)
         tax = ((item_amount * float(withholding_tax)) / 100)
         total_amount = tax + item_amount
-        # tran = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = )
+        header_id = header_id.id
+        total_amount = -abs(total_amount)
+        print(total_amount)
+        tran = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Invoice", amount = total_amount, date = date, remarks = "Amount Credit")
+        tran.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/new_purchase.html',{'all_item_code':all_item_code,'get_last_purchase_no':get_last_purchase_no, 'all_accounts':all_accounts})
 
@@ -116,6 +125,8 @@ def purchase_return_summary(request):
 
 
 def new_purchase_return(request,pk):
+    total_amount = 0
+    item_amount = 0
     get_last_purchase_no = PurchaseReturnHeader.objects.last()
     if get_last_purchase_no:
         get_last_purchase_no = get_last_purchase_no.purchase_no
@@ -140,6 +151,15 @@ def new_purchase_return(request,pk):
         for value in items:
             purchase_return_detail = PurchaseReturnDetail(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"],unit = value["unit"] ,cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], purchase_return_id = header_id)
             purchase_return_detail.save()
+            quantity = float(value["quantity"])
+            price =  float((value["price"]))
+            sales_tax = float(value["sales_tax"])
+            amount = (((quantity * price) * sales_tax) / 100)
+            amount = ((quantity * price ) + amount)
+            total_amount = item_amount + amount
+        header_id = header_id.id
+        tran = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Return", amount = total_amount, date = date, remarks = "Purchase return against "+purchase_header.purchase_no+" invoice")
+        tran.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/purchase_return.html',{'purchase_header':purchase_header, 'purchase_detail': purchase_detail,'pk':pk})
 
@@ -178,6 +198,8 @@ def sale(request):
 
 
 def new_sale(request):
+    item_amount = 0
+    total_amount = 0
     all_item_code = Add_products.objects.all()
     all_accounts = ChartOfAccount.objects.all()
     for value in all_item_code:
@@ -215,6 +237,18 @@ def new_sale(request):
         for value in items:
             sale_detail = SaleDetail(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"],unit = value["unit"], cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], sale_id = header_id)
             sale_detail.save()
+            quantity = float(value["quantity"])
+            price =  float((value["price"]))
+            sales_tax = float(value["sales_tax"])
+            amount = (((quantity * price) * sales_tax) / 100)
+            amount = ((quantity * price ) + amount)
+            item_amount = item_amount + amount
+        item_amount = item_amount + float(cartage_amount) + float(additional_tax)
+        tax = ((item_amount * float(withholding_tax)) / 100)
+        total_amount = tax + item_amount
+        header_id = header_id.id
+        tran = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+        tran.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/new_sales.html',{'all_item_code':all_item_code,'get_last_sale_no':get_last_sale_no, 'all_accounts':all_accounts})
 
@@ -267,6 +301,8 @@ def sale_return_summary(request):
 
 
 def new_sale_return(request,pk):
+    item_amount = 0
+    total_amount = 0
     get_last_sale_no = SaleReturnHeader.objects.last()
     if get_last_sale_no:
         get_last_sale_no = get_last_sale_no.sale_no
@@ -291,6 +327,16 @@ def new_sale_return(request,pk):
         for value in items:
             sale_return_detail = SaleReturnDetail(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"],unit = value["unit"], cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], sale_return_id = header_id)
             sale_return_detail.save()
+            quantity = float(value["quantity"])
+            price =  float((value["price"]))
+            sales_tax = float(value["sales_tax"])
+            amount = (((quantity * price) * sales_tax) / 100)
+            amount = ((quantity * price ) + amount)
+            total_amount = item_amount + amount
+        header_id = header_id.id
+        total_amount = -abs(total_amount)
+        tran = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Return", amount = total_amount, date = date, remarks = "Sale return against "+sale_header.sale_no+" invoice")
+        tran.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk})
 
@@ -334,8 +380,12 @@ def chart_of_account(request):
         ntn = request.POST.get('ntn')
         address = request.POST.get('address')
         remarks = request.POST.get('remarks')
+        op_type = request.POST.get('optradio')
+
         if opening_balance is "":
             opening_balance = 0
+        if op_type == "credit":
+            opening_balance = -abs(int(opening_balance))
         coa = ChartOfAccount(account_title = account_title, parent_id = account_type, opening_balance = opening_balance, phone_no = phone_no, email_address = email_address, ntn = ntn, Address = address, remarks = remarks)
         coa.save()
     customer_accounts = ChartOfAccount.objects.filter(parent_id = 1)
@@ -346,3 +396,82 @@ def chart_of_account(request):
 def reports(request):
     all_accounts = ChartOfAccount.objects.all()
     return render(request,'transaction/reports.html',{'all_accounts':all_accounts})
+
+def journal_voucher(request):
+    all_accounts = ChartOfAccount.objects.all()
+    return render(request, 'transaction/journal_voucher.html',{"all_accounts":all_accounts})
+
+
+
+
+
+def account_ledger(request):
+    if request.method == "POST":
+        debit_amount = 0
+        credit_amount = 0
+        pk = request.POST.get('account_title')
+        from_date = request.POST.get('from_date')
+        to_date = request.POST.get('to_date')
+        company_info = Company_info.objects.all()
+        image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+        cursor = connection.cursor()
+        cursor.execute('''Select tran_type,refrence_id,refrence_date,remarks,voucher_no,
+                        Case When amount > -1 Then  amount Else 0 End As Debit,
+                        Case When amount < -1 Then  amount Else 0 End As Credit
+                        From transaction_transactions
+                        Where transaction_transactions.date Between %s And %s and transaction_transactions.account_id_id = %s
+                        Order By refrence_date Asc
+                    ''',[from_date, to_date, pk])
+        row = cursor.fetchall()
+        for value in row:
+            print(value)
+        if row:
+            for v in row:
+                if v[5] >= 0:
+                    debit_amount = debit_amount + v[5]
+                if v[6] <= 0:
+                    credit_amount = credit_amount + v[6]
+        print(debit_amount)
+        print(credit_amount)
+        pdf = render_to_pdf('transaction/account_ledger_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount})
+        if pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            filename = "TrialBalance%s.pdf" %("000")
+            content = "inline; filename='%s'" %(filename)
+            response['Content-Disposition'] = content
+            return response
+        return HttpResponse("Not found")
+    return redirect('report')
+
+
+def trial_balance(request):
+    if request.method == "POST":
+        debit_amount = 0;
+        credit_amount = 0;
+        from_date = request.POST.get('from_date')
+        to_date = request.POST.get('to_date')
+        company_info = Company_info.objects.all()
+        image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+        cursor = connection.cursor()
+        cursor.execute('''Select id,account_title,ifnull(amount,0) + opening_balance As Amount
+                        from transaction_chartofaccount
+                        Left Join
+                        (select account_id_id,sum(AMount) As Amount from transaction_transactions
+                        Where transaction_transactions.date Between %s And %s
+                        Group By account_id_id) As tbltran On transaction_chartofaccount.id = tbltran.account_id_id
+                        ''',[from_date, to_date])
+        row = cursor.fetchall()
+        for v in row:
+            if v[2] >= 0:
+                debit_amount = debit_amount + v[2]
+            else:
+                credit_amount = credit_amount + v[2]
+        pdf = render_to_pdf('transaction/trial_balance_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount})
+        if pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            filename = "TrialBalance%s.pdf" %("000")
+            content = "inline; filename='%s'" %(filename)
+            response['Content-Disposition'] = content
+            return response
+        return HttpResponse("Not found")
+    return redirect('report')

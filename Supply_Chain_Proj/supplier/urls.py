@@ -26,6 +26,4 @@ urlpatterns = [
 
     path('mrn/', views.mrn_supplier, name = 'mrn-supplier'),
     path('mrn/edit/<pk>', views.edit_mrn_supplier, name = 'edit-mrn-supplier'),
-
-
 ]

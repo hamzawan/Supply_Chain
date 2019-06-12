@@ -8,6 +8,7 @@ class RfqSupplierHeader(models.Model):
     attn = models.CharField(max_length = 100)
     follow_up = models.DateField(blank = True)
     show_notification = models.BooleanField(default = True)
+    footer_remarks = models.TextField()
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 class RfqSupplierDetail(models.Model):
@@ -32,6 +33,7 @@ class QuotationHeaderSupplier(models.Model):
     exchange_rate = models.DecimalField(max_digits = 8, decimal_places = 2)
     follow_up = models.DateField(blank = True)
     show_notification = models.BooleanField(default = True)
+    footer_remarks = models.TextField()
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 class QuotationDetailSupplier(models.Model):
@@ -59,6 +61,7 @@ class PoHeaderSupplier(models.Model):
     exchange_rate = models.DecimalField(max_digits = 8, decimal_places = 2)
     follow_up = models.DateField(blank = True)
     show_notification = models.BooleanField(default = True)
+    footer_remarks = models.TextField()
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 
@@ -71,12 +74,15 @@ class PoDetailSupplier(models.Model):
     unit_price = models.DecimalField(max_digits = 8, decimal_places = 2)
     remarks = models.CharField(max_length = 100)
     quotation_no = models.CharField(max_length = 100)
+    footer_remarks = models.TextField()
     po_id = models.ForeignKey(PoHeaderSupplier, on_delete = models.CASCADE)
 
 
 class DcHeaderSupplier(models.Model):
     dc_no = models.CharField(max_length = 100)
     date = models.DateField(default = datetime.date.today)
+    footer_remarks = models.TextField()
+    follow_up = models.DateField(blank = True)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 class DcDetailSupplier(models.Model):

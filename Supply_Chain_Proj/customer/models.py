@@ -8,6 +8,7 @@ class RfqCustomerHeader(models.Model):
     attn = models.CharField(max_length = 100)
     follow_up = models.DateField(blank = True)
     show_notification = models.BooleanField(default = True)
+    footer_remarks = models.TextField()
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 class RfqCustomerDetail(models.Model):
@@ -32,6 +33,7 @@ class QuotationHeaderCustomer(models.Model):
     exchange_rate = models.DecimalField(max_digits = 8, decimal_places = 2)
     follow_up = models.DateField(blank = True)
     show_notification = models.BooleanField(default = True)
+    footer_remarks = models.TextField()
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 
@@ -60,6 +62,7 @@ class PoHeaderCustomer(models.Model):
     exchange_rate = models.DecimalField(max_digits = 8, decimal_places = 2)
     follow_up = models.DateField(blank = True)
     show_notification = models.BooleanField(default = True)
+    footer_remarks = models.TextField()
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 
@@ -78,6 +81,8 @@ class PoDetailCustomer(models.Model):
 class DcHeaderCustomer(models.Model):
     dc_no = models.CharField(max_length = 100)
     date = models.DateField(default = datetime.date.today)
+    footer_remarks = models.TextField()
+    follow_up = models.DateField(blank = True)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 class DcDetailCustomer(models.Model):

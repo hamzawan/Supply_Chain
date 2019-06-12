@@ -11,11 +11,11 @@
   {% csrf_token %}
   <li class="list-group-item">
       <div class="form-row">
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-2">
           <label for="">DC No</label>
           <input type="text" readonly class="form-control form-control-sm" value="{{get_last_dc_no}}" id="dc_no_supplier">
         </div>
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-2">
           <label>Customer Name</label>
           <input list="account" class="form-control form-control-sm" id="dc_customer">
           <datalist id="account">
@@ -23,6 +23,14 @@
             <option value="{{value.account_title}}" />
             {% endfor %}
           </datalist>
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Follow Up</label>
+          <input type="date" class="form-control form-control-sm"  id="follow_up">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Footer Remarks</label>
+          <textarea name="name" style="height:30px; width:370px;" id="footer_remarks"></textarea>
         </div>
       </div>
     </li>

@@ -11,11 +11,11 @@
   {% csrf_token %}
   <li class="list-group-item">
       <div class="form-row">
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-2">
           <label for="">DC No</label>
           <input type="text" readonly class="form-control form-control-sm" value="{{dc_header.dc_no}}">
         </div>
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-2">
           <label>Customer Name</label>
           <input list="account" class="form-control form-control-sm" value="{{dc_header.account_id.account_title}}" id="edit_dc">
           <datalist id="account">
@@ -24,9 +24,17 @@
             {% endfor %}
           </datalist>
         </div>
-        <div class="form-group col-md-3 ">
+        <div class="form-group col-md-2 ">
           <label for="">From</label>
-          <input type="text" class="form-control form-control-sm">
+          <input type="text" class="form-control form-control-sm" value="User1">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Follow Up</label>
+          <input type="date" class="form-control form-control-sm" value="{{dc_header.follow_up|date:'Y-m-d'}}"  id="follow_up">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Footer Remarks</label>
+          <textarea name="name" style="height:30px; width:370px;" id="footer_remarks">{{dc_header.footer_remarks}}</textarea>
         </div>
       </div>
   </li>

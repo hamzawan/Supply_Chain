@@ -1746,6 +1746,68 @@ display: none;
 
 /* ================================================================================================= */
 
+/* ================================================================================================= */
+
+#new-sale-table.table {
+    table-layout: fixed;
+}
+#new-sale-table.table tr th{
+    font-size: 10px;
+}
+#new-sale-table.table tr td{
+    font-size: 10px;
+}
+#new-sale-table.table tr th, #new-sale-table.table tr td {
+    border-color: #e9e9e9;
+}
+#new-sale-table.table th i {
+    font-size: 13px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+#new-sale-table.table th:last-child {
+    width: 100px;
+}
+#new-sale-table.table td a {
+cursor: pointer;
+    display: inline-block;
+    margin: 0 5px;
+min-width: 24px;
+}
+#new-sale-table.table td a.add-transaction-sale {
+    color: #27C46B;
+}
+#new-sale-table.table td a.edit-transaction-sale {
+    color: #FFC107;
+}
+#new-sale-table.table td a.delete-transaction-sale {
+    color: #E34724;
+}
+
+#new-sale-table.table td i {
+    font-size: 16px;
+}
+#new-sale-table.table td a.add-transaction-sale i {
+    font-size: 19px;
+  margin-right: -1px;
+    position: relative;
+    top: 3px;
+}
+#new-sale-table.table .form-control {
+    height: 32px;
+    line-height: 32px;
+    box-shadow: none;
+    border-radius: 2px;
+}
+#new-sale-table.table .form-control.error {
+border-color: #f50000;
+}
+#new-sale-table.table td .add-transaction-sale {
+display: none;
+}
+
+/* ================================================================================================= */
+
 .table-title .add-item-purchase-edit {
 float: right;
 height: 30px;

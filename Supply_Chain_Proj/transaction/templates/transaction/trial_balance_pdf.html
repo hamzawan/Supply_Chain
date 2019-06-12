@@ -1,0 +1,123 @@
+{% load mathfilters %}
+<html>
+<head>
+  <title>{{header.dc_no}}</title>
+<style>
+    @page {
+        size: a4 portrait;
+        @frame header_frame {           /* Static Frame */
+            -pdf-frame-content: header_content;
+            /* left: 30pt; width: 512pt; top: 20pt; height: 390pt; */
+        }
+        @frame content_frame {          /* Content Frame */
+            left: 30pt; width: 535pt; top: 10pt; height: 780pt;
+        }
+        @frame footer_frame {           /* Another static Frame */
+            -pdf-frame-content: footer_content;
+            left: 30pt; width: 535pt; top: 755pt; height: 120pt;
+        }
+    }
+    table > thead > tr > th {
+      text-align: center;
+      font-family: "Times New Roman", Times, serif;
+        }
+        table > thead > tr > td {
+          text-align: center;
+          font-family: "Times New Roman", Times, serif;
+        }
+        .no-bottom-border{
+            border-bottom:none;
+        }
+        .heading_row{
+          border:1px solid black;
+        }
+</style>
+</head>
+
+<body>
+    <!-- Content for Static Frame 'header_frame' -->
+    <div id="header_content">
+    </div>
+
+<!-- Content for Static Frame 'footer_frame' -->
+<div id="footer_content">
+  <div class="footer">
+     </div>
+  page <pdf:pagenumber> of <pdf:pagecount>
+  <p style="text-align:center;">Software Developed By TechFurq, 92 322 2832789, info@techfurq.com, www.techfurq.com</p>
+</div>
+
+    <!-- HTML Content -->
+
+  <br>
+  <br>
+  <div class="body">
+      <div>
+         <img style="width:150px; height:100px;" src="{{image.company_logo}}" align="right"/>
+         {% for value in company_info %}
+         <font size="25px" color="#0a012c" ><b>{{value.company_name}}</b></font></br>
+         <font size="11px" color="#0a012c" >33 Amina Mansion, Belasis Street,</font><br>
+         <font size="11px" color="#0a012c" >New Chali Karachi Pakistan</font><br>
+         <font size="11px" color="#0a012c" >{{ value.phone_no }}</font></br>
+         <font size="11px" color="#0a012c" >{{ value.mobile_no }}</font></br>
+         <font size="11px" color="#0a012c" >{{ value.email }}</font></br>
+         <font size="11px" color="#0a012c" >{{ value.website }}</font>
+         {% endfor %}
+     </div>
+     <br>
+     <br>
+     <font size="22px" color="#0a012c"><b>Trial Balance</b></font>
+     <br>
+     <header>
+       <table style="border-bottom:1px solid black; border-spacing: 40px 10px;" cellpadding="3" bgcolor="#f7f7f7">
+       </table>
+     </header>
+     <br>
+     <br>
+    <table cellpadding="3" id="item_table" repeat="1">
+      <thead>
+        <tr class="heading_row">
+          <th align="center" style="width: 150px;"><font size="14px">Acc Code.</font></th>
+          <th style="width:700px;"><font size="14px">Account Title</font></th>
+          <th style="width:200px;"><font size="14px">Debit</font></th>
+          <th style="width:200px;"><font size="14px">Credit</font></th>
+        </tr>
+      </thead>
+      <tbody>
+    {% for value in row %}
+      <tr class="heading_row">
+        <td style="width: 150px; height:30px;">{{value.0}}</td>
+        <td style="width: 700px;"><font size="12px">{{value.1}}</font></td>
+        <td style="width: 200px; text-align:center;">
+          <font size="12px">
+            {% if value.2 >= 0 %}
+            {{value.2|floatformat:2}}
+            {% else %}
+            0.00
+            {% endif %}
+        </font>
+        </td>
+        <td style="width: 200px; text-align:center;">
+          <font size="12px">
+            {% if value.2 <= 0 %}
+            {{value.2|abs|floatformat:2}}
+            {% else %}
+            0.00
+            {% endif %}
+          </font>
+        </td>
+    {% endfor %}
+  </tr>
+  <tr class="heading_row">
+    <td style="width: 150px; height:30px;"></td>
+    <td style="width:700px; text-align:center;" colspan="1"><font size="14px"> <b>Grand Total</b> </font></td>
+    <td style="text-align:center;"><font size="12px"><b>{{debit_amount|floatformat:2}}</b></font></td>
+    <td style="text-align:center;"><font size="12px"><b>{{credit_amount|abs|floatformat:2}}</b></font></td>
+  </tr>
+    </tbody>
+  </table>
+  <br>
+</div>
+
+</body>
+</html>

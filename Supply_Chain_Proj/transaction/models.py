@@ -88,7 +88,7 @@ class SaleReturnHeader(models.Model):
     cartage_amount = models.DecimalField(max_digits = 8, decimal_places = 2)
     additional_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
     withholding_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
-    account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
+    account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True)
 
 class SaleReturnDetail(models.Model):
     item_code = models.CharField(max_length = 100)
@@ -104,8 +104,10 @@ class SaleReturnDetail(models.Model):
 
 class Transactions(models.Model):
     refrence_id = models.IntegerField()
-    refrence_date = models.DateField(default = datetime.date.today)
-    account_id = models.IntegerField()
+    refrence_date = models.DateField(blank = True)
+    account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True)
     tran_type = models.CharField(max_length = 100)
     amount = models.DecimalField(max_digits = 8, decimal_places = 2)
     date = models.DateField(default = datetime.date.today)
+    voucher_no = models.CharField(max_length = 100)
+    remarks = models.CharField(max_length = 100)

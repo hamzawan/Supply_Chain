@@ -13,7 +13,7 @@ urlpatterns = [
 
     path('purchase_return_summary/', views.purchase_return_summary, name = 'purchase-return-summary'),
     path('purchase/return/<pk>', views.new_purchase_return, name = 'new-purchase-return'),
-    path('purchase/return/edit/<pk>', views.edit_purchase_return, name = 'edit-purchase-return'),
+    path('purchase/return/edit/<pk>/', views.edit_purchase_return, name = 'edit-purchase-return'),
 
 
 
@@ -25,5 +25,11 @@ urlpatterns = [
     path('sale_return_summary/', views.sale_return_summary, name = 'sale-return-summary'),
     path('sale/return/<pk>', views.new_sale_return, name = 'new-sale-return'),
     path('sale/return/edit/<pk>', views.edit_sale_return, name = 'edit-sale-return'),
+
+    path('journal_voucher/new', views.journal_voucher, name = 'journal-voucher'),
+    path('trial_balance/pdf', views.trial_balance, name = 'trial-balance'),
+    path('account_ledger/pdf/', views.account_ledger, name = 'account-ledger'),
+    path('trial_balance/pdf/', views.trial_balance, name = 'trial-balance'),
+
 
 ]

@@ -104,7 +104,7 @@ $(document).ready(function(){
 								quantity = $(this).text();
 								return quantity
 						}).closest("tr");
-
+						console.log(quantity);
 				var set_valueOfGoods = $($(this).parents("tr").find("#value_of_goods")).filter(function() {
 								value_of_goods =  quantity * price
 								$(this).text(value_of_goods.toFixed(2))
@@ -718,9 +718,9 @@ $('#edit-purchase-return-submit').on('submit',function(e){
 											 '<td>'+ type[0].fields['product_code'] +'</td>' +
 											 '<td>'+ type[0].fields['product_name'] +'</td>' +
 											 '<td id="desc" >'+ type[0].fields['product_desc'] +'</td>' +
-											 '<td id="quantity_edit" ><input type="text" class="form-control" value=""></td>' +
+											 '<td id="quantity" ><input type="text" class="form-control" value=""></td>' +
 											 '<td><input type="text" class="form-control" value=""></td>' +
-											 '<td id="price_edit" ><input type="text" class="form-control" value=""></td>' +
+											 '<td id="price" ><input type="text" class="form-control" value=""></td>' +
 											 '<td id="value_of_goods" >0.00</td>' +
 											 '<td id="sales_tax"><input type="text" class="form-control" value=""></td>' +
 											 '<td id="sales_tax_amount">0.00</td>' +
@@ -769,7 +769,7 @@ $('#edit-purchase-return-submit').on('submit',function(e){
 									return quantity
 							}).closest("tr");
 
-
+							console.log(quantity);
 					var set_valueOfGoods = $($(this).parents("tr").find("#value_of_goods")).filter(function() {
 									value_of_goods =  quantity * price
 									$(this).text(value_of_goods.toFixed(2))
@@ -801,7 +801,7 @@ $('#edit-purchase-return-submit').on('submit',function(e){
 									}
 						});
 
-						$('#new-purchase-table > tbody  > tr').each(function() {
+						$('#new-sale-table > tbody  > tr').each(function() {
 							 sum = sum + parseFloat($(this).find('td#total').text());
 						});
 
@@ -915,7 +915,7 @@ $('#edit-purchase-return-submit').on('submit',function(e){
 
 			$('#new-sale-submit').on('submit',function(e){
 				e.preventDefault();
-				var table = $('#new-purchase-table');
+				var table = $('#new-sale-table');
 				var data = [];
 				var sale_id = $('#sale_id').val();
 				var customer = $('#customer_name_sale').val();
@@ -1642,6 +1642,5 @@ $.fn.extend({
 //Initialization of treeviews
 
 $('#tree1').treed();
-
 
 });

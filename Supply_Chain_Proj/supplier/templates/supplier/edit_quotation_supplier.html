@@ -63,7 +63,13 @@
         </div>
         <div class="form-group col-md-2">
           <label for="">Follow Up</label>
-          <input type="date" class="form-control form-control-sm" value="{{quotation_header.follow_up}}" id="edit_quotation_follow_up">
+          <input type="date" class="form-control form-control-sm" value="{{quotation_header.follow_up|date:"Y-m-d"}}" id="edit_quotation_follow_up">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label for="">Footer Remarks</label>
+          <textarea name="name" style="height:30px; width:370px;" id="edit_footer_remarks">{{quotation_header.footer_remarks}}</textarea>
         </div>
       </div>
       </li>
