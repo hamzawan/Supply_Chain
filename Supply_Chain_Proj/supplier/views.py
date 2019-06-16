@@ -1,10 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from .models import (RfqSupplierHeader,RfqSupplierDetail,
                     QuotationHeaderSupplier, QuotationDetailSupplier,
                     PoHeaderSupplier, PoDetailSupplier,
                     DcHeaderSupplier, DcDetailSupplier,
                     Company_info)
+from customer.models import (DcHeaderCustomer, PoHeaderCustomer, QuotationHeaderCustomer, RfqCustomerHeader)
 from inventory.models import Add_products
 from transaction.models import ChartOfAccount
 from django.core import serializers
@@ -16,9 +17,49 @@ from django.conf import settings
 from django.views.generic import View
 from .utils import render_to_pdf
 from django.template.loader import get_template
+from django.db import connection
 
 def home(request):
-    return render(request,'supplier/index.html')
+    today = datetime.date.today()
+    cursor = connection.cursor()
+    cursor.execute('''select rfq_no , date, account_id_id
+                    from customer_rfqcustomerheader
+                    where customer_rfqcustomerheader.show_notification = 1 and customer_rfqcustomerheader.follow_up = %s
+                    union
+                    select quotation_no, date, account_id_id
+                    from customer_quotationheadercustomer
+                    where customer_quotationheadercustomer.show_notification = 1 and customer_quotationheadercustomer.follow_up = %s
+                    union
+                    select po_no, date, account_id_id
+                    from customer_poheadercustomer
+                    where customer_poheadercustomer.show_notification = 1 and customer_poheadercustomer.follow_up = %s
+                    union
+                    select dc_no, date, account_id_id
+                    from customer_dcheadercustomer
+                    where customer_dcheadercustomer.show_notification = 1 and customer_dcheadercustomer.follow_up = %s
+                    ''',[today,today,today,today])
+    customer_row = cursor.fetchall()
+    total_notification = len(customer_row)
+
+    supplier_row = cursor.execute('''select rfq_no , date, account_id_id
+                                from supplier_rfqsupplierheader
+                                where supplier_rfqsupplierheader.show_notification = 1 and supplier_rfqsupplierheader.follow_up = %s
+                                union
+                                select quotation_no, date, account_id_id
+                                from supplier_quotationheadersupplier
+                                where supplier_quotationheadersupplier.show_notification = 1 and supplier_quotationheadersupplier.follow_up = %s
+                                union
+                                select po_no, date, account_id_id
+                                from supplier_poheadersupplier
+                                where supplier_poheadersupplier.show_notification = 1 and supplier_poheadersupplier.follow_up = %s
+                                union
+                                select dc_no, date, account_id_id
+                                from supplier_dcheadersupplier
+                                where supplier_dcheadersupplier.show_notification = 1 and supplier_dcheadersupplier.follow_up = %s
+                                ''',[today,today,today,today])
+    supplier_row = supplier_row.fetchall()
+    total_notification_supplier = len(supplier_row)
+    return render(request,'supplier/index.html',{'total_notification':total_notification,'total_notification_supplier':total_notification_supplier ,'customer_row':customer_row, 'supplier_row':supplier_row})
 
 def rfq_supplier(request):
     all_rfq = RfqSupplierHeader.objects.all()
@@ -169,7 +210,6 @@ def edit_quotation_supplier(request,pk):
     print(quotation_detail)
     all_item_code = list(Add_products.objects.values('product_code'))
     item_code = request.POST.get('item_code',False)
-    print(item_code)
     if item_code:
         data = Add_products.objects.filter(product_code = item_code)
         item_code_exist = QuotationDetailSupplier.objects.filter(item_code = item_code, quotation_id = pk).first()
@@ -404,12 +444,13 @@ def new_delivery_challan_supplier(request):
     if request.method == 'POST':
         dc_supplier = request.POST.get('supplier')
         footer_remarks = request.POST.get('footer_remarks')
+        follow_up = request.POST.get('follow_up')
         try:
             account_id = ChartOfAccount.objects.get(account_title = dc_supplier)
         except ChartOfAccount.DoesNotExist:
             return JsonResponse({"result":"No Account Found "+dc_supplier+""})
         date = datetime.date.today()
-        dc_header = DcHeaderSupplier(dc_no = get_last_dc_no, date = date, footer_remarks = footer_remarks, account_id = account_id)
+        dc_header = DcHeaderSupplier(dc_no = get_last_dc_no, date = date, footer_remarks = footer_remarks, follow_up = follow_up ,account_id = account_id)
         dc_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = DcHeaderSupplier.objects.get(dc_no = get_last_dc_no)
@@ -437,12 +478,15 @@ def edit_delivery_challan_supplier(request,pk):
     if request.method == 'POST':
         dc_detail.delete()
         dc_supplier = request.POST.get('supplier')
+        follow_up = request.POST.get('follow_up')
         edit_footer_remarks = request.POST.get('edit_footer_remarks')
         try:
             account_id = ChartOfAccount.objects.get(account_title = dc_supplier)
         except ChartOfAccount.DoesNotExist:
             return JsonResponse({"result":"No Account Found "+dc_supplier+""})
+        print(edit_footer_remarks)
         dc_header.account_id = account_id
+        dc_header.follow_up = follow_up
         dc_header.footer_remarks = edit_footer_remarks
         dc_header.save()
         header_id = DcHeaderSupplier.objects.get(id = pk)
@@ -493,3 +537,142 @@ def edit_mrn_supplier(request,pk):
             value.save()
         return JsonResponse({"result":"success"})
     return render(request, 'supplier/edit_mrn_supplier.html',{'dc_header':dc_header,'dc_detail':dc_detail,'pk':pk})
+
+
+def show_notification(request):
+    eventId = request.POST.get('eventId', False)
+    if eventId:
+        if eventId[:2] == "DC":
+            account_info = DcHeaderCustomer.objects.filter(dc_no = eventId).first()
+            tran_no = account_info.dc_no
+            account_title = account_info.account_id.account_title
+            return JsonResponse({'account_title':account_title, 'tran_no': tran_no})
+        elif eventId[:2] == "PO":
+            account_info = PoHeaderCustomer.objects.filter(po_no = eventId).first()
+            tran_no = account_info.po_no
+            account_title = account_info.account_id.account_title
+            return JsonResponse({'account_title':account_title, 'tran_no': tran_no})
+        elif eventId[:2] == "QU":
+            account_info = QuotationHeaderCustomer.objects.filter(quotation_no = eventId).first()
+            tran_no = account_info.quotation_no
+            account_title = account_info.account_id.account_title
+            return JsonResponse({'account_title':account_title, 'tran_no': tran_no})
+        elif eventId[:2] == "RF":
+            account_info = RfqCustomerHeader.objects.filter(rfq_no = eventId).first()
+            tran_no = account_info.rfq_no
+            account_title = account_info.account_id.account_title
+            return JsonResponse({'account_title':account_title, 'tran_no': tran_no})
+    return render(request, 'supplier/index.html')
+
+def update_notification_customer(request):
+    if request.method == "POST":
+        postpone_customer = request.POST.get("postpone_customer",False)
+        turn_off = request.POST.get("turn_off",False)
+        if turn_off:
+            turn_off = turn_off
+        else:
+            turn_off = 1
+        if postpone_customer:
+            postpone_customer = postpone_customer
+        else:
+            postpone_customer = datetime.date.today()
+        print(postpone_customer)
+        tran_no = request.POST.get("tran_no", False)
+        if tran_no[:2] == "DC":
+            update_dc = DcHeaderCustomer.objects.filter(dc_no = tran_no).first()
+            update_dc.follow_up = postpone_customer
+            update_dc.show_notification = turn_off
+            update_dc.save()
+            return redirect('home')
+        elif tran_no[:2] == "PO":
+            update_po = PoHeaderCustomer.objects.filter(po_no = tran_no).first()
+            update_po.follow_up = postpone_customer
+            update_po.show_notification = turn_off
+            update_po.save()
+            return redirect('home')
+        elif tran_no[:2] == "QU":
+            update_qu = QuotationHeaderCustomer.objects.filter(quotation_no = tran_no).first()
+            update_qu.follow_up = postpone_customer
+            update_qu.show_notification = turn_off
+            update_qu.save()
+            return redirect('home')
+        elif tran_no[:2] == "RF":
+            update_rfq = RfqCustomerHeader.objects.filter(rfq_no = tran_no).first()
+            update_rfq.follow_up = postpone_customer
+            update_rfq.show_notification = turn_off
+            update_rfq.save()
+            return redirect('home')
+    return redirect('home')
+
+
+def show_notification_supplier(request):
+    eventId = request.POST.get('eventId', False)
+    if eventId:
+        if eventId[:2] == "DC":
+            account_info = DcHeaderSupplier.objects.filter(dc_no = eventId).first()
+            tran_no = account_info.dc_no
+            account_title = account_info.account_id.account_title
+            return JsonResponse({'account_title':account_title, 'tran_no': tran_no})
+        elif eventId[:2] == "PO":
+            account_info = PoHeaderSupplier.objects.filter(po_no = eventId).first()
+            tran_no = account_info.po_no
+            account_title = account_info.account_id.account_title
+            return JsonResponse({'account_title':account_title, 'tran_no': tran_no})
+        elif eventId[:2] == "QU":
+            account_info = QuotationHeaderSupplier.objects.filter(quotation_no = eventId).first()
+            tran_no = account_info.quotation_no
+            account_title = account_info.account_id.account_title
+            return JsonResponse({'account_title':account_title, 'tran_no': tran_no})
+        elif eventId[:2] == "RF":
+            account_info = RfqSupplierHeader.objects.filter(rfq_no = eventId).first()
+            tran_no = account_info.rfq_no
+            account_title = account_info.account_id.account_title
+            return JsonResponse({'account_title':account_title, 'tran_no': tran_no})
+    return render(request, 'supplier/index.html')
+
+def update_notification_supplier(request):
+    if request.method == "POST":
+        postpone_supplier = request.POST.get("postpone_supplier",False)
+        turn_off = request.POST.get("turn_off",False)
+        if turn_off:
+            turn_off = turn_off
+        else:
+            turn_off = 1
+        if postpone_supplier:
+            postpone_supplier = postpone_supplier
+        else:
+            postpone_supplier = datetime.date.today()
+        print(postpone_supplier)
+        tran_no = request.POST.get("tran_no", False)
+        print(tran_no)
+        if tran_no[:2] == "DC":
+            update_dc = DcHeaderSupplier.objects.filter(dc_no = tran_no).first()
+            update_dc.follow_up = postpone_supplier
+            update_dc.show_notification = turn_off
+            update_dc.save()
+            return redirect('home')
+        elif tran_no[:2] == "PO":
+            update_po = PoHeaderSupplier.objects.filter(po_no = tran_no).first()
+            update_po.follow_up = postpone_supplier
+            update_po.show_notification = turn_off
+            update_po.save()
+            return redirect('home')
+        elif tran_no[:2] == "QU":
+            update_qu = QuotationHeaderSupplier.objects.filter(quotation_no = tran_no).first()
+            update_qu.follow_up = postpone_supplier
+            update_qu.show_notification = turn_off
+            update_qu.save()
+            return redirect('home')
+        elif tran_no[:2] == "RF":
+            update_rfq = RfqSupplierHeader.objects.filter(rfq_no = tran_no).first()
+            update_rfq.follow_up = postpone_supplier
+            update_rfq.show_notification = turn_off
+            update_rfq.save()
+            return redirect('home')
+    return redirect('home')
+
+
+def journal_voucher(request):
+    account_title = request.POST.get('account_title', False)
+    print(account_title)
+    return render('transaction/journal_voucher.html')

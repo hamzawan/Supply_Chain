@@ -38,7 +38,7 @@ class QuotationHeaderCustomer(models.Model):
 
 
 class QuotationDetailCustomer(models.Model):
-    item_code = models.CharField(max_length = 100, unique = True)
+    item_code = models.CharField(max_length = 100)
     item_name = models.CharField(max_length = 100)
     item_description = models.TextField()
     quantity = models.IntegerField()
@@ -82,6 +82,7 @@ class DcHeaderCustomer(models.Model):
     dc_no = models.CharField(max_length = 100)
     date = models.DateField(default = datetime.date.today)
     footer_remarks = models.TextField()
+    show_notification = models.BooleanField(default = True)
     follow_up = models.DateField(blank = True)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 

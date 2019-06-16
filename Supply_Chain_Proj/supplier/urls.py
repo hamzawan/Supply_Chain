@@ -26,4 +26,10 @@ urlpatterns = [
 
     path('mrn/', views.mrn_supplier, name = 'mrn-supplier'),
     path('mrn/edit/<pk>', views.edit_mrn_supplier, name = 'edit-mrn-supplier'),
+
+    path('show_notification/', views.show_notification, name = 'show-notification'),
+    path('update_notification_customer/', views.update_notification_customer, name = 'update-notification-customer'),
+
+    path('show_notification_supplier/', views.show_notification_supplier, name = 'show-notification-supplier'),
+    path('update_notification_supplier/', views.update_notification_supplier, name = 'update-notification-supplier'),
 ]

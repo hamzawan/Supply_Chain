@@ -11,6 +11,7 @@ urlpatterns = [
     path('quotation/new', views.new_quotation_customer, name = 'new-quotation-customer'),
     path('quotation/edit/<pk>', views.edit_quotation_customer, name = 'edit-quotation-customer'),
     path('print_quotation_customer/<pk>', views.print_quotation_customer, name = 'print-quotation-customer'),
+    path('send_email/<pk>/<id>', views.send_email, name = 'send-email'),
 
     path('purchase_order/', views.purchase_order_customer, name = 'purchase-order-customer'),
     path('purchase_order/new', views.new_purchase_order_customer, name = 'new-purchase-order-customer'),
@@ -24,4 +25,5 @@ urlpatterns = [
 
     path('mrn/', views.mrn_customer, name = 'mrn-customer'),
     path('mrn/edit/<pk>', views.edit_mrn_customer, name = 'edit-mrn-customer'),
+
 ]

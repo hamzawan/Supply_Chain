@@ -7,29 +7,25 @@
   <h4>Journal Voucher</h4>
 </div>
 <ul class="list-group list-group-flush">
-<form  action="" id="new-sale-submit" autocomplete="off" method="post">
+<form  action="" id="new-jv-form" autocomplete="off"  method="post">
   {% csrf_token %}
   <li class="list-group-item">
       <div class="form-row">
         <div class="form-group col-md-2">
           <label for="">Transaction ID</label>
-          <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_sale_no }}" id="sale_id">
+          <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_tran_id }}" id="tran_id">
         </div>
         <div class="form-group col-md-2">
           <label for="">Document #</label>
-          <input type="text"  class="form-control form-control-sm" required value="" id="sale_id">
-        </div>
-        <div class="form-group col-md-2">
-          <label for="">Transaction Date</label>
-          <input type="date"  class="form-control form-control-sm" required value="" id="sale_id">
+          <input type="text"  class="form-control form-control-sm" required value="" id="doc_no">
         </div>
         <div class="form-group col-md-2">
           <label for="">Document Date</label>
-          <input type="date"  class="form-control form-control-sm" required value="" id="sale_id">
+          <input type="date"  class="form-control form-control-sm" required value="" id="doc_date">
         </div>
         <div class="form-group col-md-2">
           <label for="">Description</label>
-          <textarea name="name" style="width:370px; height:30px;"></textarea>
+          <textarea name="name" style="width:370px; height:30px;" id="description"></textarea>
         </div>
       </div>
       </li>
@@ -67,18 +63,18 @@
             {% endfor %}
           </datalist>
             <div style="margin-left:20px;">
-                <button type="button" class="btn btn-info add-item-sale"><i class="fa fa-plus"></i>Insert Account</button>
+                <button type="button" class="btn btn-info add-item-jv"><i class="fa fa-plus"></i>Insert Account</button>
             </div>
         </div>
     </div>
     <div class="table table-responsive">
-      <table class="table table-bordered" id="new-purchase-table">
+      <table class="table table-bordered" id="new-jv-table">
           <thead>
               <tr>
                   <th width="100px" style="font-size:10px;">Account Id</th>
                   <th width="300px">Account Title</th>
-                  <th width="100px">Receipt</th>
-                  <th width="100px">Payment</th>
+                  <th width="100px">Debit</th>
+                  <th width="100px">Credit</th>
                   <th>Action</th>
               </tr>
           </thead>

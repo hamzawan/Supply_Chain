@@ -29,6 +29,10 @@
           <input type="text" class="form-control form-control-sm" value="user1">
         </div>
         <div class="form-group col-md-2">
+          <label for="">Follow Up</label>
+          <input type="date" class="form-control form-control-sm" value="{{dc_header.follow_up|date:'Y-m-d'}}"  id="follow_up">
+        </div>
+        <div class="form-group col-md-2">
           <label for="">Footer Remarks</label>
           <textarea name="name" style="height:30px; width:370px;" id="edit_footer_remarks">{{dc_header.footer_remarks}}</textarea>
         </div>
@@ -39,7 +43,7 @@
     <div class="table-title">
         <div class="row">
           <div class="form-group col-md-3">
-            <input type="text" list="item" placeholder="Enter PO No here..." class="form-control form-control-sm" id="edit_item_code">
+            <input type="text" list="item" placeholder="Enter Item code here..." class="form-control form-control-sm" id="edit_item_code">
           </div>
           <datalist id="item">
             {% for value in all_item_code %}

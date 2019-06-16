@@ -3,7 +3,7 @@ body {
     background: #F5F7FA;
 font-family: 'Open Sans', sans-serif;
 }
-.table-wrapper {
+.table-wrapperss {
 width: 700px;
 margin: 30px auto;
     background: #fff;
@@ -19,7 +19,7 @@ margin: 30px auto;
     font-size: 22px;
 }
 .table-title .add-new-rfq {
-    float: right;
+float: right;
 height: 30px;
 font-weight: bold;
 font-size: 12px;
@@ -211,10 +211,10 @@ line-height: 13px;
 margin-right: 4px;
 }
 
-
+/*
 table.table {
-    table-layout: fixed;
-}
+    /*table-layout: fixed*/;
+} */
 table.table tr th, table.table tr td {
     border-color: #e9e9e9;
 }
@@ -307,7 +307,7 @@ table.table thead tr th{
 
 /* #tax_table{
   margin-left: 60%;
-} */
+}
 
 #t_table tr th {
   font-size:12px;
@@ -326,7 +326,7 @@ table.table thead tr th{
 /* ==================================================================================================== */
 
 
-.table-wrapper {
+.table-wrapperss {
   width: 700px;
   margin: 30px auto;
       background: #fff;
@@ -360,7 +360,7 @@ table.table td a.delete-rfq-supplier{
 }
 
 #edit-rfq-supplier-table.table {
-      table-layout: fixed;
+      /*table-layout: fixed*/;
   }
   #edit-rfq-supplier-table.table tr th, #edit-rfq-supplier-table.table tr td {
       border-color: #e9e9e9;
@@ -414,7 +414,7 @@ table.table td a.delete-rfq-supplier{
 /* ==================================================================================================== */
 
 
-.table-wrapper {
+.table-wrapperss {
   width: 700px;
   margin: 30px auto;
       background: #fff;
@@ -448,7 +448,7 @@ table.table td a.delete-rfq-supplier{
 }
 
 #new-quotation-supplier-table.table {
-      table-layout: fixed;
+      /*table-layout: fixed*/;
   }
   #new-quotation-supplier-table.table tr th, #new-quotation-supplier-table.table tr td {
       border-color: #e9e9e9;
@@ -499,10 +499,10 @@ table.table td a.delete-rfq-supplier{
   display: none;
 }
 
-/* ==================================================================================================== */
+/* ==================================================================================================== */ */
 
 
-.table-wrapper {
+.table-wrapperss {
   width: 700px;
   margin: 30px auto;
       background: #fff;
@@ -536,7 +536,7 @@ table.table td a.delete-quotation-supplier{
 }
 
 #edit-quotation-supplier-table.table {
-      table-layout: fixed;
+      /*table-layout: fixed*/;
   }
   #new-quotation-supplier-table.table tr th, #edit-quotation-supplier-table.table tr td {
       border-color: #e9e9e9;
@@ -590,7 +590,7 @@ table.table td a.delete-quotation-supplier{
 /* ==================================================================================================== */
 
 
-.table-wrapper {
+.table-wrapperss {
   width: 700px;
   margin: 30px auto;
       background: #fff;
@@ -624,7 +624,7 @@ table.table td a.delete-po-supplier{
 }
 
 #new-po-supplier-table.table {
-      table-layout: fixed;
+      /*table-layout: fixed*/;
   }
   #new-po-supplier-table.table tr th, #new-po-supplier-table.table tr td {
       border-color: #e9e9e9;
@@ -678,7 +678,7 @@ table.table td a.delete-po-supplier{
 /* ==================================================================================================== */
 
 
-.table-wrapper {
+.table-wrapperss {
   width: 700px;
   margin: 30px auto;
       background: #fff;
@@ -712,7 +712,7 @@ table.table td a.delete-po-supplier{
 }
 
 #edit-po-supplier-table.table {
-      table-layout: fixed;
+      /*table-layout: fixed*/;
   }
   #edit-po-supplier-table.table tr th, #edit-po-supplier-table.table tr td {
       border-color: #e9e9e9;
@@ -767,7 +767,7 @@ table.table td a.delete-po-supplier{
 /* ==================================================================================================== */
 
 
-.table-wrapper {
+.table-wrapperss {
   width: 700px;
   margin: 30px auto;
       background: #fff;
@@ -801,7 +801,7 @@ table.table td a.delete-po-supplier{
 }
 
 #new-dc-supplier-table.table {
-      table-layout: fixed;
+      /*table-layout: fixed*/;
   }
   #new-dc-supplier-table.table tr th, #new-dc-supplier-table.table tr td {
       border-color: #e9e9e9;
@@ -856,7 +856,7 @@ table.table td a.delete-po-supplier{
 /* ==================================================================================================== */
 
 
-.table-wrapper {
+.table-wrapperss {
   width: 700px;
   margin: 30px auto;
       background: #fff;
@@ -890,7 +890,7 @@ table.table td a.delete-po-supplier{
 }
 
 #edit-dc-supplier-table.table {
-      table-layout: fixed;
+      /*table-layout: fixed*/;
   }
   #edit-dc-supplier-table.table tr th, #edit-dc-supplier-table.table tr td {
       border-color: #e9e9e9;
@@ -944,7 +944,7 @@ table.table td a.delete-po-supplier{
 /* ==================================================================================================== */
 
 
-.table-wrapper {
+.table-wrapperss {
   width: 700px;
   margin: 30px auto;
       background: #fff;
@@ -978,7 +978,7 @@ table.table td a.delete-po-supplier{
 }
 
 #edit-mrn-supplier-table.table {
-      table-layout: fixed;
+      /*table-layout: fixed*/;
   }
   #edit-mrn-supplier-table.table tr th, #edit-mrn-supplier-table.table tr td {
       border-color: #e9e9e9;
@@ -1052,7 +1052,7 @@ table.table td a.delete-po-supplier{
 }
 
 #rfq-customer-table.table {
-      table-layout: fixed;
+      /*table-layout: fixed*/;
   }
 #rfq-customer-table.table tr th, #rfq-customer-table.table tr td {
     border-color: #e9e9e9;
@@ -1125,7 +1125,7 @@ color:#E34724;
 }
 
 #edit-rfq-customer-table.table {
-    table-layout: fixed;
+    /*table-layout: fixed*/;
 }
 #edit-rfq-customer-table.table tr th, #edit-rfq-customer-table.table tr td {
     border-color: #e9e9e9;
@@ -1198,7 +1198,7 @@ color:#E34724;
 }
 
 #new-quotation-customer-table.table {
-    table-layout: fixed;
+    /*table-layout: fixed*/;
 }
 #new-quotation-customer-table.table tr th, #new-quotation-customer-table.table tr td {
   border-color: #e9e9e9;
@@ -1271,7 +1271,7 @@ color:#E34724;
 }
 
 #edit-quotation-customer-table.table {
-    table-layout: fixed;
+    /*table-layout: fixed*/;
 }
 #edit-quotation-customer-table.table tr th, #edit-quotation-customer-table.table tr td {
     border-color: #e9e9e9;
@@ -1343,7 +1343,7 @@ color:#E34724;
 }
 
 #new-po-customer-table.table {
-    table-layout: fixed;
+    /*table-layout: fixed*/;
 }
 #new-po-customer-table.table tr th, #new-po-customer-table.table tr td {
   border-color: #e9e9e9;
@@ -1416,7 +1416,7 @@ color:#E34724;
 }
 
 #edit-po-customer-table.table {
-    table-layout: fixed;
+    /*table-layout: fixed*/;
 }
 #edit-po-customer-table.table tr th, #edit-po-customer-table.table tr td {
     border-color: #e9e9e9;
@@ -1488,7 +1488,7 @@ color:#E34724;
 }
 
 #new-dc-customer-table.table {
-    table-layout: fixed;
+    /*table-layout: fixed*/;
 }
 #new-dc-customer-table.table tr th, #new-dc-customer-table.table tr td {
   border-color: #e9e9e9;
@@ -1561,7 +1561,7 @@ color:#E34724;
 }
 
 #edit-dc-customer-table.table {
-    table-layout: fixed;
+    /*table-layout: fixed*/;
 }
 #edit-dc-customer-table.table tr th, #edit-dc-customer-table.table tr td {
     border-color: #e9e9e9;
@@ -1633,7 +1633,7 @@ color:#E34724;
 }
 
 #edit-mrn-customer-table.table {
-    table-layout: fixed;
+    /*table-layout: fixed*/;
 }
 #edit-mrn-customer-table.table tr th, #edit-mrn-customer-table.table tr td {
     border-color: #e9e9e9;
@@ -1687,7 +1687,7 @@ display: none;
 /* ================================================================================================= */
 
 #new-purchase-table.table {
-    table-layout: fixed;
+    /*table-layout: fixed*/;
 }
 #new-purchase-table.table tr th{
     font-size: 10px;
@@ -1749,7 +1749,7 @@ display: none;
 /* ================================================================================================= */
 
 #new-sale-table.table {
-    table-layout: fixed;
+    /*table-layout: fixed*/;
 }
 #new-sale-table.table tr th{
     font-size: 10px;
@@ -1823,7 +1823,7 @@ margin-right: 4px;
 }
 
 #edit-purchase-table.table {
-    table-layout: fixed;
+    /*table-layout: fixed*/;
 }
 #edit-purchase-table.table tr th{
     font-size: 10px;
@@ -1884,7 +1884,7 @@ display: none;
 
 
 #add-item-table.table {
-    table-layout: fixed;
+    /*table-layout: fixed*/;
 }
 #add-item-table.table tr th{
     font-size: 10px;
@@ -1949,7 +1949,7 @@ display: none;
 /* ================================================================================================= */
 
 #new-purchase-return-table.table {
-    table-layout: fixed;
+    /*table-layout: fixed*/;
 }
 #new-purchase-return-table.table tr th{
     font-size: 10px;
@@ -2009,7 +2009,7 @@ display: none;
 /* ================================================================================================= */
 
 #new-sale-return-table.table {
-    table-layout: fixed;
+    /*table-layout: fixed*/;
 }
 #new-sale-return-table.table tr th{
     font-size: 10px;
@@ -2083,7 +2083,7 @@ margin-right: 4px;
 }
 
 #edit-sale-table.table {
-    table-layout: fixed;
+    /*table-layout: fixed*/;
 }
 #edit-sale-table.table tr th{
     font-size: 10px;
@@ -2205,4 +2205,78 @@ display: none;
     margin:0px 0px 0px 0px;
     padding:0px 0px 0px 0px;
     outline: 0;
+}
+
+/* =============================================================================== */
+
+.table-title .add-item-jv {
+float: right;
+height: 30px;
+font-weight: bold;
+font-size: 12px;
+text-shadow: none;
+min-width: 100px;
+border-radius: 50px;
+line-height: 13px;
+}
+.table-title .add-item-jv i {
+margin-right: 4px;
+}
+
+#new-jv-table.table {
+    /*table-layout: fixed*/;
+}
+#new-jv-table.table tr th{
+    font-size: 10px;
+}
+#new-jv-table.table tr td{
+    font-size: 10px;
+}
+#new-jv-table.table tr th, #new-jv-table.table tr td {
+    border-color: #e9e9e9;
+}
+#new-jv-table.table th i {
+    font-size: 13px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+#new-jv-table.table th:last-child {
+    width: 100px;
+}
+#new-jv-table.table td a {
+cursor: pointer;
+    display: inline-block;
+    margin: 0 5px;
+min-width: 24px;
+}
+#new-jv-table.table td a.add-jv {
+    color: #27C46B;
+}
+#new-jv-table.table td a.edit-jv {
+    color: #FFC107;
+}
+#new-jv-table.table td a.delete-jv {
+    color: #E34724;
+}
+
+#new-jv-table.table td i {
+    font-size: 16px;
+}
+#new-jv-table.table td a.add-jv i {
+    font-size: 19px;
+  margin-right: -1px;
+    position: relative;
+    top: 3px;
+}
+#new-jv-table.table .form-control {
+    height: 32px;
+    line-height: 32px;
+    box-shadow: none;
+    border-radius: 2px;
+}
+#new-jv-table.table .form-control.error {
+border-color: #f50000;
+}
+#new-jv-table.table td .add-jv {
+display: none;
 }

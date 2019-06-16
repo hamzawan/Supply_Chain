@@ -48,13 +48,17 @@
                                                       </ul>
                                                     {% endfor %}
                                                   </li>
-
                                                 </ul>
                                             </li>
                                         </ul>
                                     </li>
                                     <li><a href="#">Expenses</a>
                                         <ul>
+                                            {% for accounts in expense_accounts %}
+                                              <ul>
+                                                  <li>{{ accounts.account_title }}</li>
+                                              </ul>
+                                            {% endfor %}
                                         </ul>
                                     </li>
                                 </ul>

@@ -390,7 +390,8 @@ def chart_of_account(request):
         coa.save()
     customer_accounts = ChartOfAccount.objects.filter(parent_id = 1)
     supplier_accounts = ChartOfAccount.objects.filter(parent_id = 2)
-    return render(request, 'transaction/chart_of_account.html',{'customer_accounts':customer_accounts, 'supplier_accounts':supplier_accounts})
+    expense_accounts = ChartOfAccount.objects.filter(parent_id = 3)
+    return render(request, 'transaction/chart_of_account.html',{'customer_accounts':customer_accounts, 'supplier_accounts':supplier_accounts,'expense_accounts':expense_accounts})
 
 
 def reports(request):
@@ -398,8 +399,48 @@ def reports(request):
     return render(request,'transaction/reports.html',{'all_accounts':all_accounts})
 
 def journal_voucher(request):
+    cursor = connection.cursor()
+    get_last_tran_id = cursor.execute('''select * from transaction_transactions where voucher_no LIKE 'JV%'
+                                    order by voucher_no DESC LIMIT 1 ''')
+    get_last_tran_id = get_last_tran_id.fetchall()
+
+    if get_last_tran_id:
+        get_last_tran_id = get_last_tran_id[0][7]
+        print(get_last_tran_id)
+        get_last_tran_id = get_last_tran_id[-3:]
+        print(get_last_tran_id)
+        num = int(get_last_tran_id)
+        num = num + 1
+        get_last_tran_id = 'JV' + str(num)
+    else:
+        get_last_tran_id = 'JV101'
+    print(get_last_tran_id)
+    account_title = request.POST.get('account_title',False)
     all_accounts = ChartOfAccount.objects.all()
-    return render(request, 'transaction/journal_voucher.html',{"all_accounts":all_accounts})
+    print(account_title)
+    if account_title:
+        account_info = ChartOfAccount.objects.filter(account_title = account_title).first()
+        print(account_info)
+        account_title = account_info.account_title
+        account_id = account_info.id
+        return JsonResponse({'account_title':account_title, 'account_id':account_id})
+    if request.method == "POST":
+        doc_no = request.POST.get('doc_no', False)
+        doc_date = request.POST.get('doc_date', False)
+        description = request.POST.get('description', False)
+        items = json.loads(request.POST.get('items', False))
+        for value in items:
+            account_id = ChartOfAccount.objects.get(account_title = value["account_title"])
+            if value["credit"] == "0.00":
+                tran = Transactions(refrence_id = doc_no, refrence_date = doc_date, tran_type = 'JV', amount = abs(float(value["debit"])),
+                                    date = datetime.date.today(), remarks = description, account_id = account_id, voucher_no = get_last_tran_id )
+                tran.save()
+            else:
+                tran = Transactions(refrence_id = doc_no, refrence_date = doc_date, tran_type = 'JV', amount = -abs(float(value["credit"])),
+                                    date = datetime.date.today(), remarks = description, account_id = account_id, voucher_no = get_last_tran_id )
+                tran.save()
+            return JsonResponse({"result":"success"})
+    return render(request, 'transaction/journal_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id})
 
 
 

@@ -1232,6 +1232,7 @@ $(document).ready(function(){
 							var data = [];
 
 							var supplier = $('#dc_supplier').val()
+							var follow_up = $('#follow_up').val()
 							var footer_remarks = $('#footer_remarks').val()
 
 							table.find('tr').each(function (i, el){
@@ -1281,6 +1282,7 @@ $(document).ready(function(){
 										data:{
 											'supplier': supplier,
 											'footer_remarks': footer_remarks,
+											'follow_up': follow_up,
 											'items': JSON.stringify(data),
 										},
 										dataType: 'json'
@@ -1640,7 +1642,9 @@ $(document).ready(function(){
 						var data = [];
 
 							var supplier = $('#edit_dc_supplier').val()
-
+							var edit_footer_remarks = $('#edit_footer_remarks').val()
+							var follow_up = $('#follow_up').val()
+							console.log(edit_footer_remarks);
 						table.find('tr').each(function (i, el){
 							if(i != 0)
 							{
@@ -1687,6 +1691,8 @@ $(document).ready(function(){
 									url : `/supplier/delivery_challan/edit/${edit_id}`,
 									data:{
 										'supplier':supplier,
+										'follow_up': follow_up,
+										'edit_footer_remarks': edit_footer_remarks,
 										'items': JSON.stringify(data),
 									},
 									dataType: 'json'

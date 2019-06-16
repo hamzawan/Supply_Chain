@@ -519,11 +519,19 @@ $(document).ready(function(){
 									'footer_remarks': footer_remarks,
 									'items': JSON.stringify(data),
 								},
-								dataType: 'json'
+								dataType: 'json',
 							})
-							.done(function done(){
+							.done(function done(data){
 								alert("Quotation Submitted");
-								location.reload();
+								var win = window.open(`/customer/print_quotation_customer/${data.last_id}`, '_blank');
+								if (win) {
+								    //Browser has allowed it to be opened
+								    win.focus();
+								} else {
+								    //Browser has blocked it
+								    alert('Please allow popups for this website');
+								}
+								window.location.href = 'http://localhost:8000/customer/send_email/140/2'; 
 							})
 				});
 
@@ -1522,4 +1530,48 @@ $(document).ready(function(){
 							});
 
 //=======================================================================================
+
+  $("#search").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#dataTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+
+	$(document).on("click", ".account_info", function (){
+     var eventId = $(this).data('id');
+			 req =	$.ajax({
+					headers: { "X-CSRFToken": getCookie("csrftoken") },
+					type: 'POST',
+					url : `/supplier/show_notification/`,
+					data:{
+						'eventId': eventId,
+					},
+					dataType: 'json'
+				})
+				.done(function done(data){
+					$('#account_title').html( data.account_title );
+					$('#tran_no').html( data.tran_no );
+					$('#tran_no_input').val( data.tran_no );
+				});
+		 });
+
+		 $(document).on("click", ".account_info_supplier", function (){
+	      var eventId = $(this).data('id');
+	 			 req =	$.ajax({
+	 					headers: { "X-CSRFToken": getCookie("csrftoken") },
+	 					type: 'POST',
+	 					url : `/supplier/show_notification_supplier/`,
+	 					data:{
+	 						'eventId': eventId,
+	 					},
+	 					dataType: 'json'
+	 				})
+	 				.done(function done(data){
+	 					$('#account_title_supplier').html( data.account_title );
+	 					$('#tran_no_supplier').html( data.tran_no );
+	 					$('#tran_no_input_supplier').val( data.tran_no );
+	 				});
+	 		 });
+
 });

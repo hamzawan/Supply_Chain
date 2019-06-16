@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from .models import (RfqCustomerHeader, RfqCustomerDetail,
                     QuotationHeaderCustomer, QuotationDetailCustomer,
@@ -13,6 +13,9 @@ import json
 import datetime
 from supplier.utils import render_to_pdf
 from django.template.loader import get_template
+from django.db import connection
+from django.core import mail
+from django.core.mail import EmailMessage
 
 
 def rfq_customer(request):
@@ -143,9 +146,18 @@ def new_quotation_customer(request):
             quotation_detail = QuotationDetailCustomer(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"],
                                             quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_id = header_id)
             quotation_detail.save()
-        return JsonResponse({'result':'success'})
+        last_id = QuotationHeaderCustomer.objects.last()
+        last_id = last_id.id
+        return JsonResponse({'result':'success',"last_id":last_id})
     return render(request, 'customer/new_quotation_customer.html',{'all_item_code':all_item_code,'get_last_quotation_no':get_last_quotation_no,'all_accounts':all_accounts})
 
+def send_email(request, pk,id):
+    print(id)
+    account_id = ChartOfAccount.objects.get(id = id)
+    msg = EmailMessage('Quotation', 'This is Quotation for Valve','ah.awan33@gmail.com',[account_id.email_address])
+    msg.attach_file('/Downloads/Quotation_Customer_QU_CU_150.pdf')
+    msg.send()
+    return redirect('new-quotation-customer')
 
 def edit_quotation_customer(request,pk):
     quotation_header = QuotationHeaderCustomer.objects.filter(id = pk).first()
@@ -217,7 +229,7 @@ def print_quotation_customer(request,pk):
     pdf = render_to_pdf('customer/quotation_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
-        filename = "Quotation_Supplier_%s.pdf" %("123")
+        filename = "Quotation_Customer_%s.pdf" %(header.quotation_no)
         content = "inline; filename='%s'" %(filename)
         response['Content-Disposition'] = content
         return response

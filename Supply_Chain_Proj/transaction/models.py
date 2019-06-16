@@ -103,7 +103,7 @@ class SaleReturnDetail(models.Model):
 
 
 class Transactions(models.Model):
-    refrence_id = models.IntegerField()
+    refrence_id = models.CharField(max_length = 100)
     refrence_date = models.DateField(blank = True)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True)
     tran_type = models.CharField(max_length = 100)
