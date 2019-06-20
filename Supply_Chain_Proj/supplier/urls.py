@@ -13,6 +13,7 @@ urlpatterns = [
     path('quotation/new', views.new_quotation_supplier, name = 'new-quotation-supplier'),
     path('quotation/edit/<pk>', views.edit_quotation_supplier, name = 'edit-quotation-supplier'),
     path('print_quotation_supplier/<pk>',views.print_quotation_supplier, name = 'print-quotation-supplier'),
+    path('quotation/export', views.quotation_export_supplier, name = 'export-supplier-quotation'),
 
     path('purchase_order/', views.purchase_order_supplier, name = 'purchase-order-supplier'),
     path('purchase_order/new', views.new_purchase_order_supplier, name = 'new-purchase-order-supplier'),

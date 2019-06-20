@@ -18,52 +18,64 @@
               <div class="card-body">
                 <div class="row">
                     <div class="col-md-12">
+
+
+
+
                         <ul id="tree1">
                             <li><a href="#">Chart Of Account</a>
                                 <ul>
-                                    <li><a href="#">Asset</a>
+                                {% for v in all_accounts_null %}
+                                    <li><a href="#">{{v.account_title}}</a>
+                                      {% for a in all_accounts  %}
+                                        {% if v.id == a.parent_id %}
                                         <ul>
-                                            <li><a href="#">Accounts Receivable</a>
+                                            <li><a href="#">{{a.account_title}}</a>
                                                 <ul>
-                                                  <li><a href="#">Customers</a>
-                                                    {% for accounts in customer_accounts %}
-                                                      <ul>
-                                                          <li>{{ accounts.account_title }}</li>
-                                                      </ul>
-                                                    {% endfor %}
+                                                  {% for b in all_accounts %}
+                                                  {% if a.id == b.parent_id %}
+                                                  <li><a href="#">{{b.account_title}}</a>
+                                                    <ul>
+                                                      {% for c in all_accounts %}
+                                                      {% if b.id == c.parent_id %}
+                                                      <li><a href="#">{{c.account_title}}</a>
+                                                        <ul>
+                                                          {% for d in all_accounts %}
+                                                          {% if c.id == d.parent_id %}
+                                                          <li><a href="#">{{d.account_title}}</a>
+                                                            <ul>
+                                                              {% for e in all_accounts %}
+                                                              {% if d.id == e.parent_id %}
+                                                              <li><a href="#">{{e.account_title}}</a>
+                                                              </li>
+                                                              {% endif %}
+                                                              {% endfor %}
+                                                            </ul>
+                                                          </li>
+                                                          {% endif %}
+                                                          {% endfor %}
+                                                        </ul>
+                                                      </li>
+                                                      {% endif %}
+                                                      {% endfor %}
+                                                    </ul>
                                                   </li>
+                                                  {% endif %}
+                                                  {% endfor %}
                                                 </ul>
                                             </li>
-
                                         </ul>
+                                        {% endif %}
+                                      {% endfor %}
                                     </li>
-                                    <li><a href="#">Liablities</a>
-                                        <ul>
-                                            <li><a href="#">Accounts Payable</a>
-                                                <ul>
-                                                  <li><a href="#">Suppliers</a>
-                                                    {% for accounts in supplier_accounts %}
-                                                      <ul>
-                                                          <li>{{ accounts.account_title }}</li>
-                                                      </ul>
-                                                    {% endfor %}
-                                                  </li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li><a href="#">Expenses</a>
-                                        <ul>
-                                            {% for accounts in expense_accounts %}
-                                              <ul>
-                                                  <li>{{ accounts.account_title }}</li>
-                                              </ul>
-                                            {% endfor %}
-                                        </ul>
-                                    </li>
+                                  {% endfor %}
                                 </ul>
                             </li>
                         </ul>
+
+
+
+
                     </div>
                   </div>
                 </div>
@@ -85,9 +97,9 @@
                 <label for="" class="col-sm-4 form-control-sm col-form-label">Account Type:</label>
                 <div class="col-sm-8">
                   <select class="form-control" name="account_type">
-                    <option value="1">Customer</option>
-                    <option value="2">Supplier</option>
-                    <option value="3">Expense</option>
+                  {% for account in all_accounts %}
+                    <option value="{{account.id}}">{{account.account_title}}</option>
+                  {% endfor %}
                   </select>
                 </div>
               </div>

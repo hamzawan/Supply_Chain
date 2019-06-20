@@ -18,6 +18,8 @@ from django.views.generic import View
 from .utils import render_to_pdf
 from django.template.loader import get_template
 from django.db import connection
+import xlwt
+from django.contrib.auth.models import User
 
 def home(request):
     today = datetime.date.today()
@@ -283,6 +285,37 @@ def print_quotation_supplier(request,pk):
         return response
     return HttpResponse("Not found")
 
+
+def quotation_export_supplier(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="QuotationSupplier.xls"'
+
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Users')
+
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    columns = ['Quotation No', 'Date','Attn' ,'Prc Basis', 'Lead Time', 'Validity', 'Payment', 'Remarks', 'Curreny', 'Exchange Rate', 'Follow Up', 'Footer Remarks']
+
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+
+    rows = QuotationHeaderSupplier.objects.all().values_list('quotation_no', 'date', 'attn', 'prc_basis', 'leadtime', 'validity', 'payment', 'remarks', 'currency', 'exchange_rate', 'follow_up', 'footer_remarks')
+    for row in rows:
+        row_num += 1
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, row[col_num], font_style)
+
+    wb.save(response)
+    return response
 
 def purchase_order_supplier(request):
     all_po = PoHeaderSupplier.objects.all()

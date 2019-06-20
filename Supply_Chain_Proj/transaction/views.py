@@ -371,6 +371,8 @@ def edit_sale_return(request,pk):
 
 
 def chart_of_account(request):
+    all_accounts_null = ChartOfAccount.objects.filter(parent_id = 0).all()
+    all_accounts = ChartOfAccount.objects.all()
     if request.method == 'POST':
         account_title = request.POST.get('account_title')
         account_type = request.POST.get('account_type')
@@ -388,10 +390,7 @@ def chart_of_account(request):
             opening_balance = -abs(int(opening_balance))
         coa = ChartOfAccount(account_title = account_title, parent_id = account_type, opening_balance = opening_balance, phone_no = phone_no, email_address = email_address, ntn = ntn, Address = address, remarks = remarks)
         coa.save()
-    customer_accounts = ChartOfAccount.objects.filter(parent_id = 1)
-    supplier_accounts = ChartOfAccount.objects.filter(parent_id = 2)
-    expense_accounts = ChartOfAccount.objects.filter(parent_id = 3)
-    return render(request, 'transaction/chart_of_account.html',{'customer_accounts':customer_accounts, 'supplier_accounts':supplier_accounts,'expense_accounts':expense_accounts})
+    return render(request, 'transaction/chart_of_account.html',{'all_accounts':all_accounts,'all_accounts_null':all_accounts_null})
 
 
 def reports(request):
