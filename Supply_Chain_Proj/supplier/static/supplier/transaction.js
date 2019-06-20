@@ -1235,8 +1235,8 @@ $(".add-item-sale-edit").click(function(){
 		 total_amount = (type[0].fields['unit_price'] * type[0].fields['quantity']);
 				 var row = '<tr>' +
 						 '<td>'+count+'</td>' +
-						 '<td>'+ type[0].fields['product_code'] +'</td>' +
-						 '<td>'+ type[0].fields['product_name'] +'</td>' +
+						 '<td>'+type[0].fields['product_code']+'</td>' +
+						 '<td>'+type[0].fields['product_name']+'</td>' +
 						 '<td id="desc" >'+ type[0].fields['product_desc'] +'</td>' +
 						 '<td id="quantity_edit" ><input type="text" class="form-control" value=""></td>' +
 						 '<td><input type="text" class="form-control" value=""></td>' +

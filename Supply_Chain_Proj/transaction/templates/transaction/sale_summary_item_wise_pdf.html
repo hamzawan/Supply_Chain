@@ -66,7 +66,7 @@
      </div>
      <br>
      <br>
-     <font size="22px" color="#0a012c"><b>Account Ledger:</b></font>
+     <font size="22px" color="#0a012c"><b>Sale Summary <small>(Item Wise)</small> </b></font>
      <br>
      <header>
        <table style="border-bottom:1px solid black; border-spacing: 40px 10px;" cellpadding="3" bgcolor="#f7f7f7">
@@ -81,33 +81,26 @@
     <table cellpadding="3" id="item_table" repeat="1">
       <thead>
         <tr class="heading_row">
-          <th align="center" style="width: 150px;"><font size="14px">Date</font></th>
-          <th style="width:300px;"><font size="14px">Voucher</font></th>
-          <th style="width:500px;"><font size="14px">Particular</font></th>
-          <th style="width:200px;"><font size="14px">Debit</font></th>
-          <th style="width:200px;"><font size="14px">Credit</font></th>
-          <th style="width:200px;"><font size="14px">Balance</font></th>
+          <th align="center" style="width: 150px;"><font size="14px">Item Code</font></th>
+          <th style="width:200px;"><font size="14px">Item Name</font></th>
+          <th style="width:350px;"><font size="14px">Description</font></th>
+          <th style="width:200px;"><font size="14px">Total Sale in PKR</font></th>
         </tr>
       </thead>
+      {% for value in row %}
       <tbody>
-    {% for value in row %}
-      <tr class="">
-        <td style="width: 150px; height:30px;"><font size="12px">{{value.2}}</font></td>
-        <td style="width: 300px;"><font size="12px">{{ value.0 }} {{value.4}}</font></td>
-        <td style="width: 500px; text-align:center;"><font size="12px">Invoice No: {{value.4}} / Refrence Date: {{value.2}}</font></td>
-        <td style="width: 200px; text-align:center;"><font size="12px">{{value.5|floatformat:2}}</font></td>
-        <td style="width: 200px; text-align:center;"><font size="12px">{{value.6|abs|floatformat:2}}</font></td>
-        <td style="width: 200px; text-align:center;"><font size="12px"></font></td>
-    {% endfor %}
-  </tr>
-  <tr class="">
-    <td style="width: 150px; height:30px;"></td>
-    <td style="width:700px; text-align:center;" colspan="2"><font size="14px"> <b>Grand Total</b> </font></td>
-    <td style="text-align:center;"><font size="12px"><b>{{debit_amount|floatformat:2}}</b></font></td>
-    <td style="text-align:center;"><font size="12px"><b>{{credit_amount|abs|floatformat:2}}</b></font></td>
-    <td style="width: 200px; text-align:center;"><font size="12px">{{debit_amount|add:credit_amount|abs|floatformat:2}}</font></td>
-  </tr>
-    </tbody>
+        <tr>
+          <td style="text-align:center; border-bottom: 1px solid black">{{ value.2 }}</td>
+          <td style="text-align:center; border-bottom: 1px solid black">{{ value.3 }}</td>
+          <td style="text-align:center; border-bottom: 1px solid black">{{ value.4 }}</td>
+          <td style="text-align:center; border-bottom: 1px solid black">{{ value.5|floatformat:2 }}</td>
+        </tr>
+      </tbody>
+      {% endfor %}
+      <tr>
+        <td colspan="3" style="text-align:center; border-bottom: 1px solid black"><font size="4"><b>Total</b></font></td>
+        <td style="text-align:center; border-bottom: 1px solid black"><font size="4"><b>{{total|floatformat:2}}</b></font></td>
+      </tr>
   </table>
   <br>
 </div>

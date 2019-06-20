@@ -247,7 +247,7 @@ def new_sale(request):
         tax = ((item_amount * float(withholding_tax)) / 100)
         total_amount = tax + item_amount
         header_id = header_id.id
-        tran = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+        tran = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit", voucher_no = sale_id)
         tran.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/new_sales.html',{'all_item_code':all_item_code,'get_last_sale_no':get_last_sale_no, 'all_accounts':all_accounts})
@@ -464,6 +464,7 @@ def account_ledger(request):
                         Order By refrence_date Asc
                     ''',[from_date, to_date, pk])
         row = cursor.fetchall()
+        print(row)
         for value in row:
             print(value)
         if row:
@@ -472,9 +473,9 @@ def account_ledger(request):
                     debit_amount = debit_amount + v[5]
                 if v[6] <= 0:
                     credit_amount = credit_amount + v[6]
-        print(debit_amount)
-        print(credit_amount)
-        pdf = render_to_pdf('transaction/account_ledger_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount})
+        account_id = ChartOfAccount.objects.filter(id = pk).first()
+        account_title = account_id.account_title
+        pdf = render_to_pdf('transaction/account_ledger_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount, 'account_title':account_title, 'from_date':from_date,'to_date':to_date})
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "TrialBalance%s.pdf" %("000")
@@ -507,6 +508,39 @@ def trial_balance(request):
                 debit_amount = debit_amount + v[2]
             else:
                 credit_amount = credit_amount + v[2]
+        pdf = render_to_pdf('transaction/trial_balance_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount,'from_date':from_date,'to_date':to_date})
+        if pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            filename = "TrialBalance%s.pdf" %("000")
+            content = "inline; filename='%s'" %(filename)
+            response['Content-Disposition'] = content
+            return response
+        return HttpResponse("Not found")
+    return redirect('report')
+
+
+def sale_detail(request):
+    if request.method == "POST":
+        debit_amount = 0;
+        credit_amount = 0;
+        from_date = request.POST.get('from_date')
+        to_date = request.POST.get('to_date')
+        company_info = Company_info.objects.all()
+        image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+        cursor = connection.cursor()
+        cursor.execute('''Select id,account_title,ifnull(amount,0) + opening_balance As Amount
+                        from transaction_chartofaccount
+                        Left Join
+                        (select account_id_id,sum(AMount) As Amount from transaction_transactions
+                        Where transaction_transactions.date Between %s And %s
+                        Group By account_id_id) As tbltran On transaction_chartofaccount.id = tbltran.account_id_id
+                        ''',[from_date, to_date])
+        row = cursor.fetchall()
+        for v in row:
+            if v[2] >= 0:
+                debit_amount = debit_amount + v[2]
+            else:
+                credit_amount = credit_amount + v[2]
         pdf = render_to_pdf('transaction/trial_balance_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount})
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
@@ -516,3 +550,114 @@ def trial_balance(request):
             return response
         return HttpResponse("Not found")
     return redirect('report')
+
+
+def sale_detail_item_wise(request):
+    total = 0;
+    if request.method == "POST":
+        from_date = request.POST.get('from_date')
+        to_date = request.POST.get('to_date')
+        company_info = Company_info.objects.all()
+        image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+        cursor = connection.cursor()
+        cursor.execute('''Select item_code, item_name, item_description,Sum(Total) As TotalAmount From (
+                        select item_code, item_name, item_description, sum(cost_price * quantity) As Total
+                        from transaction_saleheader
+                        inner join transaction_saledetail
+                        on transaction_saledetail.sale_id_id = transaction_saleheader.id
+                        where transaction_saleheader.date Between %s And %s
+                        Group by item_code
+                        Union All
+                        select item_code, item_name, item_description, -sum(cost_price * quantity) As Total
+                        from transaction_salereturnheader
+                        inner join transaction_salereturndetail
+                        on transaction_salereturndetail.sale_return_id_id = transaction_salereturnheader.id
+                        where transaction_salereturnheader.date Between %s And %s
+                        Group by item_code
+                        ) tblData
+                        group by item_code''',[from_date, to_date,from_date, to_date])
+        row = cursor.fetchall()
+        for value in row:
+            total = total + value[3]
+        print(total)
+        pdf = render_to_pdf('transaction/sale_detail_item_wise_pdf.html', {'company_info':company_info,'image':image,'row':row,'from_date':from_date, 'to_date':to_date,'total':total})
+        if pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            filename = "Sale_Detail_Item_Wise%s.pdf" %("000")
+            content = "inline; filename='%s'" %(filename)
+            response['Content-Disposition'] = content
+            return response
+        return HttpResponse("Not found")
+    return redirect('report')
+
+
+def sale_summary_item_wise(request):
+    total = 0;
+    if request.method == "POST":
+        from_date = request.POST.get('from_date')
+        to_date = request.POST.get('to_date')
+        account_id = request.POST.get('account_id')
+        print(account_id)
+        company_info = Company_info.objects.all()
+        image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+        all_accounts = ChartOfAccount.objects.all()
+        cursor = connection.cursor()
+        cursor.execute('''Select account_id_id,account_title,item_code,item_name,item_description,ifNull(sum(TotalSale),0) As TotalSale
+                        From (
+                        select account_id_id,item_code,item_name,item_description,ifNull(Sum(quantity*cost_price),0) As TotalSale
+                        from transaction_saleheader
+                        inner join transaction_saledetail
+                        on transaction_saledetail.id = transaction_saleheader.id
+                        where transaction_saleheader.date Between %s And %s
+                        Group By account_id_id,item_code,item_name
+                        Union All
+                        select account_id_id,item_code,item_name,item_description,-ifNull(Sum(quantity*cost_price),0) As TotalSale
+                        from transaction_salereturnheader
+                        inner join transaction_salereturndetail
+                        on transaction_salereturndetail.id = transaction_salereturnheader.id
+                        where transaction_salereturnheader.date Between %s And %s
+                        Group By account_id_id,item_code,item_name
+                        ) tblData
+                        Inner Join transaction_chartofaccount on transaction_chartofaccount.id=tblData.account_id_id
+                        where transaction_chartofaccount.id = %s
+                        Group By account_id_id,item_code,item_name ''',[from_date, to_date,from_date, to_date, account_id])
+        row = cursor.fetchall()
+        for value in row:
+            total = total + value[5]
+        account_id = ChartOfAccount.objects.filter(id = account_id).first()
+        account_title = account_id.account_title
+        pdf = render_to_pdf('transaction/sale_summary_item_wise_pdf.html', {'company_info':company_info,'image':image,'row':row,'from_date':from_date, 'to_date':to_date,'total':total, 'all_accounts':all_accounts, 'account_title':account_title})
+        if pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            filename = "Sale_Detail_Item_Wise%s.pdf" %("000")
+            content = "inline; filename='%s'" %(filename)
+            response['Content-Disposition'] = content
+            return response
+        return HttpResponse("Not found")
+    return redirect('report')
+
+
+def sales_tax_invoice(request):
+    lines = 0
+    total_amount = 0
+    company_info = Company_info.objects.all()
+    image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+    header = SaleHeader.objects.filter(id = 1).first()
+    detail = SaleDetail.objects.filter(sale_id = 1).all()
+    for value in detail:
+        lines = lines + len(value.item_description.split('\n'))
+        amount = float(value.cost_price * value.quantity)
+        total_amount = total_amount + amount
+        sales_tax_amount = total_amount * 17 / 100
+        total_amount = total_amount + sales_tax_amount
+    print(total_amount)
+    lines = lines + len(detail) + len(detail)
+    total_lines = 36 - lines
+    pdf = render_to_pdf('transaction/sales_tax_invoice_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount,'total_amount':total_amount})
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "SaleTaxInvoice%s.pdf" %(header.sale_no)
+        content = "inline; filename='%s'" %(filename)
+        response['Content-Disposition'] = content
+        return response
+    return HttpResponse("Not found")

@@ -254,6 +254,13 @@ table.table td a.delete-all {
 #dataTable.table td a.delete_item_row {
     color: #E34724;
 }
+#dataTable.table td a.return {
+    color: gray;
+}
+#dataTable.table td a.delete {
+    color: #E34724;
+}
+
 
 #dataTable.table td a.cart {
     color: #27C46B;

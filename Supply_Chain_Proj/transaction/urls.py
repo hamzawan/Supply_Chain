@@ -30,6 +30,9 @@ urlpatterns = [
     path('trial_balance/pdf', views.trial_balance, name = 'trial-balance'),
     path('account_ledger/pdf/', views.account_ledger, name = 'account-ledger'),
     path('trial_balance/pdf/', views.trial_balance, name = 'trial-balance'),
-
+    path('sale_detail/pdf/', views.sale_detail, name = 'sale-detail'),
+    path('sale_detail_item_wise/pdf/', views.sale_detail_item_wise, name = 'sale-detail-item-wise'),
+    path('sale_summary_item_wise/pdf/', views.sale_summary_item_wise, name = 'sale-summary-item-wise'),
+    path('sales_tax_invoice/pdf/', views.sales_tax_invoice, name = 'sales-tax-invoice'),
 
 ]
