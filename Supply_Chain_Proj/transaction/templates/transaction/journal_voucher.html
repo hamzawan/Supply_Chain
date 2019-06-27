@@ -54,14 +54,13 @@
     <li class="list-group-item">
     <div class="table-title">
         <div class="row">
-          <div class="form-group col-md-3">
-            <input type="text" list="item" placeholder="Enter Account title here..." class="form-control form-control-sm" id="account_title">
+          <div class="col-md-2">
+            <select class="form-control form-control-sm" id="account_title">
+              {% for value in all_accounts %}
+              <option value="{{value.id}}">{{value.account_title}}</option>
+              {% endfor %}
+            </select>
           </div>
-          <datalist id="item">
-            {% for value in all_accounts %}
-            <option value="{{value.account_title}}" />
-            {% endfor %}
-          </datalist>
             <div style="margin-left:20px;">
                 <button type="button" class="btn btn-info add-item-jv"><i class="fa fa-plus"></i>Insert Account</button>
             </div>

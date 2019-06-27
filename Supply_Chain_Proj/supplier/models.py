@@ -108,3 +108,6 @@ class Company_info(models.Model):
     mobile_no = models.CharField(max_length = 100)
     email = models.CharField(max_length = 100)
     website = models.CharField(max_length = 100)
+    ntn = models.CharField(max_length = 100)
+    stn = models.CharField(max_length = 100)
+    cnic = models.CharField(max_length = 100)

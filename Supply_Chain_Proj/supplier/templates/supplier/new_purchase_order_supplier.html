@@ -15,40 +15,45 @@
           <label for="">Purchase Order No</label>
           <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_po_no }}">
         </div>
-        <div class="form-group col-md-2">
-          <label>Supplier Name</label>
-          <input list="accounts" class="form-control form-control-sm" id="po_supplier">
+        <div class="form-group col-md-3">
+         <label for="">Supplier</label>
+          <div class="input-group mb-3">
+            <input type="text" list="accounts" class="form-control form-control-sm " placeholder="Supplier Name" aria-label="Recipient's username" aria-describedby="basic-addon2" id="po_supplier">
+            <div class="input-group-append">
+              <a class="btn btn-outline-secondary on btn-sm" href="{% url 'chart-of-account' %}" target="_blank" type="button"><i class="fas fa-plus"></i></a>
+            </div>
             <datalist id="accounts">
               {% for value in all_accounts %}
               <option value="{{value.account_title}}">{{value.account_title}}</option>
               {% endfor %}
-             </datalist>
+           </datalist>
+          </div>
         </div>
         <div class="form-group col-md-2">
           <label for="">Attn</label>
-          <input type="text" class="form-control form-control-sm" required id="po_supplier_attn">
+          <input type="text" class="form-control form-control-sm"  id="po_supplier_attn">
         </div>
         <div class="form-group col-md-2">
           <label for="">Prc Basis</label>
-          <input type="text" class="form-control form-control-sm" required id="po_supplier_prcbasis">
+          <input type="text" class="form-control form-control-sm"  id="po_supplier_prcbasis">
         </div>
         <div class="form-group col-md-2">
           <label for="">Lead Time</label>
-          <input type="text" class="form-control form-control-sm" required id="po_supplier_leadtime">
-        </div>
-        <div class="form-group col-md-2">
-          <label for="">Validity</label>
-          <input type="text" class="form-control form-control-sm" required id="po_supplier_validity">
+          <input type="text" class="form-control form-control-sm"  id="po_supplier_leadtime">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group col-md-2">
+          <label for="">Validity</label>
+          <input type="text" class="form-control form-control-sm"  id="po_supplier_validity">
+        </div>
+        <div class="form-group col-md-2">
           <label for="">Payment</label>
-          <input type="text" class="form-control form-control-sm" required id="po_supplier_payment">
+          <input type="text" class="form-control form-control-sm"  id="po_supplier_payment">
         </div>
         <div class="form-group col-md-2">
           <label>Remarks</label>
-          <input list="browsers" class="form-control form-control-sm" required id="po_supplier_remarks">
+          <input list="browsers" class="form-control form-control-sm"  id="po_supplier_remarks">
             <datalist id="browsers">
              <option value="Internet Explorer">
           </datalist>
@@ -63,7 +68,7 @@
         </div>
         <div class="form-group col-md-2">
           <label for="">Follow Up</label>
-          <input type="date" class="form-control form-control-sm" required id="po_supplier_follow_up">
+          <input type="date" class="form-control form-control-sm"  id="po_supplier_follow_up">
         </div>
       </div>
       <div class="form-row">
@@ -81,7 +86,7 @@
           </div>
           <datalist id="item">
             {% for value in all_item_code %}
-            <option value="{{value.product_code}}" />
+            <option value="{{value.product_code}}">{{value.product_code}} | {{value.product_name}} | {{value.product_desc}}</option>
             {% endfor %}
           </datalist>
             <div style="margin-left:20px;">

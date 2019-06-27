@@ -8,33 +8,23 @@
 </div>
 <ul class="list-group list-group-flush">
   <li class="list-group-item">
-    <!-- <div class="form-row">
-      <input type="text" name=""class="form-control col-md-2" value="">
-    </div> -->
     <div class="input-group">
-      <input type="text" class="form-control col-md-4" id="search" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
-      <div class="input-group-append">
-        <button class="btn btn-primary" type="button">
-          <i class="fas fa-search"></i>
-        </button>
-      </div>
-      <div class="col-md-8">
+      <div class="col-md-12">
         <a role="button" href="{% url 'new-rfq-customer' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
       </div>
     </div>
     <br>
     <div class="table table-responsive">
-      <table class="table table-bordered" id="dataTable">
+      <table class="table table-bordered sort" id="dataTable">
           <thead>
               <tr>
-                  <th width="80px">S NO.</th>
-                  <th >RFQ no</th>
-                  <th>Customer</th>
-                  <th >Date</th>
-                  <th>From</th>
+                  <th width="60px">S NO.</th>
+                  <th width="100px">RFQ no</th>
+                  <th width="100px">Customer</th>
+                  <th width="100px">Date</th>
+                  <th width="100px">From</th>
                   <th>Attn</th>
                   <th>Follow up</th>
-                  <th>Notify me</th>
                   <td>Action</td>
               </tr>
           </thead>
@@ -48,13 +38,6 @@
                 <td> user1 </td>
                 <td>{{ row.attn }}</td>
                 <td>{{ row.follow_up }}</td>
-                <td>
-                  {% if row.show_notification == True %}
-                    Yes
-                  {% else %}
-                    No
-                  {% endif %}
-                </td>
                 <td><a class="edit_list" href="{% url 'edit-rfq-customer' pk=row.id %}"><i class="material-icons">&#xE254;</i></a><a class="delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
             </tr>
             {% endfor %}

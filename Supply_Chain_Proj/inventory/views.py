@@ -43,16 +43,19 @@ def add_product(request):
         product_name = request.POST.get('product_name',False)
         product_desc = request.POST.get('product_desc',False)
         opening_stock = request.POST.get('opening_stock',False)
+        unit = request.POST.get('unit',False)
+        print(unit)
         type = request.POST.get('type',False)
         size = request.POST.get('size',False)
-        return JsonResponse({"product_name":product_name,"type":type,"size":size,"product_desc": product_desc,'opening_stock':opening_stock})
+        return JsonResponse({"product_name":product_name,"type":type,"size":size,"product_desc": product_desc,'unit':unit,'opening_stock':opening_stock})
     if request.method == 'POST':
         items = json.loads(request.POST.get('items'))
         for value in items:
             type = value["type"][:3]
             size = value["size"][:3]
             item_code = type+"-"+size+"-"+str(serial_no)
-            new_products = Add_products(product_code = item_code, product_name = value["item_name"], product_desc = value["item_desc"], opening_stock = value["opening_stock"])
+
+            new_products = Add_products(product_code = item_code, product_name = value["item_name"], product_desc = value["item_desc"],unit = value["unit"], size = value["size"], type = value["type"] ,opening_stock = value["opening_stock"])
             new_products.save()
             serial_no = serial_no + 1
         return JsonResponse({"result":"success"})

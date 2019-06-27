@@ -20,6 +20,7 @@ urlpatterns = [
     path('sale/', views.sale, name = 'sale'),
     path('sale/new/', views.new_sale, name = 'new-sale'),
     path('sale/edit/<pk>', views.edit_sale, name = 'edit-sale'),
+    path('dc/sale/new/<pk>', views.direct_sale, name = 'direct-sale'),
 
 
     path('sale_return_summary/', views.sale_return_summary, name = 'sale-return-summary'),
@@ -27,12 +28,19 @@ urlpatterns = [
     path('sale/return/edit/<pk>', views.edit_sale_return, name = 'edit-sale-return'),
 
     path('journal_voucher/new', views.journal_voucher, name = 'journal-voucher'),
+    path('bank_receiving_voucher/new', views.bank_receiving_voucher, name = 'bank-receiving-voucher'),
+    path('cash_receiving_voucher/new', views.cash_receiving_voucher, name = 'cash-receiving-voucher'),
+    path('cash_payment_voucher/new', views.cash_payment_voucher, name = 'cash-payment-voucher'),
+    path('bank_payment_voucher/new', views.bank_payment_voucher, name = 'bank-payment-voucher'),
+
+
     path('trial_balance/pdf', views.trial_balance, name = 'trial-balance'),
     path('account_ledger/pdf/', views.account_ledger, name = 'account-ledger'),
     path('trial_balance/pdf/', views.trial_balance, name = 'trial-balance'),
     path('sale_detail/pdf/', views.sale_detail, name = 'sale-detail'),
     path('sale_detail_item_wise/pdf/', views.sale_detail_item_wise, name = 'sale-detail-item-wise'),
     path('sale_summary_item_wise/pdf/', views.sale_summary_item_wise, name = 'sale-summary-item-wise'),
-    path('sales_tax_invoice/pdf/', views.sales_tax_invoice, name = 'sales-tax-invoice'),
 
+    path('sales_tax_invoice/pdf/', views.sales_tax_invoice, name = 'sales-tax-invoice'),
+    path('commercial_invoice/pdf/', views.commercial_invoice, name = 'commercial-invoice'),
 ]

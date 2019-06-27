@@ -14,6 +14,8 @@ $(document).ready(function(){
 	var cartage_amount;
 	var additional_tax;
 	var withholding_tax;
+	var tax;
+
 
 	$(".has_id").click(function(){
 			 edit_id = this.id;
@@ -700,10 +702,95 @@ $('#edit-purchase-return-submit').on('submit',function(e){
 
 					$(".add-item-sale").click(function(){
 						var item_code_sale = $('#item_code_sale').val();
+						var dc_code_sale = $('#dc_code_sale').val();
+						if (item_code_sale !== "") {
+
+							req =	$.ajax({
+								 headers: { "X-CSRFToken": getCookie("csrftoken") },
+								 type: 'POST',
+								 url : '/transaction/sale/new/',
+								 data:{
+									 'item_code_sale': item_code_sale,
+								 },
+								 dataType: 'json'
+							 })
+							 .done(function done(data){
+								 console.log(data.row);
+								 var type = JSON.parse(data.row);
+								 console.log(type.length);
+								 var index = $("table tbody tr:last-child").index();
+								 // total_amount = (type[0].fields['unit_price'] * type[0].fields['quantity']);
+										 var row = '<tr>' +
+												 '<td>'+count+'</td>' +
+												 '<td id="get_item_code">'+type[0].fields['item_code']+'</td>' +
+												 '<td>'+type[0].fields['item_name']+'</td>' +
+												 '<td id="desc" >'+type[0].fields['item_description']+'</td>' +
+												 '<td id="quantity" width="100px" ><input type="text" class="form-control" value=""></td>' +
+												 '<td><input type="text" class="form-control" value=""></td>' +
+												 '<td id="price" ><input type="text" class="form-control" value=""></td>' +
+												 '<td id="value_of_goods" >0.00</td>' +
+												 '<td id="sales_tax"><input type="text" class="form-control" value=""></td>' +
+												 '<td id="sales_tax_amount">0.00</td>' +
+												 '<td id="total" style="font-weight:bold;" class="sum"><b>0.00</b></td>' +
+												 '<td style="display:none;">'+type[0].fields['dc_no']+'</td>' +
+									 '<td><a class="add-transaction-sale" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-transaction-sale" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="delete-transaction-sale" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+										 '</tr>';
+										 count++;
+									 $("table").append(row);
+								 $("table tbody tr").eq(index + 1).find(".edit-transaction-sale, .add-transaction-sale").toggle();
+										 $('[data-toggle="tooltip"]').tooltip();
+										 $('#item_code_sale').val("");
+							 });
+						}
+						else if (dc_code_sale !== "") {
+							req =	$.ajax({
+								 headers: { "X-CSRFToken": getCookie("csrftoken") },
+								 type: 'POST',
+								 url : '/transaction/sale/new/',
+								 data:{
+									 'dc_code_sale': dc_code_sale,
+								 },
+								 dataType: 'json'
+							 })
+							 .done(function done(data){
+								 console.log(data.row[0]);
+								 console.log(data.row.length);
+								 var index = $("table tbody tr:last-child").index();
+								 // total_amount = (type[0].fields['unit_price'] * type[0].fields['quantity']);
+								 for (var i = 0; i < data.row.length; i++) {
+									var row = '<tr>' +
+											'<td>'+count+'</td>' +
+											'<td id="get_item_code">'+data.row[i][1]+'</td>' +
+											'<td>'+data.row[i][2]+'</td>' +
+											'<td id="desc" >'+data.row[i][3]+'</td>' +
+											'<td id="quantity" width="100px" ><input type="text" class="form-control" value="'+data.row[i][7]+'"></td>' +
+											'<td>'+data.row[i][4]+'</td>' +
+											'<td id="price" ><input type="text" class="form-control" value=""></td>' +
+											'<td id="value_of_goods" >0.00</td>' +
+											'<td id="sales_tax"><input type="text" class="form-control" value=""></td>' +
+											'<td id="sales_tax_amount">0.00</td>' +
+											'<td id="total" style="font-weight:bold;" class="sum"><b>0.00</b></td>' +
+											'<td style="display:none;">'+data.dc_ref+'</td>' +
+								'<td><a class="add-transaction-sale" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-transaction-sale" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="delete-transaction-sale" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+									'</tr>';
+									count++;
+								$("table").append(row);
+							$("table tbody tr").eq(index + i+1).find(".edit-transaction-sale, .add-transaction-sale").toggle();
+									$('[data-toggle="tooltip"]').tooltip();
+									$('#dc_code_sale').val("");
+								 }
+							 });
+						}
+					});
+
+// FOR DIRECT SALE
+
+					$(".add-item-sale-direct").click(function(){
+						var item_code_sale = $('#item_code_sale').val();
 						req =	$.ajax({
 							 headers: { "X-CSRFToken": getCookie("csrftoken") },
 							 type: 'POST',
-							 url : '/transaction/sale/new/',
+							 url : `/transaction/dc/sale/new/${edit_id}`,
 							 data:{
 								 'item_code_sale': item_code_sale,
 							 },
@@ -715,10 +802,10 @@ $('#edit-purchase-return-submit').on('submit',function(e){
 							 total_amount = (type[0].fields['unit_price'] * type[0].fields['quantity']);
 									 var row = '<tr>' +
 											 '<td>'+count+'</td>' +
-											 '<td>'+ type[0].fields['product_code'] +'</td>' +
+											 '<td id="get_item_code">'+ type[0].fields['product_code'] +'</td>' +
 											 '<td>'+ type[0].fields['product_name'] +'</td>' +
 											 '<td id="desc" >'+ type[0].fields['product_desc'] +'</td>' +
-											 '<td id="quantity" ><input type="text" class="form-control" value=""></td>' +
+											 '<td id="quantity" width="100px" ><input type="text" class="form-control" value=""></td>' +
 											 '<td><input type="text" class="form-control" value=""></td>' +
 											 '<td id="price" ><input type="text" class="form-control" value=""></td>' +
 											 '<td id="value_of_goods" >0.00</td>' +
@@ -729,7 +816,7 @@ $('#edit-purchase-return-submit').on('submit',function(e){
 									 '</tr>';
 									 count++;
 								 $("table").append(row);
-							 $("table tbody tr").eq(index + 1).find(".add-transaction-sale, .edit-transaction-sale").toggle();
+							 $("table tbody tr").eq(index + 1).find(".edit-transaction-sale, .add-transaction-sale").toggle();
 									 $('[data-toggle="tooltip"]').tooltip();
 						 });
 					});
@@ -738,26 +825,30 @@ $('#edit-purchase-return-submit').on('submit',function(e){
 					// Add row on add button click
 					$(document).on("click", ".add-transaction-sale", function(){
 						sum = 0;
-					var empty = false;
-					var input = $(this).parents("tr").find('input[type="text"]');
-							input.each(function(){
-						if(!$(this).val()){
-							$(this).addClass("error");
-							empty = true;
-						}
-						else{
-								$(this).removeClass("error");
+						tax = 0;
+					var get_item_code = $($(this).parents("tr").find("#get_item_code")).filter(function() {
+									item_code = $(this).text();
+									return item_code
+							}).closest("tr");
+							var empty = false;
+							var input = $(this).parents("tr").find('input[type="text"]');
+									input.each(function(){
+								if(!$(this).val()){
+									$(this).addClass("error");
+									empty = true;
 								}
-					});
-					$(this).parents("tr").find(".error").first().focus();
-					if(!empty){
-						input.each(function(){
-							$(this).parent("td").html($(this).val());
-						});
-						$(this).parents("tr").find(".add-transaction-sale, .edit-transaction-sale").toggle();
-						$(".add-item-sale").removeAttr("disabled");
-					}
-
+								else{
+										$(this).removeClass("error");
+										}
+							});
+							$(this).parents("tr").find(".error").first().focus();
+							if(!empty){
+								input.each(function(){
+									$(this).parent("td").html($(this).val());
+								});
+								$(this).parents("tr").find(".add-transaction-sale, .edit-transaction-sale").toggle();
+								$(".add-item-sale").removeAttr("disabled");
+							}
 
 					var get_price_edit = $($(this).parents("tr").find("#price")).filter(function() {
 									price = $(this).text();
@@ -768,7 +859,6 @@ $('#edit-purchase-return-submit').on('submit',function(e){
 									quantity = $(this).text();
 									return quantity
 							}).closest("tr");
-
 							console.log(quantity);
 					var set_valueOfGoods = $($(this).parents("tr").find("#value_of_goods")).filter(function() {
 									value_of_goods =  quantity * price
@@ -805,26 +895,36 @@ $('#edit-purchase-return-submit').on('submit',function(e){
 							 sum = sum + parseFloat($(this).find('td#total').text());
 						});
 
+						$('#new-sale-table-direct > tbody  > tr').each(function() {
+							 sum = sum + parseFloat($(this).find('td#total').text());
+						});
+
+
+						$('#new-sale-table > tbody  > tr').each(function() {
+							 tax = tax + parseFloat($(this).find('td#sales_tax_amount').text());
+						});
+							console.log(tax);
+						$('#new-sale-table-direct > tbody  > tr').each(function() {
+							 tax = tax + parseFloat($(this).find('td#sales_tax_amount').text());
+						});
+
+
 					cartage_amount =	$('#cartage_amount').val();
 					additional_tax = $('#additional_tax').val();
 					console.log(sum);
-					grand = parseFloat(cartage_amount) + parseFloat(additional_tax) + sum;
+					grand = parseFloat(cartage_amount) + parseFloat(additional_tax) +  sum;
 					$('#last_grand_total').val(grand.toFixed(2));
+					$('#total_sales_tax').val(tax.toFixed(2));
+
 					});
 
 								// Edit row on edit button click
 				$(document).on("click", ".edit-transaction-sale", function(){
 						$(this).parents("tr").find("td:not(:last-child)").each(function(i){
-								if (i === 3) {
-									$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
-								}
 								if (i === 4) {
 									$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 								}
-								if (i === 5) {
-									 $(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
-								}
-								if (i === 7) {
+								if (i === 8) {
 									 $(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 								}
 
@@ -939,6 +1039,7 @@ $('#edit-purchase-return-submit').on('submit',function(e){
 							'unit' : "",
 							'price' : "",
 							'sales_tax' : "",
+							'dc_no': ""
 						};
 						$tds.each(function(i, el){
 							if (i === 1) {
@@ -961,6 +1062,9 @@ $('#edit-purchase-return-submit').on('submit',function(e){
 							}
 							else if (i === 8) {
 									row["sales_tax"] = ($(this).text());
+							}
+							else if (i === 11) {
+									row["dc_no"] = ($(this).text());
 							}
 						});
 						data.push(row);
@@ -988,6 +1092,91 @@ $('#edit-purchase-return-submit').on('submit',function(e){
 							location.reload();
 						})
 			});
+			$('#new-sale-submit-direct').on('submit',function(e){
+				e.preventDefault();
+				console.log("clicked");
+				var table = $('#new-sale-table-direct');
+				var data = [];
+				var sale_id = $('#sale_id').val();
+				var customer = $('#customer_name_sale').val();
+				var payment_method = $('#payment_method').val();
+				var footer_desc = $('#footer_desc').val();
+
+				var cartage_amount = $('#cartage_amount').val();
+				var additional_tax = $('#additional_tax').val();
+				var withholding_tax = $('#withholding_tax').val();
+
+
+				table.find('tr').each(function (i, el){
+					if(i != 0)
+					{
+						var $tds = $(this).find('td');
+						var row = {
+							'item_code' : "",
+							'item_name' : "",
+							'item_description' : "",
+							'quantity' : "",
+							'unit' : "",
+							'price' : "",
+							'sales_tax' : "",
+							'dc_no': ""
+						};
+						$tds.each(function(i, el){
+							if (i === 1) {
+									row["item_code"] = ($(this).text());
+							}
+							if (i === 2) {
+									row["item_name"] = ($(this).text());
+							}
+							else if (i === 3) {
+									row["item_description"] = ($(this).text());
+							}
+							else if (i === 4) {
+									row["quantity"] = ($(this).text());
+							}
+							else if (i === 5) {
+									row["unit"] = ($(this).text());
+							}
+							else if (i === 6) {
+									row["price"] = ($(this).text());
+							}
+							else if (i === 8) {
+									row["sales_tax"] = ($(this).text());
+							}
+							else if (i === 11) {
+									row["dc_no"] = ($(this).text());
+									console.log($(this).text());
+							}
+						});
+						data.push(row);
+					}
+				});
+
+					 req =	$.ajax({
+							headers: { "X-CSRFToken": getCookie("csrftoken") },
+							type: 'POST',
+							url : `/transaction/dc/sale/new/${edit_id}`,
+							data:{
+								'sale_id': sale_id,
+								'customer': customer,
+								'payment_method': payment_method,
+								'footer_desc': footer_desc,
+								'cartage_amount': cartage_amount,
+								'additional_tax':additional_tax,
+								'withholding_tax':withholding_tax,
+								'items': JSON.stringify(data),
+							},
+							dataType: 'json'
+						})
+						.done(function done(){
+							alert("Sales Created");
+							location.reload();
+						})
+			});
+
+// // ==================================================================================================================================
+
+
 
 // // ==================================================================================================================================
 							// EDIT PURCHASE RETURN
@@ -1723,7 +1912,8 @@ $.fn.extend({
 				e.preventDefault();
 				var table = $('#new-jv-table');
 				var data = [];
-
+				var debit = 0;
+				var credit = 0;
 				var doc_no = $('#doc_no').val();
 				var doc_date = $('#doc_date').val();
 				var description = $('#description').val();
@@ -1747,36 +1937,43 @@ $.fn.extend({
 							}
 							else if (i === 2) {
 									row["debit"] = ($(this).text());
+									debit = debit + parseFloat(($(this).text()));
 							}
 							else if (i === 3) {
 									row["credit"] = ($(this).text());
+									credit = credit + parseFloat(($(this).text()));
 							}
 						});
 						data.push(row);
 					}
 				});
+				if (debit == credit) {
+					req =	$.ajax({
+						 headers: { "X-CSRFToken": getCookie("csrftoken") },
+						 type: 'POST',
+						 url : '/transaction/journal_voucher/new',
+						 data:{
+							 'doc_no': doc_no,
+							 'doc_date': doc_date,
+							 'description': description,
+							 'items': JSON.stringify(data),
+						 },
+						 dataType: 'json'
+					 })
+					 .done(function done(data){
+						 if (data.result != "success") {
+							 alert(data.result)
+						 }
+						 else {
+							 alert("Journal Voucher Submitted");
+							 location.reload();
+						 }
+					 })
+				}
+				else {
+					alert("Debit and Credit sides are not same");
+				}
 
-					 req =	$.ajax({
-							headers: { "X-CSRFToken": getCookie("csrftoken") },
-							type: 'POST',
-							url : '/transaction/journal_voucher/new',
-							data:{
-								'doc_no': doc_no,
-								'doc_date': doc_date,
-								'description': description,
-								'items': JSON.stringify(data),
-							},
-							dataType: 'json'
-						})
-						.done(function done(data){
-							if (data.result != "success") {
-								alert(data.result)
-							}
-							else {
-								alert("Journal Voucher Submitted");
-								location.reload();
-							}
-						})
 			});
 
 

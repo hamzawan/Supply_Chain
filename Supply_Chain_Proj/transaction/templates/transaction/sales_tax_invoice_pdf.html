@@ -44,7 +44,7 @@
   <div class="footer">
        <div>
          <pre>{{header.footer_remarks}}</pre>
-         <h1 style="text-align:right;">for {{image.company_name}}</h1>
+         <h1 style="text-align:right;">for Hamza Enterprise</h1>
        </div>
      </div>
   page <pdf:pagenumber> of <pdf:pagecount>
@@ -60,12 +60,11 @@
          <img style="width:150px; height:100px;" src="{{image.company_logo}}" align="right"/>
          {% for value in company_info %}
          <font size="25px" color="#0a012c" ><b>{{value.company_name}}</b></font> <br>
-         <font size="11px" color="#0a012c" >33 Amina Mansion, Belasis Street,</font><br>
-         <font size="11px" color="#0a012c" >New Chali Karachi Pakistan</font><br>
-         <font size="11px" color="#0a012c" >{{ value.phone_no }}</font><br>
-         <font size="11px" color="#0a012c" >{{ value.mobile_no }}</font><br>
-         <font size="11px" color="#0a012c" >{{ value.email }}</font><br>
-         <font size="11px" color="#0a012c" >{{ value.website }}</font><br>
+         <font size="11px" color="#0a012c" ><b>Address:</b> {{ value.company_address }}</font><br>
+         <font size="11px" color="#0a012c" ><b>Phone:</b> {{ value.phone_no }}</font><br>
+         <font size="11px" color="#0a012c" ><b>Mobile:</b> {{ value.mobile_no }}</font><br>
+         <font size="11px" color="#0a012c" ><b>STN:</b> {{ value.stn }}</font><br>
+         <font size="11px" color="#0a012c" ><b>NTN:</b> {{ value.ntn }}</font><br>
          {% endfor %}
      </div>
      <br>
@@ -91,15 +90,18 @@
          <tr>
            <th align="left"><font size="12px" color="#0a012c">Telephone No.</font></th>
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.phone_no}}</font></td>
-           <th align="left"><font size="12px" color="#0a012c">Delivery Challan #</font</th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c"></font>DC/CU/101</td>
-         </tr>
-         <tr>
            <th align="left"><font size="12px" color="#0a012c">Sales Tax Number</font</th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">-</font></td>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.stn}}</font></td>
+
+           <!-- <th align="left"><font size="12px" color="#0a012c">Delivery Challan #</font</th>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c"></font>DC/CU/101</td> -->
+         </tr>
+         <!-- <tr>
+           <th align="left"><font size="12px" color="#0a012c">Sales Tax Number</font</th>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.stn}}</font></td>
            <th align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">Delivery Date</font></th>
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">June 08, 2019</font></td>
-         </tr>
+         </tr> -->
          <tr>
            <th align="left"><font size="12px" color="#0a012c">NTN No</font</th>
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.ntn}}</font></td>

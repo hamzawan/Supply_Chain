@@ -8,23 +8,14 @@
 </div>
 <ul class="list-group list-group-flush">
   <li class="list-group-item">
-    <!-- <div class="form-row">
-      <input type="text" name=""class="form-control col-md-2" value="">
-    </div> -->
     <div class="input-group">
-      <input type="text" class="form-control col-md-4" id="search" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
-      <div class="input-group-append">
-        <button class="btn btn-primary" type="button">
-          <i class="fas fa-search"></i>
-        </button>
-      </div>
-      <div class="col-md-8">
+      <div class="col-md-12">
         <a role="button" href="{% url 'new-purchase-order-customer' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
       </div>
     </div>
     <br>
     <div class="table table-responsive content-loader">
-      <table class="table table-bordered" id="dataTable">
+      <table class="table table-bordered sort" id="dataTable">
           <thead>
               <tr>
                   <th width="70px" >S NO.</th>
@@ -35,7 +26,6 @@
                   <th >Currency Unit</th>
                   <th >Exchange Rate</th>
                   <th >Follow Up</th>
-                  <th >Notify Me</th>
                   <th >Action</th>
               </tr>
           </thead>
@@ -50,13 +40,6 @@
                   <td> {{ value.currency }} </td>
                   <td> {{ value.exchange_rate }} </td>
                   <td> {{ value.follow_up }} </td>
-                  <td>
-                    {% if value.show_notification == True %}
-                      Yes
-                    {% else %}
-                      No
-                    {% endif %}
-                  </td>
                   <td><a class="edit_list" href="{% url 'edit-purchase-order-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a href="{% url 'print-po-customer' pk=value.id %}" target="_blank"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a><a class="delete-all"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
               </tr>
             {% endfor %}

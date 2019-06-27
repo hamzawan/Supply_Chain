@@ -531,7 +531,7 @@ $(document).ready(function(){
 								    //Browser has blocked it
 								    alert('Please allow popups for this website');
 								}
-								window.location.href = 'http://localhost:8000/customer/send_email/140/2'; 
+								window.location.href = 'http://localhost:8000/customer/send_email/140/2';
 							})
 				});
 
@@ -1118,10 +1118,10 @@ $(document).ready(function(){
 								 var index = $("table tbody tr:last-child").index();
 										 var row = '<tr>' +
 												 '<td>'+count+'</td>' +
-												 '<td>'+ type[0].fields['product_code'] +'</td>' +
+												 '<td id="get_item_code">'+ type[0].fields['product_code'] +'</td>' +
 												 '<td>'+ type[0].fields['product_name'] +'</td>' +
 												 '<td><pre>'+ type[0].fields['product_desc'] +'</pre></td>' +
-												 '<td><input type="text" class="form-control form-control-sm" required ></td>' +
+												 '<td id="quantity"><input type="text" class="form-control form-control-sm" required ></td>' +
 												 '<td><input type="text" class="form-control" required ></td>' +
 												 '<td><input type="text" class="form-control" required ></td>' +
 												 '<td><input type="text" class="form-control" required ></td>' +
@@ -1160,6 +1160,44 @@ $(document).ready(function(){
 						$(this).parents("tr").find(".add-dc-customer, .edit-dc-customer").toggle();
 						$(".add-new-dc-customer").removeAttr("disabled");
 					}
+					var get_quantity = $($(this).parents("tr").find("#quantity")).filter(function() {
+									quantity = $(this).text();
+									return quantity
+							}).closest("tr");
+					console.log(quantity);
+					var get_item_code = $($(this).parents("tr").find("#get_item_code")).filter(function() {
+									item_code = $(this).text();
+									return item_code
+							}).closest("tr");
+
+				req =	$.ajax({
+					 headers: { "X-CSRFToken": getCookie("csrftoken") },
+					 type: 'POST',
+					 url : '/customer/delivery_challan/new',
+					 data:{
+						 'quantity':quantity,
+						 'item_code':item_code
+					 },
+					 dataType: 'json'
+				 })
+				 .done(function done(data){
+
+					 if(data.message === "False"){
+						alert("Not enough stock")
+						var table = $('#new-dc-customer-table');
+						table.find("tr").find("td:not(:last-child)").each(function(i){
+								if (i === 4) {
+									$(this).html('<input type="text" style="border: 1px solid red;" class="form-control form-control-warning" value="' + $(this).text() + '">');
+								}
+					});
+					table.find("tr").find(".add-transaction-sale, .edit-transaction-sale").toggle();
+					$(".add-item-sale").attr("disabled", "disabled");
+					 }
+					 else{
+
+					 }
+				});
+
 					});
 
 

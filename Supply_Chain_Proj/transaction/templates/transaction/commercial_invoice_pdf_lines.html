@@ -1,0 +1,186 @@
+{% load mathfilters %}
+<html>
+<head>
+  <title>{{header.quotation_no}}</title>
+<style>
+    @page {
+        size: a4 portrait;
+        @frame header_frame {           /* Static Frame */
+            -pdf-frame-content: header_content;
+            /* left: 30pt; width: 512pt; top: 20pt; height: 390pt; */
+        }
+        @frame content_frame {          /* Content Frame */
+            left: 30pt; width: 535pt; top: 10pt; height: 715pt;
+        }
+        @frame footer_frame {           /* Another static Frame */
+            -pdf-frame-content: footer_content;
+            left: 30pt; width: 535pt; top: 733pt; height: 140pt;
+        }
+    }
+    table > thead > tr > th {
+      text-align: center;
+      font-family: "Times New Roman", Times, serif;
+        }
+        table > thead > tr > td {
+          text-align: center;
+          font-family: "Times New Roman", Times, serif;
+        }
+        .no-bottom-border{
+            border-bottom:none;
+        }
+        .heading_row{
+          border:1px solid black;
+        }
+</style>
+</head>
+
+<body>
+    <!-- Content for Static Frame 'header_frame' -->
+    <div id="header_content">
+    </div>
+
+<!-- Content for Static Frame 'footer_frame' -->
+<div id="footer_content">
+  <div class="footer">
+       <div>
+         <pre>{{header.footer_remarks}}</pre>
+         <h1 style="text-align:right;">for Hamza Enterprise</h1>
+       </div>
+     </div>
+  page <pdf:pagenumber> of <pdf:pagecount>
+  <p style="text-align:center;">Software Developed By TechFurq, 92 322 2832789, info@techfurq.com, www.techfurq.com</p>
+</div>
+
+    <!-- HTML Content -->
+
+  <br>
+  <br>
+  <div class="body">
+      <div>
+         <img style="width:150px; height:100px;" src="{{image.company_logo}}" align="right"/>
+         {% for value in company_info %}
+         <font size="25px" color="#0a012c" ><b>{{value.company_name}}</b></font> <br>
+         <font size="11px" color="#0a012c" ><b>Address:</b> {{ value.company_address }}</font><br>
+         <font size="11px" color="#0a012c" ><b>Phone:</b> {{ value.phone_no }}</font><br>
+         <font size="11px" color="#0a012c" ><b>Mobile:</b> {{ value.mobile_no }}</font><br>
+         <font size="11px" color="#0a012c" ><b>STN:</b> {{ value.stn }}</font><br>
+         <font size="11px" color="#0a012c" ><b>NTN:</b> {{ value.ntn }}</font><br>
+         {% endfor %}
+     </div>
+     <br>
+     <br>
+     <!-- <font size="22px" color="#0a012c"><b>Sales Tax Invoice</b></font>
+     <br> -->
+     <header>
+       <table style="border:1px solid black; border-spacing: 40px 10px;" cellpadding="3" bgcolor="#f7f7f7">
+       <thead>
+         <tr>
+           <th align="left" style="width: 180px;"><font size="12px" color="#0a012c">Buyer's Name</font></th>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.account_title}}</font></td>
+           <th align="left" style="width: 180px;"><font size="13px" color="#0a012c">Invoice No.</font</th>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.sale_no}}</font></td>
+         </tr>
+         <tr>
+           <th align="left"><font size="12px" color="#0a012c">Address</font</th>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.Address}}</font></td>
+           <th align="left"><font size="12px" color="#0a012c">Invoice Date</font</th>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.date}}</font></td>
+
+         </tr>
+         <tr>
+           <th align="left"><font size="12px" color="#0a012c">Purchase Order No.</font></th>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">102029</font></td>
+           <th align="left"><font size="12px" color="#0a012c">Delivery Challan</font</th>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">145950</font></td>
+
+           <!-- <th align="left"><font size="12px" color="#0a012c">Delivery Challan #</font</th>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c"></font>DC/CU/101</td> -->
+         </tr>
+         <tr>
+           <th align="left"><font size="12px" color="#0a012c">Sales Tax Number</font</th>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.stn}}</font></td>
+           <th align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">Delivery Date</font></th>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">June 08, 2019</font></td>
+         </tr>
+         <tr>
+           <th align="left"><font size="12px" color="#0a012c">NTN No</font</th>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.ntn}}</font></td>
+           <th align="left"><font size="12px" color="#0a012c">Page No</font</th>
+           <td align="left" style="padding-top:4px;" color="#0a012c"><font size="12px">1 of 1</font></td>
+         </tr>
+       </thead>
+       </table>
+     </header>
+     <br>
+     <br>
+    <table cellpadding="3" id="item_table" repeat="1">
+      <thead>
+        <tr class="heading_row">
+          <th align="center" style="width: 70px;"><font size="12px">S No.</font></th>
+          <th style="width:400px;"><font size="12px">Part Name & Description</font></th>
+          <th><font size="12px">Qty</font></th>
+          <th><font size="12px">Unit</font></th>
+          <th><font size="12px">Unit/Price</font></th>
+          <th><font size="12px">Values Of Goods</font></th>
+          <th><font size="12px">Sales Tax 17%</font></th>
+          <th style="width:200px;"><font size="12px">Value Including Sales Tax</font></th>
+        </tr>
+        <tr class="heading_row">
+          <th style="width: 70px;"></th>
+          <th style="width:400px;"></th>
+          <th></th>
+          <th></th>
+          <th>in {{header.currency}}</th>
+          <th>in {{header.currency}}</th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for detail in detail %}
+        {% with quantity=detail.quantity unit=detail.unit price=detail.cost_price sales_tax=detail.sales_tax value_of_goods=detail.cost_price|mul:detail.quantity tax=detail.cost_price|mul:detail.quantity|mul:detail.sales_tax|div:100 %}
+        <tr>
+          <td style=" width: 70px; text-align: center; border-left:1px solid black; border-right:1px solid black; border-bottom:1px solid black;"><font style="margin-top:-100px;">{{forloop.counter}}</font></td>
+          <td style="border-left:1px solid black; border-right:1px solid black; border-bottom:1px solid black;"><font>{{detail.item_name}}<font>
+              <pre style="padding:0px; margin-top:-100px;">{{detail.item_description}}</pre>
+          </td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{quantity}}</td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{unit}}</td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-right:1px solid black; border-bottom:1px solid black;">{{price}}</td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-right:1px solid black; border-bottom:1px solid black;">{{value_of_goods|floatformat:2}}</td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-right:1px solid black; border-bottom:1px solid black;">{{tax|floatformat:2}}</td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-right:1px solid black; border-bottom:1px solid black;">{{value_of_goods|add:tax|floatformat:2}}</td>
+        </tr>
+        {% endwith %}
+        {% endfor %}
+
+      {% for i in i|rjust:total_lines %}
+      <tr style="height:6px;">
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
+      </tr>
+      {% endfor %}
+
+      <tr class="heading_row">
+        <td style="width: 70px;"></td>
+        <td style="width:400px;"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td style="text-align:center;" ><b>Total in {{header.currency}}</b></td>
+        <td style="text-align:center;" >{{total_amount|floatformat:2}}</td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
+</div>
+
+</body>
+</html>

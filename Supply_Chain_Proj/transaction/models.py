@@ -9,8 +9,11 @@ class ChartOfAccount(models.Model):
     phone_no = models.CharField(max_length = 100)
     email_address = models.CharField(max_length = 100)
     ntn = models.CharField(max_length = 100)
+    stn = models.CharField(max_length = 100)
+    cnic = models.CharField(max_length = 100)
     Address = models.CharField(max_length = 200)
     remarks = models.CharField(max_length = 100)
+    credit_limit = models.DecimalField(max_digits = 8, decimal_places = 2)
 
 
 class PurchaseHeader(models.Model):
@@ -77,6 +80,7 @@ class SaleDetail(models.Model):
     cost_price = models.DecimalField(max_digits = 8, decimal_places = 2)
     retail_price = models.DecimalField(max_digits = 8, decimal_places = 2)
     sales_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
+    dc_ref = models.CharField(max_length = 100)
     sale_id = models.ForeignKey(SaleHeader, on_delete = models.CASCADE)
 
 
@@ -109,5 +113,19 @@ class Transactions(models.Model):
     tran_type = models.CharField(max_length = 100)
     amount = models.DecimalField(max_digits = 8, decimal_places = 2)
     date = models.DateField(default = datetime.date.today)
-    voucher_no = models.CharField(max_length = 100)
     remarks = models.CharField(max_length = 100)
+
+
+class VoucherHeader(models.Model):
+    voucher_no = models.CharField(max_length = 100)
+    doc_no = models.CharField(max_length = 100)
+    doc_date = models.DateField(default = datetime.date.today)
+    cheque_no = models.CharField(max_length = 100)
+    cheque_date = models.DateField(max_length = datetime.date.today)
+    description = models.TextField()
+
+
+class VoucherDetail(models.Model):
+    account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True)
+    debit = models.DecimalField(max_digits = 8, decimal_places = 2)
+    credit = models.DecimalField(max_digits = 8, decimal_places = 2)

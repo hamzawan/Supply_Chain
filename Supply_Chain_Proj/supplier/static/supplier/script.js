@@ -70,6 +70,7 @@ $(document).ready(function(){
 				 					$('[data-toggle="tooltip"]').tooltip();
 
 					 });
+					 $('#item_code').val("");
 				});
 
 			// Add row on add button click
@@ -1405,7 +1406,9 @@ $(document).ready(function(){
 						var size = $('#size').val();
 						var product_name = $('#product_name').val();
 						var product_desc = $('#product_desc').val();
+						var unit = $('#select_unit').find(":selected").text();
 						var opening_stock = $('#opening_stock').val();
+						console.log(unit);
 						req =	$.ajax({
 							 headers: { "X-CSRFToken": getCookie("csrftoken") },
 							 type: 'POST',
@@ -1414,6 +1417,7 @@ $(document).ready(function(){
 								 'type': type,
 								 'size': size,
 								 'product_name': product_name,
+								 'unit':unit,
 								 'product_desc': product_desc,
 								 'opening_stock': opening_stock,
 							 },
@@ -1423,11 +1427,12 @@ $(document).ready(function(){
 								 var index = $("table tbody tr:last-child").index();
 										 var row = '<tr>' +
 												 '<td>'+count+'</td>' +
-												 '<td>'+ data.product_name +'</td>' +
-												 '<td>'+data.product_desc+'</td>' +
-												 '<td>'+data.opening_stock+'</td>' +
 												 '<td><pre>'+data.type+'</pre></td>' +
 												 '<td>'+data.size+'</td>' +
+												 '<td>'+data.product_name+'</td>' +
+												 '<td>'+data.product_desc+'</td>' +
+												 '<td>'+data.unit+'</td>' +
+												 '<td>'+data.opening_stock+'</td>' +
 									 '<td><a class="add-item" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-item" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-item" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 										 '</tr>';
 									 $("table").append(row);
@@ -1500,22 +1505,26 @@ $(document).ready(function(){
 										'opening_stock' : "",
 										'type' : "",
 										'size' : "",
+										'unit':"",
 									};
 									$tds.each(function(i, el){
 										if (i === 1) {
-												row["item_name"] = ($(this).text());
-										}
-										if (i === 2) {
-												row["item_desc"] = ($(this).text());
-										}
-										else if (i === 3) {
-												row["opening_stock"] = ($(this).text());
-										}
-										else if (i === 4) {
 												row["type"] = ($(this).text());
 										}
-										else if (i === 5) {
+										if (i === 2) {
 												row["size"] = ($(this).text());
+										}
+										else if (i === 3) {
+												row["item_name"] = ($(this).text());
+										}
+										else if (i === 4) {
+												row["item_desc"] = ($(this).text());
+										}
+										else if (i === 5) {
+												row["unit"] = ($(this).text());
+										}
+										else if (i === 6) {
+												row["opening_stock"] = ($(this).text());
 										}
 									});
 									data.push(row);
@@ -1706,6 +1715,9 @@ $(document).ready(function(){
 
 							// END EDIT DC SUPPLIER
 
+							$(document).ready(function() {
+							    $('.sort').DataTable();
+							} );
 
 
 });

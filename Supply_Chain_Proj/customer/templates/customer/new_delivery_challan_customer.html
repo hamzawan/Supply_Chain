@@ -15,14 +15,19 @@
           <label for="">DC No</label>
           <input type="text" readonly class="form-control form-control-sm" value="{{get_last_dc_no}}" id="dc_no_supplier">
         </div>
-        <div class="form-group col-md-2">
-          <label>Customer Name</label>
-          <input list="account" class="form-control form-control-sm" id="dc_customer">
-          <datalist id="account">
-            {% for value in all_accounts %}
-            <option value="{{value.account_title}}" />
-            {% endfor %}
-          </datalist>
+        <div class="form-group col-md-3">
+         <label for="">Customer</label>
+          <div class="input-group mb-3">
+            <input type="text" list="accounts" class="form-control form-control-sm " placeholder="Customer Name" aria-label="Recipient's username" aria-describedby="basic-addon2" id="dc_customer">
+            <div class="input-group-append">
+              <a class="btn btn-outline-secondary on btn-sm" href="{% url 'chart-of-account' %}" target="_blank" type="button"><i class="fas fa-plus"></i></a>
+            </div>
+            <datalist id="accounts">
+              {% for value in all_accounts %}
+              <option value="{{value.account_title}}">{{value.account_title}}</option>
+              {% endfor %}
+           </datalist>
+          </div>
         </div>
         <div class="form-group col-md-2">
           <label for="">Follow Up</label>
@@ -42,7 +47,7 @@
           </div>
           <datalist id="item">
             {% for value in all_item_code %}
-            <option value="{{value.product_code}}"></option>
+            <option value="{{value.product_code}}">{{value.product_code}} | {{value.product_name}} | {{value.product_desc}}</option>
             {% endfor %}
           </datalist>
             <div style="margin-left:20px;">

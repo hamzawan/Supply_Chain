@@ -17,6 +17,9 @@
 
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.css">
+  <link rel="stylesheet" href=" https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+
 
   <!-- Custom styles for this template-->
   <link href="{% static 'supplier/css/sb-admin.css' %}" rel="stylesheet">
@@ -163,7 +166,14 @@
           <a class="dropdown-item" href="{% url 'purchase-return-summary' %}">Purchase Return</a>
           <a class="dropdown-item" href="{% url 'sale' %}">Sale</a>
           <a class="dropdown-item" href="{% url 'sale-return-summary' %}">Sale Return</a>
+          <h5 class="dropdown-header">Vouchers :</h5>
           <a class="dropdown-item" href="{% url 'journal-voucher' %}">Journal Voucher</a>
+          <h6 class="dropdown-header">Receiving :</h6>
+          <a class="dropdown-item" href="{% url 'bank-receiving-voucher' %}">Bank Receiving Voucher</a>
+          <a class="dropdown-item" href="{% url 'cash-receiving-voucher' %}">Cash Receiving Voucher</a>
+          <h6 class="dropdown-header">Payment :</h6>
+          <a class="dropdown-item" href="{% url 'bank-payment-voucher' %}">Bank Payment Voucher</a>
+          <a class="dropdown-item" href="{% url 'cash-payment-voucher' %}">Cash Payment Voucher</a>
         </div>
       </li>
       <li class="nav-item dropdown">
@@ -310,6 +320,8 @@
   <script src="{% static 'supplier/script.js' %} "></script>
   <script src="{% static 'supplier/script_customer.js' %} "></script>
   <script src="{% static 'supplier/transaction.js' %} "></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
   <!-- <script src="{% static 'supplier/js/demo/chart-area-demo.js' %}"></script> -->
   <script type="text/javascript">
   function cheque_enable(status) {

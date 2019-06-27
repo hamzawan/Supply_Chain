@@ -25,7 +25,7 @@ def rfq_customer(request):
 
 def new_rfq_customer(request):
     get_last_rfq_no = RfqCustomerHeader.objects.last()
-    all_item_code = list(Add_products.objects.values('product_code'))
+    all_item_code = Add_products.objects.all()
     all_accounts = ChartOfAccount.objects.all()
     if get_last_rfq_no:
         get_last_rfq_no = get_last_rfq_no.rfq_no
@@ -106,7 +106,7 @@ def quotation_customer(request):
 
 
 def new_quotation_customer(request):
-    all_item_code = list(Add_products.objects.values('product_code'))
+    all_item_code = Add_products.objects.all()
     get_last_quotation_no = QuotationHeaderCustomer.objects.last()
     all_accounts = ChartOfAccount.objects.all()
     if get_last_quotation_no:
@@ -244,7 +244,7 @@ def purchase_order_customer(request):
 
 def new_purchase_order_customer(request):
     get_last_po_no = PoHeaderCustomer.objects.last()
-    all_item_code = list(Add_products.objects.values('product_code'))
+    all_item_code = Add_products.objects.all()
     all_accounts = ChartOfAccount.objects.all()
     if get_last_po_no:
         get_last_po_no = get_last_po_no.po_no
@@ -370,11 +370,27 @@ def print_po_customer(request,pk):
 
 def delivery_challan_customer(request):
     all_dc = DcHeaderCustomer.objects.all()
-    return render(request, 'customer/delivery_challan_customer.html',{'all_dc':all_dc})
+    cursor = connection.cursor()
+    is_dc = cursor.execute('''Select Distinct id,dc_no From (
+                            Select distinct dc_id_id,DC.item_code,DC.Item_name,
+                            DC.Quantity As DcQuantity,
+                            ifnull(sum(SD.Quantity),0) As SaleQuantity,
+                            (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
+                            from customer_dcdetailcustomer DC
+                            Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+                            And SD.item_code = DC.item_code
+                            group by dc_id_id,dc.item_code,dc.Item_name
+                            ) As tblData
+                            Inner Join customer_dcheadercustomer  HD on  HD.id = tblData.dc_id_id
+                            Where RemainingQuantity > 0''')
+    is_dc = is_dc.fetchall()
+    for value in is_dc:
+        print(value[1])
+    return render(request, 'customer/delivery_challan_customer.html',{'all_dc':all_dc,'is_dc':is_dc})
 
 
 def new_delivery_challan_customer(request):
-    all_item_code = list(Add_products.objects.values('product_code'))
+    all_item_code = Add_products.objects.all()
     get_last_dc_no = DcHeaderCustomer.objects.last()
     all_accounts = ChartOfAccount.objects.all()
     if get_last_dc_no:
@@ -392,6 +408,36 @@ def new_delivery_challan_customer(request):
             print(value.product_code)
         row = serializers.serialize('json',data)
         return HttpResponse(json.dumps({'row':row}))
+    get_item_code = request.POST.get('item_code', False)
+    quantity = request.POST.get('quantity', False)
+    if get_item_code:
+        cursor = connection.cursor()
+        cursor.execute('''Select item_code, item_name,Item_description,Unit,SUM(quantity) As qty From (
+                        Select 'Opening Stock' As TranType,Product_Code As Item_Code,Product_Name As Item_name,Product_desc As Item_description,Unit As unit,Opening_Stock as Quantity From inventory_add_products
+                        where product_code = %s
+                        union All
+                        Select 'Purchase' As TranType,Item_Code,Item_name,Item_description,unit,Quantity From transaction_purchasedetail
+                        where item_code = %s
+                        union All
+                        Select 'Purchase Return' As TranType,Item_Code,Item_name,Item_description,unit,Quantity * -1 From transaction_purchasereturndetail
+                        where item_code = %s
+                        union All
+                        Select 'Sale' As TranType,Item_Code,Item_name,Item_description,unit,Quantity * -1 From transaction_saledetail
+                        where item_code = %s
+                        union All
+                        Select 'Sale Return' As TranType,Item_Code,Item_name,Item_description,unit,Quantity  From transaction_salereturndetail
+                        where item_code = %s
+                        ) As tblTemp
+                        Group by Item_Code''',[get_item_code,get_item_code,get_item_code,get_item_code,get_item_code])
+        row = cursor.fetchall()
+        a = row[0][4]
+        b = quantity
+        if str(a) > str(b):
+            print(quantity)
+            print(row[0][4])
+            return JsonResponse({"message":"True"})
+        else:
+            return JsonResponse({"message":"False"})
     if request.method == 'POST':
         dc_customer = request.POST.get('customer', False)
         follow_up = request.POST.get('follow_up', False)

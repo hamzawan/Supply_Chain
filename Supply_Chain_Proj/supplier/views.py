@@ -69,7 +69,7 @@ def rfq_supplier(request):
 
 def new_rfq_supplier(request):
     get_last_rfq_no = RfqSupplierHeader.objects.last()
-    all_item_code = list(Add_products.objects.values('product_code'))
+    all_item_code = Add_products.objects.all()
     if get_last_rfq_no:
         get_last_rfq_no = get_last_rfq_no.rfq_no
         get_last_rfq_no = get_last_rfq_no[-3:]
@@ -157,7 +157,7 @@ def quotation_supplier(request):
 
 def new_quotation_supplier(request):
     get_last_quotation_no = QuotationHeaderSupplier.objects.last()
-    all_item_code = list(Add_products.objects.values('product_code'))
+    all_item_code = Add_products.objects.all()
     all_accounts = ChartOfAccount.objects.all()
     if get_last_quotation_no:
         get_last_quotation_no = get_last_quotation_no.quotation_no
@@ -324,7 +324,7 @@ def purchase_order_supplier(request):
 
 def new_purchase_order_supplier(request):
     get_last_po_no = PoHeaderSupplier.objects.last()
-    all_item_code = list(Add_products.objects.values('product_code'))
+    all_item_code = Add_products.objects.all
     all_accounts = ChartOfAccount.objects.all()
     if get_last_po_no:
         get_last_po_no = get_last_po_no.po_no
@@ -456,7 +456,7 @@ def delivery_challan_supplier(request):
 
 
 def new_delivery_challan_supplier(request):
-    all_item_code = list(Add_products.objects.values('product_code'))
+    all_item_code = Add_products.objects.all()
     get_last_dc_no = DcHeaderSupplier.objects.last()
     all_accounts = ChartOfAccount.objects.all()
     if get_last_dc_no:
@@ -469,6 +469,7 @@ def new_delivery_challan_supplier(request):
         get_last_dc_no = 'DC/SP/101'
     item_code_dc = request.POST.get('item_code_dc',False)
     if item_code_dc:
+        item_code_dc = item_code_dc[:12]
         data = Add_products.objects.filter(product_code = item_code_dc)
         for value in data:
             print(value.product_code)

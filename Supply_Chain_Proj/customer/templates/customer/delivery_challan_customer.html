@@ -1,5 +1,6 @@
 {% extends "supplier/base.html" %}
 {% load crispy_forms_tags %}
+{% load break_loop %}
 {% block body %}
 
 <div class="card" style="width: 100%;">
@@ -8,23 +9,14 @@
 </div>
 <ul class="list-group list-group-flush">
   <li class="list-group-item">
-    <!-- <div class="form-row">
-      <input type="text" name=""class="form-control col-md-2" value="">
-    </div> -->
     <div class="input-group">
-      <input type="text" class="form-control col-md-4" id="search" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
-      <div class="input-group-append">
-        <button class="btn btn-primary" type="button">
-          <i class="fas fa-search"></i>
-        </button>
-      </div>
-      <div class="col-md-8">
+      <div class="col-md-12">
         <a role="button" href="{% url 'new-delivery-challan-customer' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
       </div>
     </div>
     <br>
     <div class="table table-responsive content-loader">
-      <table class="table table-bordered" id="dataTable">
+      <table class="table table-bordered sort" id="dataTable">
           <thead>
               <tr>
                   <th width="70px" >S NO.</th>
@@ -43,7 +35,21 @@
                 <td>{{value.account_id.account_title}}</td>
                 <td>{{ value.date }}</td>
                 <td>user1</td>
-                <td><a class="edit_list" href="{% url 'edit-delivery-challan-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a href="{% url 'print-dc-customer' pk=value.id %}" target="_blank"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a><a class="delete-po-supplier"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+                <td><a class="edit_list" href="{% url 'edit-delivery-challan-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
+                  {% with i=0 %}
+                  {% if is_dc %}
+
+                  {% for i in is_dc %}
+                    {% if value.dc_no == i.1  %}
+                      <a href="{% url 'direct-sale' pk=value.id %} " style="color:black;" target="_blank"><i class="fas fa-file-invoice"></i></a>
+                    {% endif %}
+                  {% endfor %}
+                  {% else %}
+                  <a href="#" style="color:gray;"><i class="fas fa-file-invoice"></i></a>
+                  {% endif %}
+                  <a href="{% url 'print-dc-customer' pk=value.id %}" target="_blank"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a><a class="delete-po-supplier"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                  {% endwith %}
+                </td>
             </tr>
             {% endfor %}
           </tbody>
