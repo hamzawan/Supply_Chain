@@ -12,10 +12,12 @@
   {% csrf_token %}
   <li class="list-group-item">
       <div class="form-row">
+
         <div class="form-group col-md-2">
           <label for="">Purchase ID</label>
           <input type="text" readonly class="form-control form-control-sm" required value="{{ purchase_header.purchase_no }}" id="purchase_id">
         </div>
+
         <div class="form-group col-md-2">
           <label>Supplier Name</label>
           <input list="account" id="supplier_name_purchase" class="form-control form-control-sm" value="{{ purchase_header.account_id.account_title }}" required >
@@ -23,8 +25,9 @@
             {% for value in all_accounts %}
             <option value="{{value.account_title}}">{{value.account_title}}</option>
             {% endfor %}
-        </datalist>
+          </datalist>
         </div>
+
         <div class="form-group col-md-2">
          <label for="sel1">Payment Term:</label>
          <select class="form-control form-control-sm" id="payment_method">
@@ -36,6 +39,22 @@
            {% endif %}
          </select>
         </div>
+        <div class="form-group col-md-2">
+          <label for="">No Of Days:</label>
+          <input type="text" readonly class="form-control form-control-sm" value="{{purchase_header.credit_days}}" id="credit_days">
+        </div>
+        {% if purchase_header.follow_up|date:"Y-m-d" == "2010-06-10" %}
+        <div class="form-group col-md-2">
+          <label for="">Follow Up</label>
+          <input type="date" class="form-control form-control-sm"  value="" id="follow_up">
+        </div>
+        {% else %}
+        <div class="form-group col-md-2">
+          <label for="">Follow Up</label>
+          <input type="date" class="form-control form-control-sm"  value="{{ purchase_header.follow_up|date:"Y-m-d" }}" id="follow_up">
+        </div>
+        {% endif %}
+
         <div class="form-group">
           <label for="exampleFormControlTextarea2">Footer Description</label>
           <textarea class="form-control rounded-0" rows="3" id="footer_desc">{{ purchase_header.footer_description }}</textarea>
@@ -62,23 +81,21 @@
       <table class="table table-bordered" id="edit-purchase-table">
           <thead>
               <tr>
-                  <th width="40px" style="font-size:10px;">S No.</th>
                   <th width="100px">Item Code</th>
                   <th width="70px">Item Name</th>
                   <th width="70px">Desc.</th>
-                  <th width="60px">Qty</th>
-                  <th width="60px">Unit</th>
-                  <th width="70px">Price</th>
-                  <th width="90px">Value Of Goods</th>
-                  <th width="90px">Sales Tax in % </th>
-                  <th width="110px">Sales Tax Amount</th>
+                  <th width="140px">Qty</th>
+                  <th width="70px">Unit</th>
+                  <th width="140px">Price</th>
+                  <th width="70px">VOG</th>
+                  <th width="90px">ST in % </th>
+                  <th width="90px">ST Amount</th>
                   <th>Action</th>
               </tr>
           </thead>
           <tbody>
             {% for value in purchase_detail %}
               <tr>
-                <td>{{ forloop.counter }}</td>
                 <td> {{value.item_code}} </td>
                 <td> {{value.item_name}} </td>
                 <td><pre>{{value.item_description}}</pre></td>

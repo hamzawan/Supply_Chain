@@ -52,6 +52,7 @@ $(document).ready(function(){
 					 })
 					 .done(function done(data){
 						 var type = JSON.parse(data.row);
+						 console.log(type);
 							 // Append table with add row form on add new button click
 				 			$(this).attr("disabled", "disabled");
 				 			var index = $("table tbody tr:last-child").index();
@@ -60,7 +61,7 @@ $(document).ready(function(){
 				 							'<td>'+type[0].fields['product_code']+'</td>' +
 				 							'<td>'+type[0].fields['product_name']+'</td>' +
 				 							'<td><pre>'+type[0].fields['product_desc']+'</pre></td>' +
-				 							'<td><input type="text" class="form-control" value=""></td>' +
+				 							'<td>'+type[0].fields['unit']+'</td>' +
 				 							'<td><input type="text" class="form-control" value=""></td>' +
 				 							'<td><a class="add-rfq" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-rfq" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-rfq" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 				 					'</tr>';
@@ -1427,10 +1428,10 @@ $(document).ready(function(){
 								 var index = $("table tbody tr:last-child").index();
 										 var row = '<tr>' +
 												 '<td>'+count+'</td>' +
-												 '<td><pre>'+data.type+'</pre></td>' +
+												 '<td>'+data.type+'</td>' +
 												 '<td>'+data.size+'</td>' +
 												 '<td>'+data.product_name+'</td>' +
-												 '<td>'+data.product_desc+'</td>' +
+												 '<td><pre><span class="inner-pre" style="font-size: 11px"">'+data.product_desc+'</span></pre></td>' +
 												 '<td>'+data.unit+'</td>' +
 												 '<td>'+data.opening_stock+'</td>' +
 									 '<td><a class="add-item" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-item" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-item" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
@@ -1713,11 +1714,42 @@ $(document).ready(function(){
 					});
 
 
-							// END EDIT DC SUPPLIER
+				// END EDIT DC SUPPLIER
 
-							$(document).ready(function() {
-							    $('.sort').DataTable();
-							} );
+				$(document).ready(function() {
+				    $('.sort').DataTable();
+				} );
+
+				//Submit edit form of inventory items
+				$('#edit-item-form').on('submit',function(e){
+					e.preventDefault();
+
+						var type = $('#type').val()
+						var size = $('#size').val()
+						var product_name = $('#product_name').val()
+						var product_desc = $('#product_desc').val()
+						var select_unit = $('#select_unit').val()
+						var opening_stock = $('#opening_stock').val()
+
+						 req =	$.ajax({
+								headers: { "X-CSRFToken": getCookie("csrftoken") },
+								type: 'POST',
+								url : `/inventory/edit_item/${edit_id}/`,
+								data:{
+									'type':type,
+									'size':size,
+									'product_name':product_name,
+									'product_desc':product_desc,
+									'select_unit':select_unit,
+									'opening_stock':opening_stock,
+								},
+								dataType: 'json'
+							})
+							.done(function done(){
+								alert("Item Updated");
+								location.reload();
+							})
+				});
 
 
 });

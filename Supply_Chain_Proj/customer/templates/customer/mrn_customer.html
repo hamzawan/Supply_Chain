@@ -15,6 +15,8 @@
               <tr>
                   <th width="70px" >S NO.</th>
                   <th width="140px">DC no</th>
+                  <th width="140px">Customer</th>
+                  <th width="140px">Date</th>
                   <th width="70px">Action</th>
               </tr>
           </thead>
@@ -23,6 +25,8 @@
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ value.dc_no }}</td>
+                <td>{{ value.account_id.account_title }}</td>
+                <td>{{ value.date }}</td>
                 <td><a class="edit_list" href="{% url 'edit-mrn-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a></td>
             </tr>
             {% endfor %}

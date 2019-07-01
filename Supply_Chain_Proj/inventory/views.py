@@ -8,18 +8,24 @@ from django.db import connection
 
 def item_stock(request):
     cursor = connection.cursor()
-    cursor.execute('''Select item_code, item_name,Item_description,Unit,SUM(quantity) As qty From (
-Select 'Opening Stock' As TranType,Product_Code As Item_Code,Product_Name As Item_name,Product_desc As Item_description,Unit As unit,Opening_Stock as Quantity From inventory_add_products
-union All
-Select 'Purchase' As TranType,Item_Code,Item_name,Item_description,unit,Quantity From transaction_purchasedetail
-union All
-Select 'Purchase Return' As TranType,Item_Code,Item_name,Item_description,unit,Quantity * -1 From transaction_purchasereturndetail
-union All
-Select 'Sale' As TranType,Item_Code,Item_name,Item_description,unit,Quantity * -1 From transaction_saledetail
-union All
-Select 'Sale Return' As TranType,Item_Code,Item_name,Item_description,unit,Quantity  From transaction_salereturndetail
-) As tblTemp
-Group by Item_Code''')
+    cursor.execute('''Select itemID,Size,item_code, item_name,Item_description,Unit,Size,SUM(quantity) As qty From (
+                        Select 'Opening Stock' As TranType,ID As ItemID, Size,Product_Code As Item_Code,Product_Name As Item_name,Product_desc As Item_description,Unit As unit,Opening_Stock as Quantity
+                        From inventory_add_products
+                        union all
+                        Select 'Purchase' As TranType,P.ID As ItemID,P.Size,Item_Code,Item_name,Item_description,H.unit,Quantity
+                        From transaction_purchasedetail H Inner join inventory_add_products P On H.item_code = P.product_code
+                        union All
+                        Select 'Purchase Return' As TranType,P.ID As ItemID,P.Size,Item_Code,Item_name,Item_description,H.unit,Quantity * -1
+                        From transaction_purchasereturndetail H Inner join inventory_add_products P On H.item_code = P.product_code
+                        union all
+                        Select 'Sale' As TranType,P.ID AS ItemID,P.Size,Item_Code,Item_name,Item_description,H.unit,Quantity * -1
+                        From transaction_saledetail H Inner join inventory_add_products P On H.item_code = P.product_code
+                        union all
+                        Select 'Sale Return' As TranType,P.ID AS ItemID,P.Size,Item_Code,Item_name,Item_description,H.unit,Quantity
+                        From transaction_salereturndetail H Inner join inventory_add_products P On H.item_code = P.product_code
+                        ) As tblTemp
+                        Group by Item_Code
+                    ''')
     row = cursor.fetchall()
     return render(request, 'inventory/item_stock.html',{'row':row})
 
@@ -60,3 +66,24 @@ def add_product(request):
             serial_no = serial_no + 1
         return JsonResponse({"result":"success"})
     return render(request, 'inventory/add_product.html')
+
+
+def edit_item(request,pk):
+    all_detail = Add_products.objects.filter(id = pk).first()
+    if request.method == "POST":
+        type = request.POST.get('type')
+        size = request.POST.get('size')
+        product_name = request.POST.get('product_name')
+        product_desc = request.POST.get('product_desc')
+        select_unit = request.POST.get('select_unit')
+        opening_stock = request.POST.get('opening_stock')
+
+        all_detail.type = type
+        all_detail.size = size
+        all_detail.product_name = product_name
+        all_detail.product_desc = product_desc
+        all_detail.select_unit = select_unit
+        all_detail.opening_stock = opening_stock
+        all_detail.save()
+        return JsonResponse({"result":"success"})
+    return render(request, 'inventory/edit_item.html', {'all_detail':all_detail,'pk':pk})

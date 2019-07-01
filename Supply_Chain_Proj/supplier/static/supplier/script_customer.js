@@ -60,7 +60,7 @@ $(document).ready(function(){
 				 							'<td>'+type[0].fields['product_code']+'</td>' +
 				 							'<td>'+type[0].fields['product_name']+'</td>' +
 				 							'<td><pre>'+type[0].fields['product_desc']+'</pre></td>' +
-				 							'<td><input type="text" class="form-control" value=""></td>' +
+				 							'<td>'+type[0].fields['unit']+'</td>' +
 				 							'<td><input type="text" class="form-control" value=""></td>' +
 				 							'<td><a class="add-rfq-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-rfq-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-rfq-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 				 					'</tr>';
@@ -364,11 +364,11 @@ $(document).ready(function(){
 						 var index = $("table tbody tr:last-child").index();
 								 var row = '<tr>' +
 										 '<td>'+count+'</td>' +
-										 '<td>'+ type[0].fields['product_code'] +'</td>' +
-										 '<td>'+ type[0].fields['product_name'] +'</td>' +
-										 '<td>'+ type[0].fields['product_desc'] +'</td>' +
+										 '<td>'+type[0].fields['product_code']+'</td>' +
+										 '<td>'+type[0].fields['product_name']+'</td>' +
+										 '<td><pre>'+type[0].fields['product_desc']+'</pre></td>' +
 										 '<td><input type="text" class="form-control" required ></td>' +
-										 '<td><input type="text" class="form-control" required ></td>' +
+										 '<td>'+type[0].fields['unit']+'</td>' +
 										 '<td><input type="text" class="form-control" required ></td>' +
 										 '<td><input type="text" class="form-control" required ></td>' +
 							 '<td><a class="add-quotation-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-quotation-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-quotation-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
@@ -452,6 +452,7 @@ $(document).ready(function(){
 					var customer = $('#customer_quotation').val();
 					var attn = $('#quotation_customer_attn').val();
 					var prcbasis = $('#quotation_customer_prcbasis').val();
+					var yrref = $('#quotation_customer_yrref').val();
 					var leadtime = $('#quotation_customer_leadtime').val();
 					var validity = $('#quotation_customer_validity').val();
 					var payment = $('#quotation_customer_payment').val();
@@ -512,6 +513,7 @@ $(document).ready(function(){
 									'leadtime': leadtime,
 									'validity': validity,
 									'payment': payment,
+									'yrref': yrref,
 									'remarks': remarks,
 									'currency': currency,
 									'exchange_rate':exchange_rate,
@@ -531,7 +533,8 @@ $(document).ready(function(){
 								    //Browser has blocked it
 								    alert('Please allow popups for this website');
 								}
-								window.location.href = 'http://localhost:8000/customer/send_email/140/2';
+								location.reload()
+								// window.location.href = 'http://localhost:8000/customer/send_email/140/2';
 							})
 				});
 
@@ -556,11 +559,11 @@ $(document).ready(function(){
 									 var index = $("table tbody tr:last-child").index();
 											 var row = '<tr>' +
 													 '<td><input type="text" readonly class="form-control" value='+count+'></td>' +
-													 '<td>'+ type[i].fields['product_code'] +'</td>' +
-													 '<td>'+ type[i].fields['product_name'] +'</td>' +
-													 '<td>'+ type[i].fields['product_desc'] +'</td>' +
+													 '<td>'+type[i].fields['product_code']+'</td>' +
+													 '<td>'+type[i].fields['product_name']+'</td>' +
+													 '<td><pre>'+type[i].fields['product_desc']+'</pre></td>' +
 													 '<td><input type="text" class="form-control" required ></td>' +
-													 '<td><input type="text" class="form-control" required ></td>' +
+													 '<td>'+type[i].fields['unit']+'</td>' +
 													 '<td><input type="text" class="form-control" required ></td>' +
 													 '<td><input type="text" class="form-control" required ></td>' +
 										 '<td><a class="add-quotation-edit-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-quotation-edit-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-quotation-edit-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
@@ -569,6 +572,7 @@ $(document).ready(function(){
 										 $("table").append(row);
 									 $("table tbody tr").eq(index + 1).find(".add-quotation-edit-customer, .edit-quotation-edit-customer").toggle();
 											 $('[data-toggle="tooltip"]').tooltip();
+											 $(".has_id").attr("disabled", "disabled");
 										 }
 								 }
 								 else{
@@ -597,6 +601,7 @@ $(document).ready(function(){
 							});
 							$(this).parents("tr").find(".add-quotation-edit-customer, .edit-quotation-edit-customer").toggle();
 							$(".edit-quotation-customer").removeAttr("disabled");
+							$(".has_id").removeAttr("disabled");
 						}
 						});
 
@@ -619,6 +624,7 @@ $(document).ready(function(){
 						});
 						$(this).parents("tr").find(".add-quotation-edit-customer, .edit-quotation-edit-customer").toggle();
 						$(".edit-quotation-customer").attr("disabled", "disabled");
+						$(".has_id").attr("disabled", "disabled");
 						});
 
 						// Delete row on delete button click
@@ -630,6 +636,7 @@ $(document).ready(function(){
 							});
 							$(this).parents("tr").remove();
 							$(".edit-quotation-customer").removeAttr("disabled");
+							$(".has_id").removeAttr("disabled");
 						});
 
 
@@ -645,6 +652,7 @@ $(document).ready(function(){
 						var customer = $('#quotation_customer_edit').val();
 						var attn = $('#edit_quotation_attn').val();
 						var prcbasis = $('#edit_quotation_prcbasis').val();
+						var yrref = $('#edit_quotation_yrref').val();
 						var leadtime = $('#edit_quotation_leadtime').val();
 						var validity = $('#edit_quotation_validity').val();
 						var payment = $('#edit_quotation_payment').val();
@@ -702,6 +710,7 @@ $(document).ready(function(){
 										'customer': customer,
 										'attn': attn,
 										'prcbasis': prcbasis,
+										'yrref': yrref,
 										'leadtime': leadtime,
 										'validity': validity,
 										'payment': payment,
@@ -749,7 +758,7 @@ $(document).ready(function(){
 										 '<td>'+ type[0].fields['product_name'] +'</td>' +
 										 '<td><pre>'+ type[0].fields['product_desc'] +'</pre></td>' +
 										 '<td><input type="text" class="form-control form-control-sm" required ></td>' +
-										 '<td><input type="text" class="form-control" required ></td>' +
+										 '<td>'+ type[0].fields['unit'] +'</td>' +
 										 '<td><input type="text" class="form-control" required ></td>' +
 										 '<td><input type="text" class="form-control" required ></td>' +
 							 '<td><a class="add-po-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-po-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-po-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
@@ -758,6 +767,7 @@ $(document).ready(function(){
 						 $("table tbody tr").eq(index + 1).find(".add-po-customer, .edit-po-customer").toggle();
 								 $('[data-toggle="tooltip"]').tooltip();
 							 $('#item_code_po').val("");
+							 $(".has_id").attr("disabled", "disabled");
 					 }
 					 else{
 						 alert(data.message)
@@ -786,6 +796,7 @@ $(document).ready(function(){
 				});
 				$(this).parents("tr").find(".add-po-customer, .edit-po-customer").toggle();
 				$(".add-new-po-customer").removeAttr("disabled");
+				$(".has_id").removeAttr("disabled");
 			}
 			});
 
@@ -808,6 +819,8 @@ $(document).ready(function(){
 			});
 			$(this).parents("tr").find(".add-po-customer, .edit-po-customer").toggle();
 			$(".add-new-po-customer").attr("disabled", "disabled");
+			$(".has_id").attr("disabled", "disabled");
+
 			});
 
 			// Delete row on delete button click
@@ -819,6 +832,7 @@ $(document).ready(function(){
 				});
 				$(this).parents("tr").remove();
 				$(".add-new-po-customer").removeAttr("disabled");
+				$(".has_id").removeAttr("disabled");
 			});
 
 
@@ -832,6 +846,7 @@ $(document).ready(function(){
 				var customer = $('#po_customer').val();
 	  		var attn = $('#po_customer_attn').val();
 	  		var prcbasis = $('#po_customer_prcbasis').val();
+				var po_client = $('#po_client').val();
 	  		var leadtime = $('#po_customer_leadtime').val();
 	  		var validity = $('#po_customer_validity').val();
 	  		var payment = $('#po_customer_payment').val();
@@ -889,6 +904,7 @@ $(document).ready(function(){
 								'customer':customer,
 								'attn': attn,
 								'prcbasis': prcbasis,
+								'po_client': po_client,
 								'leadtime': leadtime,
 								'validity': validity,
 								'payment': payment,
@@ -929,11 +945,11 @@ $(document).ready(function(){
 								 var index = $("table tbody tr:last-child").index();
 										 var row = '<tr>' +
 												 '<td><input type="text" readonly class="form-control" value='+count+'></td>' +
-												 '<td>'+ type[i].fields['product_code'] +'</td>' +
-												 '<td>'+ type[i].fields['product_name'] +'</td>' +
-												 '<td>'+ type[i].fields['product_desc'] +'</td>' +
+												 '<td>'+type[i].fields['product_code']+'</td>' +
+												 '<td>'+type[i].fields['product_name']+'</td>' +
+												 '<td><pre>'+type[i].fields['product_desc']+'</pre></td>' +
 												 '<td><input type="text" class="form-control" required ></td>' +
-												 '<td><input type="text" class="form-control" required ></td>' +
+												 '<td>'+type[i].fields['unit']+'</td>' +
 												 '<td><input type="text" class="form-control" required ></td>' +
 												 '<td><input type="text" class="form-control" required ></td>' +
 									 '<td><a class="add-po-edit-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-po-edit-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-po-edit-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
@@ -942,10 +958,13 @@ $(document).ready(function(){
 									 $("table").append(row);
 								 $("table tbody tr").eq(index + 1).find(".add-po-edit-customer, .edit-po-edit-customer").toggle();
 										 $('[data-toggle="tooltip"]').tooltip();
+										 $(".has_id").attr("disabled", "disabled");
 									 }
 							 }
 							 else{
 								 alert(data.message)
+								 $(".edit-po-customer").removeAttr("disabled");
+								 $(".has_id").removeAttr("disabled");
 							 }
 						 });
 					});
@@ -970,6 +989,7 @@ $(document).ready(function(){
 						});
 						$(this).parents("tr").find(".add-po-edit-customer, .edit-po-edit-customer").toggle();
 						$(".edit-po-customer").removeAttr("disabled");
+						$(".has_id").removeAttr("disabled");
 					}
 					});
 
@@ -992,6 +1012,7 @@ $(document).ready(function(){
 					});
 					$(this).parents("tr").find(".add-po-edit-customer, .edit-po-edit-customer").toggle();
 					$(".edit-po-customer").attr("disabled", "disabled");
+					$(".has_id").attr("disabled", "disabled");
 					});
 
 					// Delete row on delete button click
@@ -1003,6 +1024,7 @@ $(document).ready(function(){
 						});
 						$(this).parents("tr").remove();
 						$(".edit-po-customer").removeAttr("disabled");
+						$(".has_id").removeAttr("disabled");
 					});
 
 
@@ -1018,6 +1040,7 @@ $(document).ready(function(){
 					var customer = $('#edit_po_customer').val();
 					var attn = $('#edit_po_attn').val();
 					var prcbasis = $('#edit_po_prcbasis').val();
+					var po_client = $('#edit_po_client').val();
 					var leadtime = $('#edit_po_leadtime').val();
 					var validity = $('#edit_po_validity').val();
 					var payment = $('#edit_po_payment').val();
@@ -1075,6 +1098,7 @@ $(document).ready(function(){
 									'customer':customer,
 									'attn': attn,
 									'prcbasis': prcbasis,
+									'po_client': po_client,
 									'leadtime': leadtime,
 									'validity': validity,
 									'payment': payment,
@@ -1118,19 +1142,19 @@ $(document).ready(function(){
 								 var index = $("table tbody tr:last-child").index();
 										 var row = '<tr>' +
 												 '<td>'+count+'</td>' +
-												 '<td id="get_item_code">'+ type[0].fields['product_code'] +'</td>' +
-												 '<td>'+ type[0].fields['product_name'] +'</td>' +
-												 '<td><pre>'+ type[0].fields['product_desc'] +'</pre></td>' +
+												 '<td id="get_item_code">'+type[0].fields['product_code']+'</td>' +
+												 '<td>'+type[0].fields['product_name']+'</td>' +
+												 '<td><pre>'+type[0].fields['product_desc']+'</pre></td>' +
 												 '<td id="quantity"><input type="text" class="form-control form-control-sm" required ></td>' +
-												 '<td><input type="text" class="form-control" required ></td>' +
-												 '<td><input type="text" class="form-control" required ></td>' +
-												 '<td><input type="text" class="form-control" required ></td>' +
+												 '<td>'+type[0].fields['unit']+'</td>' +
 									 '<td><a class="add-dc-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-dc-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-dc-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 										 '</tr>';
 									 $("table").append(row);
 								 $("table tbody tr").eq(index + 1).find(".add-dc-customer, .edit-dc-customer").toggle();
 										 $('[data-toggle="tooltip"]').tooltip();
 									 $('#item_code_dc').val("");
+									 $(".add-new-dc-customer").attr("disabled", "disabled");
+				 					 $(".has_id").attr("disabled", "disabled");
 							 }
 							 else{
 								 alert(data.message)
@@ -1159,6 +1183,7 @@ $(document).ready(function(){
 						});
 						$(this).parents("tr").find(".add-dc-customer, .edit-dc-customer").toggle();
 						$(".add-new-dc-customer").removeAttr("disabled");
+						$(".has_id").removeAttr("disabled");
 					}
 					var get_quantity = $($(this).parents("tr").find("#quantity")).filter(function() {
 									quantity = $(this).text();
@@ -1219,6 +1244,7 @@ $(document).ready(function(){
 					});
 					$(this).parents("tr").find(".add-dc-customer, .edit-dc-customer").toggle();
 					$(".add-new-dc-customer").attr("disabled", "disabled");
+					$(".has_id").attr("disabled", "disabled");
 					});
 
 					// Delete row on delete button click
@@ -1230,6 +1256,7 @@ $(document).ready(function(){
 						});
 						$(this).parents("tr").remove();
 						$(".add-new-dc-customer").removeAttr("disabled");
+						$(".has_id").removeAttr("disabled");
 					});
 
 
@@ -1242,6 +1269,8 @@ $(document).ready(function(){
 							var data = [];
 
 							var customer = $('#dc_customer').val();
+							var cartage_amount = $('#cartage_amount').val();
+							var comments = $('#comments').val();
 							var follow_up = $('#follow_up').val();
 							var footer_remarks = $('#footer_remarks').val();
 
@@ -1291,6 +1320,8 @@ $(document).ready(function(){
 										url : '/customer/delivery_challan/new',
 										data:{
 											'customer':customer,
+											'cartage_amount': cartage_amount,
+											'comments': comments,
 											'follow_up': follow_up,
 											'footer_remarks': footer_remarks,
 											'items': JSON.stringify(data),
@@ -1323,11 +1354,11 @@ $(document).ready(function(){
 											 var index = $("table tbody tr:last-child").index();
 													 var row = '<tr>' +
 															 '<td><input type="text" readonly class="form-control" value='+count+'></td>' +
-															 '<td>'+ type[i].fields['product_code'] +'</td>' +
-															 '<td>'+ type[i].fields['product_name'] +'</td>' +
-															 '<td>'+ type[i].fields['product_desc'] +'</td>' +
+															 '<td>'+type[i].fields['product_code']+'</td>' +
+															 '<td>'+type[i].fields['product_name']+'</td>' +
+															 '<td><pre>'+type[i].fields['product_desc']+'</pre></td>' +
 															 '<td><input type="text" class="form-control" required ></td>' +
-															 '<td><input type="text" class="form-control" required ></td>' +
+															 '<td>'+type[i].fields['unit']+'</td>' +
 															 '<td><input type="text" class="form-control" required ></td>' +
 															 '<td><input type="text" class="form-control" required ></td>' +
 												 '<td><a class="add-dc-edit-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-dc-edit-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-dc-edit-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
@@ -1336,10 +1367,14 @@ $(document).ready(function(){
 												 $("table").append(row);
 											 $("table tbody tr").eq(index + 1).find(".add-dc-edit-customer, .edit-dc-edit-customer").toggle();
 													 $('[data-toggle="tooltip"]').tooltip();
+													 $(".edit-dc-supplier").attr("disabled", "disabled");
+					 								$(".has_id").attr("disabled", "disabled");
 												 }
 										 }
 										 else{
 											 alert(data.message)
+											 $(".edit-dc-customer").removeAttr("disabled");
+											 $(".has_id").removeAttr("disabled");
 										 }
 									 });
 								});
@@ -1364,17 +1399,15 @@ $(document).ready(function(){
 									});
 									$(this).parents("tr").find(".add-dc-edit-customer, .edit-dc-edit-customer").toggle();
 									$(".edit-dc-customer").removeAttr("disabled");
+									$(".has_id").removeAttr("disabled");
 								}
 								});
 
 
 								// Edit row on edit button click
-								$(document).on("click", ".edit-dc-edit", function(){
+								$(document).on("click", ".edit-dc-edit-customer", function(){
 										$(this).parents("tr").find("td:not(:last-child)").each(function(i){
 											if (i === 4 ) {
-												$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
-											}
-											if (i === 5) {
 												$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
 											}
 											if (i === 6) {
@@ -1384,8 +1417,9 @@ $(document).ready(function(){
 												$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
 											}
 								});
-								$(this).parents("tr").find(".add-dc-edit, .edit-dc-edit").toggle();
+								$(this).parents("tr").find(".add-dc-edit-customer, .edit-dc-edit-customer").toggle();
 								$(".edit-dc-supplier").attr("disabled", "disabled");
+								$(".has_id").attr("disabled", "disabled");
 								});
 
 								// Delete row on delete button click
@@ -1397,6 +1431,7 @@ $(document).ready(function(){
 									});
 									$(this).parents("tr").remove();
 									$(".edit-dc-customer").removeAttr("disabled");
+									$(".has_id").removeAttr("disabled");
 								});
 
 

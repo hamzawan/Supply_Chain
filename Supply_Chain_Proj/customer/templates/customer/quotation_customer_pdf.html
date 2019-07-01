@@ -10,11 +10,11 @@
             /* left: 30pt; width: 512pt; top: 20pt; height: 390pt; */
         }
         @frame content_frame {          /* Content Frame */
-            left: 30pt; width: 535pt; top: 10pt; height: 715pt;
+            left: 30pt; width: 535pt; top: 10pt; height: 675pt;
         }
         @frame footer_frame {           /* Another static Frame */
             -pdf-frame-content: footer_content;
-            left: 30pt; width: 535pt; top: 733pt; height: 140pt;
+            left: 30pt; width: 535pt; top: 703pt; height: 170pt;
         }
     }
     table > thead > tr > th {
@@ -98,19 +98,19 @@
            <th align="left"><font size="14px" color="#0a012c">Prc Basis:</font</th>
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.prc_basis}}</font></td>
            <th align="left" style="padding-top:4px;"><font size="14px" color="#0a012c">Yr Ref:</font></th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">10192</font></td>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.yrref}}</font></td>
          </tr>
          <tr>
            <th align="left"><font size="14px" color="#0a012c">Lead Time:</font</th>
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.leadtime}}</font></td>
            <th align="left"><font size="14px" color="#0a012c">Validity:</font</th>
-           <td align="left" style="padding-top:4px;" color="#0a012c"><font size="12px">1001010</font></td>
+           <td align="left" style="padding-top:4px;" color="#0a012c"><font size="12px">{{header.validity}}</font></td>
          </tr>
          <tr>
            <th align="left"><font size="14px" color="#0a012c">Payment:</font</th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c" >1001010</font></td>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c" >{{header.payment}}</font></td>
            <th align="left"><font size="14px" color="#0a012c" >Remarks:</font</th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c" >1001010</font></td>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c" >{{header.remarks}}</font></td>
          </tr>
        </thead>
        </table>
@@ -143,15 +143,15 @@
           <td style="border-left:1px solid black; border-right:1px solid black;"><font>{{detail.item_name}}<font>
               <pre style="padding:0px; margin-top:-100px;">{{detail.item_description}}</pre>
           </td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;">{{detail.quantity}}</td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;">{{detail.unit}}</td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; width:60px;">{{detail.quantity}}</td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; width:60px;">{{detail.unit}}</td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-right:1px solid black;">{{detail.unit_price}}</td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-right:1px solid black;">{{detail.unit_price|mul:detail.quantity}}</td>
         </tr>
         {% endfor %}
 
-        {% for i in i|rjust:total_lines %}
-        <tr style="height:6px;">
+        <!-- {% for i in i|rjust:total_lines %}
+        <tr style="height:4.5pt;">
             <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
             <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
             <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
@@ -159,14 +159,14 @@
             <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
             <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
         </tr>
-        {% endfor %}
+        {% endfor %} -->
       <tr class="heading_row">
-        <td style="width: 70px;"></td>
-        <td style="width:400px;"></td>
-        <td></td>
-        <td></td>
-        <td style="text-align:center;" ><b>Total in {{header.currency}}</b></td>
-        <td style="text-align:center;" >{{total_amount|floatformat:2}}</td>
+        <td style="width: 95px;"></td>
+        <td style="width:700px;"></td>
+        <td style="width:150px;"></td>
+        <td style="width:150px;"></td>
+        <td style="text-align:center; width:200px;" ><b>Total in {{header.currency}}</b></td>
+        <td style="text-align:center; width:200px;" >{{total_amount|floatformat:2}}</td>
       </tr>
     </tbody>
   </table>

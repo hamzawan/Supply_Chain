@@ -41,6 +41,6 @@ urlpatterns = [
     path('sale_detail_item_wise/pdf/', views.sale_detail_item_wise, name = 'sale-detail-item-wise'),
     path('sale_summary_item_wise/pdf/', views.sale_summary_item_wise, name = 'sale-summary-item-wise'),
 
-    path('sales_tax_invoice/pdf/', views.sales_tax_invoice, name = 'sales-tax-invoice'),
-    path('commercial_invoice/pdf/', views.commercial_invoice, name = 'commercial-invoice'),
+    path('sales_tax_invoice/pdf/<pk>', views.sales_tax_invoice, name = 'sales-tax-invoice'),
+    path('commercial_invoice/pdf/<pk>', views.commercial_invoice, name = 'commercial-invoice'),
 ]

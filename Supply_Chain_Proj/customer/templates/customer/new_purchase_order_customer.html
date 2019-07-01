@@ -18,7 +18,7 @@
         <div class="form-group col-md-3">
          <label for="">Customer</label>
           <div class="input-group mb-3">
-            <input type="text" list="accounts" class="form-control form-control-sm " placeholder="Customer Name" aria-label="Recipient's username" aria-describedby="basic-addon2" id="po_customer">
+            <input type="text" list="accounts" class="form-control form-control-sm" required placeholder="Customer Name" aria-label="Recipient's username" aria-describedby="basic-addon2" id="po_customer">
             <div class="input-group-append">
               <a class="btn btn-outline-secondary on btn-sm" href="{% url 'chart-of-account' %}" target="_blank" type="button"><i class="fas fa-plus"></i></a>
             </div>
@@ -38,13 +38,17 @@
           <input type="text" class="form-control form-control-sm"  id="po_customer_prcbasis">
         </div>
         <div class="form-group col-md-2">
-          <label for="">Lead Time</label>
-          <input type="text" class="form-control form-control-sm"  id="po_customer_leadtime">
+          <label for="">PO No <small>(client)</small> </label>
+          <input type="text" class="form-control form-control-sm"  id="po_client">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group col-md-2">
-          <label for="">Validity</label>
+          <label for="">Lead Time</label>
+          <input type="text" class="form-control form-control-sm"  id="po_customer_leadtime">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Expiry</label>
           <input type="text" class="form-control form-control-sm"  id="po_customer_validity">
         </div>
         <div class="form-group col-md-2">
@@ -60,18 +64,18 @@
         </div>
         <div class="form-group col-md-2">
           <label for="">Currency</label>
-          <input type="text" class="form-control form-control-sm" required id="po_customer_currency">
+          <input type="text" class="form-control form-control-sm" required id="po_customer_currency" value="PKR">
         </div>
         <div class="form-group col-md-2">
           <label for="">Exchange Rate</label>
-          <input type="text" class="form-control form-control-sm" required id="po_customer_exchange_rate">
+          <input type="text" class="form-control form-control-sm" required id="po_customer_exchange_rate" value="1">
         </div>
+      </div>
+      <div class="form-row">
         <div class="form-group col-md-2">
           <label for="">Follow Up</label>
           <input type="date" class="form-control form-control-sm"  id="po_customer_follow_up">
         </div>
-      </div>
-      <div class="form-row">
         <div class="form-group col-md-2">
           <label for="">Footer Remarks</label>
           <textarea name="name" style="height:30px; width:370px;" id="footer_remarks"></textarea>
@@ -114,7 +118,7 @@
       </table>
     </div>
     <div class="text-center">
-      <button type="submit" class="btn btn-outline-primary">Submit <small>(Purchase Order)</small></button>
+      <button type="submit" class="btn btn-outline-primary has_id">Submit <small>(Purchase Order)</small></button>
     </div>
   </li>
 </form>

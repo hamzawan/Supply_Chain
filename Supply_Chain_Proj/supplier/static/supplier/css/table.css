@@ -250,7 +250,8 @@ table.table td a.edit_list {
 table.table td a.delete-all {
     color: #E34724;
 }
-
+pre {font-family: "Avenir", Verdana, sans-serif
+    }
 #dataTable.table td a.delete_item_row {
     color: #E34724;
 }
@@ -308,7 +309,7 @@ table.table thead tr th{
 }
 
 #footer_desc {
-  width: 400px;
+  width: 300px;
   height: 30px;
 }
 
@@ -1056,6 +1057,13 @@ table.table td a.delete-po-supplier{
 
 table.table td a.delete-po-supplier{
   color:#E34724;
+}
+#rfq-customer-table.table tr th{
+    font-size: 14px;
+}
+
+#rfq-customer-table.table tr td{
+    font-size: 14px;
 }
 
 #rfq-customer-table.table {
@@ -1957,12 +1965,15 @@ display: none;
 #add-item-table.table {
     /*table-layout: fixed*/;
 }
+#add-item-table.table tbody tr td {
+    font-size: 13px;
+}
 #add-item-table.table tr th{
-    font-size: 10px;
+    font-size: 14px;
 }
-#add-item-table.table tr td{
+/* #add-item-table.table tr td{
     font-size: 10px;
-}
+} */
 #add-item-table.table tr th, #add-item-table.table tr td {
     border-color: #e9e9e9;
 }
@@ -2017,6 +2028,12 @@ display: none;
   color:#E34724;
 }
 
+#dataTable.table tbody tr td {
+    font-size: 13px;
+}
+#dataTable.table tr th{
+    font-size: 14px;
+}
 /* ================================================================================================= */
 
 #new-purchase-return-table.table {
@@ -2290,7 +2307,76 @@ min-width: 100px;
 border-radius: 50px;
 line-height: 13px;
 }
+
 .table-title .add-item-jv i {
+margin-right: 4px;
+}
+
+.table-title .add-item-crv {
+float: right;
+height: 30px;
+font-weight: bold;
+font-size: 12px;
+text-shadow: none;
+min-width: 100px;
+border-radius: 50px;
+line-height: 13px;
+}
+.table-title .add-item-crv i {
+margin-right: 4px;
+}
+
+.table-title .add-item-jv i {
+margin-right: 4px;
+}
+
+.table-title .add-item-cpv {
+float: right;
+height: 30px;
+font-weight: bold;
+font-size: 12px;
+text-shadow: none;
+min-width: 100px;
+border-radius: 50px;
+line-height: 13px;
+}
+.table-title .add-item-cpv i {
+margin-right: 4px;
+}
+
+.table-title .add-item-jv i {
+margin-right: 4px;
+}
+
+.table-title .add-item-brv {
+float: right;
+height: 30px;
+font-weight: bold;
+font-size: 12px;
+text-shadow: none;
+min-width: 100px;
+border-radius: 50px;
+line-height: 13px;
+}
+.table-title .add-item-brv i {
+margin-right: 4px;
+}
+
+.table-title .add-item-jv i {
+margin-right: 4px;
+}
+
+.table-title .add-item-bpv {
+float: right;
+height: 30px;
+font-weight: bold;
+font-size: 12px;
+text-shadow: none;
+min-width: 100px;
+border-radius: 50px;
+line-height: 13px;
+}
+.table-title .add-item-bpv i {
 margin-right: 4px;
 }
 
@@ -2350,4 +2436,85 @@ border-color: #f50000;
 }
 #new-jv-table.table td .add-jv {
 display: none;
+}
+
+/* =============================================================================== */\
+
+#edit-rfq-customer-table.table tbody tr td{
+    font-size: 15px;
+}
+#edit-rfq-customer-table.table tr th,td{
+    font-size: 14px;
+}
+#new-quotation-customer-table.table tbody tr td{
+    font-size: 15px;
+}
+#new-quotation-customer-table.table tr th,td{
+    font-size: 14px;
+}
+#edit-quotation-customer-table.table tbody tr td{
+    font-size: 15px;
+}
+#edit-quotation-customer-table.table tr th,td{
+    font-size: 14px;
+}
+
+#new-po-customer-table.table tbody tr td{
+    font-size: 15px;
+}
+#new-po-customer-table.table tr th,td{
+    font-size: 14px;
+}
+#edit-po-customer-table.table tbody tr td{
+    font-size: 15px;
+}
+#edit-po-customer-table.table tr th,td{
+    font-size: 14px;
+}
+#new-dc-customer-table.table tbody tr td{
+    font-size: 15px;
+}
+#new-dc-customer-table.table tr th,td{
+    font-size: 14px;
+}
+#edit-dc-customer-table.table tbody tr td{
+    font-size: 15px;
+}
+#edit-dc-customer-table.table tr th,td{
+    font-size: 14px;
+}
+
+#new-purchase-table.table tbody tr td{
+    font-size: 15px;
+}
+#new-purchase-table.table tr th,td{
+    font-size: 14px;
+}
+
+#edit-purchase-table.table tbody tr td{
+    font-size: 15px;
+}
+#edit-purchase-table.table tr th,td{
+    font-size: 14px;
+}
+
+#edit-mrn-customer-table.table tbody tr td{
+    font-size: 15px;
+}
+#edit-mrn-customer-table.table tr th,td{
+    font-size: 14px;
+}
+
+#new-sale-table.table tbody tr td{
+    font-size: 15px;
+}
+#new-sale-table.table tr th,td{
+    font-size: 14px;
+}
+
+#edit-sale-table.table tbody tr td{
+    font-size: 15px;
+}
+#edit-sale-table.table tr th,td{
+    font-size: 14px;
 }

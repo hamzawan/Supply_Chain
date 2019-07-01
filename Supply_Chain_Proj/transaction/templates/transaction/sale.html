@@ -12,22 +12,16 @@
       <input type="text" name=""class="form-control col-md-2" value="">
     </div> -->
     <div class="input-group">
-      <input type="text" class="form-control col-md-4" id="search" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
-      <div class="input-group-append">
-        <button class="btn btn-primary" type="button">
-          <i class="fas fa-search"></i>
-        </button>
-      </div>
-      <div class="col-md-8">
+      <div class="col-md-12">
         <a role="button" href="{% url 'new-sale' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
       </div>
     </div>
     <br>
     <div class="table table-responsive content-loader">
-      <table class="table table-bordered" id="dataTable">
+      <table class="table table-bordered sort" id="dataTable">
           <thead>
               <tr>
-                  <th width="140px">Purchase ID</th>
+                  <th width="140px">Sale ID</th>
                   <th >Date</th>
                   <th >Customer</th>
                   <th >From</th>
@@ -37,11 +31,11 @@
           <tbody>
             {% for value in all_sales reversed %}
             <tr>
-                <td>{{ forloop.counter }}</td>
+                <td>{{ value.sale_no }}</td>
                 <td>{{ value.date }}</td>
                 <td>{{ value.account_id.account_title }}</td>
                 <td>user1</td>
-                <td><a class="edit_list" href="{% url 'edit-sale' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a data-toggle="modal" href="#" data-target="#invoiceType"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a><a class="return" href="{% url 'new-sale-return' pk=value.id %}" data-toggle=""><i class="fas fa-undo"></i></a><a class="delete"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+                <td><a class="edit_list" href="{% url 'edit-sale' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a data-toggle="modal" href="#"  class="has_id" id="{{value.id}}" data-target="#invoiceType"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a><a class="return" href="{% url 'new-sale-return' pk=value.id %}" data-toggle=""><i class="fas fa-undo"></i></a><a class="delete"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
             </tr>
             {% endfor %}
           </tbody>
@@ -65,10 +59,10 @@
       <div class="modal-body">
         <div class="row">
           <div class="col-md-6 col-sm-12">
-            <a type="button" href="{% url 'sales-tax-invoice' %}" target="_blank" class="btn btn-info">Sales Tax Invoice</a>
+            <a type="button" id="sales_tax_invoice" href="" class="btn btn-info">Sales Tax Invoice</a>
           </div>
           <div class="col-md-6 col-sm-12">
-              <a type="button" href="{% url 'commercial-invoice' %}" target="_blank" class="btn btn-info">Commercial Invoice</a>
+              <a type="button" id="commercial_invoice" href="" class="btn btn-info">Commercial Invoice</a>
           </div>
         </div>
       </div>

@@ -13,12 +13,12 @@
       <div class="form-row">
         <div class="form-group col-md-2">
           <label for="">DC No</label>
-          <input type="text" readonly class="form-control form-control-sm" value="{{get_last_dc_no}}" id="dc_no_supplier">
+          <input type="text" readonly class="form-control form-control-sm" required value="{{get_last_dc_no}}" id="dc_no_supplier">
         </div>
         <div class="form-group col-md-3">
          <label for="">Customer</label>
           <div class="input-group mb-3">
-            <input type="text" list="accounts" class="form-control form-control-sm " placeholder="Customer Name" aria-label="Recipient's username" aria-describedby="basic-addon2" id="dc_customer">
+            <input type="text" list="accounts" class="form-control form-control-sm" required placeholder="Customer Name" aria-label="Recipient's username" aria-describedby="basic-addon2" id="dc_customer">
             <div class="input-group-append">
               <a class="btn btn-outline-secondary on btn-sm" href="{% url 'chart-of-account' %}" target="_blank" type="button"><i class="fas fa-plus"></i></a>
             </div>
@@ -30,8 +30,16 @@
           </div>
         </div>
         <div class="form-group col-md-2">
-          <label for="">Follow Up</label>
+          <label for="">Follow Up <small>( for MRN )</small> </label>
           <input type="date" class="form-control form-control-sm"  id="follow_up">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Cartage Amount</label>
+          <input type="text" class="form-control form-control-sm" value="" id="cartage_amount">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Comments</label>
+          <textarea name="name" style="height:30px; width:270px;" id="comments"></textarea>
         </div>
         <div class="form-group col-md-2">
           <label for="">Footer Remarks</label>
@@ -65,8 +73,6 @@
                 <th>Description</th>
                 <th width="90px">Quantity</th>
                 <th width="90px">Unit</th>
-                <th width="120px">Price</th>
-                <th width="90px">Remarks</th>
                 <th>Action</th>
             </tr>
           </thead>
@@ -75,7 +81,7 @@
       </table>
     </div>
     <div class="text-center">
-      <button type="submit" class="btn btn-outline-primary" name="">Submit <small>(Delivery Challan)</small></button>
+      <button type="submit" class="btn btn-outline-primary has_id" name="">Submit <small>(Delivery Challan)</small></button>
     </div>
   </li>
 </form>

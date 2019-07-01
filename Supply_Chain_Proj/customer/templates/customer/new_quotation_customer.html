@@ -19,7 +19,7 @@
         <div class="form-group col-md-3">
          <label for="">Customer</label>
           <div class="input-group mb-3">
-            <input type="text" list="accounts" class="form-control form-control-sm " placeholder="Customer Name" aria-label="Recipient's username" aria-describedby="basic-addon2" id="customer_quotation">
+            <input type="text" list="accounts" class="form-control form-control-sm " required placeholder="Customer Name" aria-label="Recipient's username" aria-describedby="basic-addon2" id="customer_quotation">
             <div class="input-group-append">
               <a class="btn btn-outline-secondary on btn-sm" href="{% url 'chart-of-account' %}" target="_blank" type="button"><i class="fas fa-plus"></i></a>
             </div>
@@ -39,11 +39,15 @@
           <input type="text" class="form-control form-control-sm"  id="quotation_customer_prcbasis">
         </div>
         <div class="form-group col-md-2">
-          <label for="">Lead Time</label>
-          <input type="text" class="form-control form-control-sm"  id="quotation_customer_leadtime">
+          <label for="">Yr Ref</label>
+          <input type="text" class="form-control form-control-sm"  id="quotation_customer_yrref">
         </div>
       </div>
       <div class="form-row">
+        <div class="form-group col-md-2">
+          <label for="">Lead Time</label>
+          <input type="text" class="form-control form-control-sm"  id="quotation_customer_leadtime">
+        </div>
         <div class="form-group col-md-2">
           <label for="">Validity</label>
           <input type="text" class="form-control form-control-sm"  id="quotation_customer_validity">
@@ -54,22 +58,22 @@
         </div>
         <div class="form-group col-md-2">
           <label for="">Currency</label>
-          <input type="text" class="form-control form-control-sm" required id="quotation_customer_currency">
+          <input type="text" class="form-control form-control-sm" required id="quotation_customer_currency" value="PKR">
         </div>
         <div class="form-group col-md-2">
           <label for="">Exchange Rate</label>
-          <input type="text" class="form-control form-control-sm" required id="quotation_customer_exchange_rate">
+          <input type="text" class="form-control form-control-sm" required id="quotation_customer_exchange_rate" value="1">
         </div>
         <div class="form-group col-md-2">
           <label for="">Follow Up</label>
           <input type="date" class="form-control form-control-sm"  id="quotation_customer_follow_up">
         </div>
+      </div>
+      <div class="form-row">
         <div class="form-group col-md-2">
           <label>Remarks</label>
           <input class="form-control form-control-sm"  id="quotation_customer_remarks">
         </div>
-      </div>
-      <div class="form-row">
         <div class="form-group col-md-2">
           <label for="">Footer Remarks</label>
           <textarea name="name" style="height:30px; width:370px;" id="footer_remarks"></textarea>
@@ -80,7 +84,7 @@
     <div class="table-title">
         <div class="row">
           <div class="form-group col-md-3">
-            <input type="text" list="item" id="item_code_quotation" placeholder="Enter RFQ No here..." class="form-control form-control-sm">
+            <input type="text" list="item" id="item_code_quotation" placeholder="Enter Item Code No here..." class="form-control form-control-sm">
           </div>
           <datalist id="item">
             {% for value in all_item_code %}

@@ -25,7 +25,6 @@
                   <th >From</th>
                   <th >Currency Unit</th>
                   <th >Exchange Rate</th>
-                  <th >Follow Up</th>
                   <th >Action</th>
               </tr>
           </thead>
@@ -39,7 +38,6 @@
                   <td> User1  </td>
                   <td> {{ value.currency }} </td>
                   <td> {{ value.exchange_rate }} </td>
-                  <td> {{ value.follow_up }} </td>
                   <td><a class="edit_list" href="{% url 'edit-purchase-order-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a href="{% url 'print-po-customer' pk=value.id %}" target="_blank"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a><a class="delete-all"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
               </tr>
             {% endfor %}

@@ -13,11 +13,11 @@
         <div class="form-row">
           <div class="form-group col-md-2">
             <label for="">Purchase Order No</label>
-            <input type="text" readonly class="form-control form-control-sm" readonly value="{{ po_header.po_no }}">
+            <input type="text" readonly class="form-control form-control-sm" required readonly value="{{ po_header.po_no }}">
           </div>
           <div class="form-group col-md-2">
             <label>Supplier Name</label>
-            <input list="account" class="form-control form-control-sm" value="{{po_header.account_id.account_title}}" id="edit_po_customer">
+            <input list="account" class="form-control form-control-sm" required value="{{po_header.account_id.account_title}}" id="edit_po_customer">
             <datalist id="account">
               {% for value in all_accounts %}
               <option value="{{value.account_title}}" />
@@ -33,15 +33,19 @@
             <input type="text" class="form-control form-control-sm" value="{{ po_header.prc_basis }}" id="edit_po_prcbasis">
           </div>
           <div class="form-group col-md-2">
+            <label for="">PO No <small>(customer)</small></label>
+            <input type="text" class="form-control form-control-sm" value="{{ po_header.po_client }}" id="edit_po_client">
+          </div>
+          <div class="form-group col-md-2">
             <label for="">Lead Time</label>
             <input type="text" class="form-control form-control-sm" value="{{ po_header.leadtime }}" id="edit_po_leadtime">
           </div>
-          <div class="form-group col-md-2">
-            <label for="">Validity</label>
-            <input type="text" class="form-control form-control-sm" value="{{ po_header.validity }}" id="edit_po_validity">
-          </div>
         </div>
         <div class="form-row">
+          <div class="form-group col-md-2">
+            <label for="">Expiry</label>
+            <input type="text" class="form-control form-control-sm" value="{{ po_header.validity }}" id="edit_po_validity">
+          </div>
           <div class="form-group col-md-2">
             <label for="">Payment</label>
             <input type="text" class="form-control form-control-sm" value="{{ po_header.payment }}" id="edit_po_payment">
@@ -110,7 +114,7 @@
               <td>{{ forloop.counter }}</td>
               <td>{{ value.item_code }}</td>
               <td>{{ value.item_name }}</td>
-              <td>{{ value.item_description }}</td>
+              <td><pre>{{ value.item_description }}</pre></td>
               <td>{{ value.quantity }}</td>
               <td>{{ value.unit }}</td>
               <td>{{ value.unit_price }}</td>

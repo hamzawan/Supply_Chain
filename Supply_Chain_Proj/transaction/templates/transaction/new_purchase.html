@@ -31,6 +31,14 @@
            <option>Credit</option>
          </select>
         </div>
+        <div class="form-group col-md-2">
+          <label for="">No Of Days:</label>
+          <input type="text" readonly class="form-control form-control-sm" value="" id="credit_days">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Follow Up</label>
+          <input type="date"  class="form-control form-control-sm"   id="follow_up">
+        </div>
         <div class="form-group">
           <label for="exampleFormControlTextarea2">Footer Description</label>
           <textarea class="form-control rounded-0" rows="3" id="footer_desc"></textarea>
@@ -60,16 +68,15 @@
       <table class="table table-bordered" id="new-purchase-table">
           <thead>
               <tr>
-                  <th width="40px" style="font-size:10px;">S No.</th>
                   <th width="100px">Item Code</th>
                   <th width="70px">Item Name</th>
                   <th width="70px">Desc.</th>
-                  <th width="60px">Qty</th>
-                  <th width="60px">Unit</th>
-                  <th width="70px">Price</th>
-                  <th width="90px">Value Of Goods</th>
-                  <th width="90px">Sales Tax in % </th>
-                  <th width="110px">Sales Tax Amount</th>
+                  <th width="140px">Qty</th>
+                  <th width="70px">Unit</th>
+                  <th width="140px">Price</th>
+                  <th width="70px">VOG</th>
+                  <th width="90px">ST in % </th>
+                  <th width="90px">ST Amount</th>
                   <th width="90px">Total</th>
                   <th>Action</th>
               </tr>

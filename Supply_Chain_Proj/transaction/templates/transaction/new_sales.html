@@ -31,6 +31,14 @@
            <option>Credit</option>
          </select>
         </div>
+        <div class="form-group col-md-2">
+          <label for="">No Of Days:</label>
+          <input type="text" readonly class="form-control form-control-sm" value="" id="credit_days">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Follow Up</label>
+          <input type="date"  class="form-control form-control-sm"   id="follow_up">
+        </div>
         <div class="form-group">
           <label for="exampleFormControlTextarea2">Description</label>
           <textarea class="form-control rounded-0" rows="3" id="footer_desc"></textarea>
@@ -40,17 +48,17 @@
     <li class="list-group-item">
     <div class="table-title">
         <div class="row">
-          <div class="form-group col-md-3">
+          <!-- <div class="form-group col-md-3">
             <input type="text" list="item" placeholder="Enter Item Code here..." class="form-control form-control-sm" id="item_code_sale">
           </div>
           <datalist id="item">
             {% for value in dc_detail %}
-            <option value="{{value.product_code}}">{{value.product_code}} | {{value.product_name}}</option>
+            <option value="{{value.1}}">{{value.1}} | {{value.2}} | {{value.3}}</option>
             {% endfor %}
           </datalist>
             <div style="margin-left:20px;">
                 <button type="button" class="btn btn-info add-item-sale"><i class="fa fa-plus"></i>Insert Item</button>
-            </div>
+            </div> -->
             <div class="form-group col-md-3">
               <input type="text" list="dc" placeholder="Enter Dc No here..." class="form-control form-control-sm" id="dc_code_sale">
             </div>
@@ -70,14 +78,15 @@
               <tr>
                   <th width="40px" style="font-size:10px;">S No.</th>
                   <th width="100px">Item Code</th>
+                  <th width="70px">HS Code</th>
                   <th width="70px">Item Name</th>
                   <th width="70px">Desc.</th>
                   <th width="60px">Qty</th>
                   <th width="60px">Unit</th>
                   <th width="70px">Price</th>
-                  <th width="90px">Value Of Goods</th>
-                  <th width="90px">Sales Tax in % </th>
-                  <th width="110px">Sales Tax Amount</th>
+                  <th width="90px">VOG</th>
+                  <th width="90px">ST in % </th>
+                  <th width="110px">ST Amount</th>
                   <th width="90px">Total</th>
                   <th>Action</th>
               </tr>

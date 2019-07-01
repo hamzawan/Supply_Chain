@@ -17,7 +17,7 @@
         </div>
         <div class="form-group col-md-2">
           <label>Customer Name</label>
-          <input list="account" class="form-control form-control-sm" value="{{dc_header.account_id.account_title}}" id="edit_dc">
+          <input list="account" class="form-control form-control-sm" required value="{{dc_header.account_id.account_title}}" id="edit_dc">
           <datalist id="account">
             {% for value in all_accounts %}
             <option value="{{value.account_title}}" />
@@ -43,7 +43,7 @@
     <div class="table-title">
         <div class="row">
           <div class="form-group col-md-3">
-            <input type="text" list="item" placeholder="Enter PO No here..." class="form-control form-control-sm" id="edit_item_code">
+            <input type="text" list="item" placeholder="Enter Item Code No here..." class="form-control form-control-sm" id="edit_item_code">
           </div>
           <datalist id="item">
             {% for value in all_item_code %}
@@ -76,7 +76,7 @@
               <td>{{ forloop.counter }}</td>
               <td>{{ value.item_code }}</td>
               <td>{{ value.item_name }}</td>
-              <td>{{ value.item_description }}</td>
+              <td><pre>{{ value.item_description }}</pre></td>
               <td>{{ value.quantity }}</td>
               <td>{{ value.unit }}</td>
               <td>{{ value.unit_price }}</td>

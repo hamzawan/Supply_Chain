@@ -13,11 +13,11 @@
       <div class="form-row">
         <div class="form-group col-md-2">
           <label for="">Quotation No</label>
-          <input type="text" class="form-control form-control-sm" readonly value="{{quotation_header.quotation_no}}">
+          <input type="text" class="form-control form-control-sm" readonly required value="{{quotation_header.quotation_no}}">
         </div>
         <div class="form-group col-md-2">
           <label>Customer Name</label>
-          <input list="account" class="form-control form-control-sm" value="{{quotation_header.account_id.account_title}}" id="quotation_customer_edit">
+          <input list="account" class="form-control form-control-sm" required value="{{quotation_header.account_id.account_title}}" id="quotation_customer_edit">
           <datalist id="account">
             {% for value in all_accounts %}
             <option value="{{value.account_title}}" />
@@ -33,15 +33,19 @@
           <input type="text" class="form-control form-control-sm" value="{{quotation_header.prc_basis}}" id="edit_quotation_prcbasis">
         </div>
         <div class="form-group col-md-2">
+          <label for="">Yr Ref</label>
+          <input type="text" class="form-control form-control-sm"  id="edit_quotation_yrref">
+        </div>
+        <div class="form-group col-md-2">
           <label for="">Lead Time</label>
           <input type="text" class="form-control form-control-sm" value="{{quotation_header.leadtime}}" id="edit_quotation_leadtime">
         </div>
+      </div>
+      <div class="form-row">
         <div class="form-group col-md-2">
           <label for="">Validity</label>
           <input type="text" class="form-control form-control-sm" value="{{quotation_header.validity}}" id="edit_quotation_validity">
         </div>
-      </div>
-      <div class="form-row">
         <div class="form-group col-md-2">
           <label for="">Payment</label>
           <input type="text" class="form-control form-control-sm" value="{{quotation_header.payment}}" id="edit_quotation_payment">

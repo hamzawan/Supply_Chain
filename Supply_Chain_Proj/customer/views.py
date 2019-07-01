@@ -51,6 +51,10 @@ def new_rfq_customer(request):
         items = json.loads(request.POST.get('items'))
         account_id = ChartOfAccount.objects.get(account_title = customer)
         date = datetime.date.today()
+        if follow_up:
+            follow_up = follow_up
+        else:
+            follow_up = '2010-06-22'
         rfq_header = RfqCustomerHeader(rfq_no = get_last_rfq_no, date = date , attn = attn, follow_up = follow_up, footer_remarks = footer_remarks ,account_id = account_id)
         rfq_header.save()
         header_id = RfqCustomerHeader.objects.get(rfq_no=get_last_rfq_no)
@@ -83,6 +87,11 @@ def edit_rfq_customer(request,pk):
             edit_rfq_follow_up = request.POST.get('edit_rfq_follow_up',False)
             footer_remarks = request.POST.get('footer_remarks')
             account_id = ChartOfAccount.objects.get(account_title = edit_rfq_customer)
+
+            if edit_rfq_follow_up:
+                edit_rfq_follow_up = edit_rfq_follow_up
+            else:
+                edit_rfq_follow_up = '2010-06-22'
 
             rfq_header.account_id = account_id
             rfq_header.attn = edit_rfq_attn
@@ -129,6 +138,7 @@ def new_quotation_customer(request):
         leadtime = request.POST.get('leadtime',False)
         validity = request.POST.get('validity',False)
         payment = request.POST.get('payment',False)
+        yrref = request.POST.get('yrref',False)
         remarks = request.POST.get('remarks',False)
         currency = request.POST.get('currency',False)
         exchange_rate = request.POST.get('exchange_rate',False)
@@ -136,8 +146,12 @@ def new_quotation_customer(request):
         footer_remarks = request.POST.get('footer_remarks',False)
         account_id = ChartOfAccount.objects.get(account_title = customer)
         date = datetime.date.today()
+        if follow_up:
+            follow_up = follow_up
+        else:
+            follow_up = '2010-06-22'
         quotation_header = QuotationHeaderCustomer(quotation_no = get_last_quotation_no, date = date, attn = attn, prc_basis = prcbasis,
-                                                leadtime = leadtime, validity = validity, payment = payment, remarks = remarks, currency = currency,
+                                                leadtime = leadtime, validity = validity, payment = payment, yrref = yrref, remarks = remarks, currency = currency,
                                                 exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, footer_remarks = footer_remarks ,account_id = account_id)
         quotation_header.save()
         items = json.loads(request.POST.get('items'))
@@ -177,6 +191,7 @@ def edit_quotation_customer(request,pk):
         edit_quotation = request.POST.get('customer',False)
         edit_quotation_attn = request.POST.get('attn',False)
         edit_quotation_prcbasis = request.POST.get('prcbasis',False)
+        edit_quotation_yrref = request.POST.get('yrref',False)
         edit_quotation_leadtime = request.POST.get('leadtime',False)
         edit_quotation_validity = request.POST.get('validity',False)
         edit_quotation_payment = request.POST.get('payment',False)
@@ -186,10 +201,15 @@ def edit_quotation_customer(request,pk):
         edit_quotation_follow_up = request.POST.get('follow_up',False)
         footer_remarks = request.POST.get('footer_remarks',False)
 
+        if edit_quotation_follow_up:
+            edit_quotation_follow_up = edit_quotation_follow_up
+        else:
+            edit_quotation_follow_up = '2010-06-22'
         account_id = ChartOfAccount.objects.get(account_title = edit_quotation)
 
         quotation_header.attn = edit_quotation_attn
         quotation_header.prc_basis = edit_quotation_prcbasis
+        quotation_header.yrref = edit_quotation_yrref
         quotation_header.leadtime = edit_quotation_leadtime
         quotation_header.validity = edit_quotation_validity
         quotation_header.payment = edit_quotation_payment
@@ -216,16 +236,17 @@ def print_quotation_customer(request,pk):
     lines = 0
     total_amount = 0
     company_info = Company_info.objects.all()
-    image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+    image = Company_info.objects.filter(company_name = "Hamza Enterprises").first()
     header = QuotationHeaderCustomer.objects.filter(id = pk).first()
     detail = QuotationDetailCustomer.objects.filter(quotation_id = pk).all()
     for value in detail:
         lines = lines + len(value.item_description.split('\n'))
         amount = float(value.unit_price * value.quantity)
         total_amount = total_amount + amount
-    print(total_amount)
     lines = lines + len(detail) + len(detail)
-    total_lines = 36 - lines
+    print(lines)
+    total_lines = 26 - lines
+    print(total_lines)
     pdf = render_to_pdf('customer/quotation_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
@@ -263,6 +284,7 @@ def new_purchase_order_customer(request):
         customer = request.POST.get('customer',False)
         attn = request.POST.get('attn',False)
         prcbasis = request.POST.get('prcbasis',False)
+        po_client = request.POST.get('po_client',False)
         leadtime = request.POST.get('leadtime',False)
         validity = request.POST.get('validity',False)
         payment = request.POST.get('payment',False)
@@ -274,7 +296,11 @@ def new_purchase_order_customer(request):
         account_id = ChartOfAccount.objects.get(account_title = customer)
 
         date = datetime.date.today()
-        po_header = PoHeaderCustomer(po_no = get_last_po_no, date = date, attn = attn, prc_basis = prcbasis,
+        if follow_up:
+            follow_up = follow_up
+        else:
+            follow_up = '2010-06-22'
+        po_header = PoHeaderCustomer(po_no = get_last_po_no, date = date, attn = attn, prc_basis = prcbasis, po_client = po_client,
                                                 leadtime = leadtime, validity = validity, payment = payment, remarks = remarks, currency = currency,
                                                 exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, footer_remarks = footer_remarks ,account_id = account_id)
         po_header.save()
@@ -310,6 +336,7 @@ def edit_purchase_order_customer(request,pk):
         edit_po_customer = request.POST.get('customer',False)
         edit_po_attn = request.POST.get('attn',False)
         edit_po_prcbasis = request.POST.get('prcbasis',False)
+        edit_po_client = request.POST.get('po_client',False)
         edit_po_leadtime = request.POST.get('leadtime',False)
         edit_po_validity = request.POST.get('validity',False)
         edit_po_payment = request.POST.get('payment',False)
@@ -321,8 +348,14 @@ def edit_purchase_order_customer(request,pk):
 
         account_id = ChartOfAccount.objects.get(account_title = edit_po_customer)
 
+        if edit_po_follow_up:
+            edit_po_follow_up = edit_po_follow_up
+        else:
+            edit_po_follow_up = '2010-06-22'
+
         po_header.attn = edit_po_attn
         po_header.prc_basis = edit_po_prcbasis
+        po_header.po_client = edit_po_client
         po_header.leadtime = edit_po_leadtime
         po_header.validity = edit_po_validity
         po_header.payment = edit_po_payment
@@ -430,27 +463,37 @@ def new_delivery_challan_customer(request):
                         ) As tblTemp
                         Group by Item_Code''',[get_item_code,get_item_code,get_item_code,get_item_code,get_item_code])
         row = cursor.fetchall()
+        print(row)
         a = row[0][4]
         b = quantity
-        if str(a) > str(b):
-            print(quantity)
-            print(row[0][4])
+        # print(quantity)
+        if int(a) >= int(b):
             return JsonResponse({"message":"True"})
         else:
             return JsonResponse({"message":"False"})
     if request.method == 'POST':
         dc_customer = request.POST.get('customer', False)
+        cartage_amount = request.POST.get('cartage_amount', False)
+        comments = request.POST.get('comments', False)
         follow_up = request.POST.get('follow_up', False)
         footer_remarks = request.POST.get('footer_remarks', False)
         account_id = ChartOfAccount.objects.get(account_title = dc_customer)
         date = datetime.date.today()
-        dc_header = DcHeaderCustomer(dc_no = get_last_dc_no, date = date, follow_up = follow_up, footer_remarks = footer_remarks ,account_id = account_id)
+        if follow_up:
+            follow_up = follow_up
+        else:
+            follow_up = '2010-06-22'
+        if cartage_amount:
+            cartage_amount = cartage_amount
+        else:
+            cartage_amount = 0.00
+        dc_header = DcHeaderCustomer(dc_no = get_last_dc_no, date = date, follow_up = follow_up,cartage_amount = cartage_amount, comments = comments, footer_remarks = footer_remarks ,account_id = account_id)
         dc_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = DcHeaderCustomer.objects.get(dc_no = get_last_dc_no)
         for value in items:
             dc_detail = DcDetailCustomer(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"],
-                                            quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0,  unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], po_no = "to be define" ,dc_id = header_id)
+                                            quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0,  unit = value["unit"], unit_price = "0.00", remarks = value["remarks"], po_no = "to be define" ,dc_id = header_id)
             dc_detail.save()
         return JsonResponse({'result':'success'})
     return render(request, 'customer/new_delivery_challan_customer.html',{'all_item_code':all_item_code,'get_last_dc_no':get_last_dc_no,'all_accounts':all_accounts})
@@ -477,7 +520,10 @@ def edit_delivery_challan_customer(request,pk):
         footer_remarks = request.POST.get('footer_remarks')
         account_id = ChartOfAccount.objects.get(account_title = edit_dc_customer)
         header_id = DcHeaderCustomer.objects.get(id = pk)
-
+        if follow_up:
+            follow_up = follow_up
+        else:
+            follow_up = '2010-06-22'
         dc_header.account_id = account_id
         dc_header.follow_up = follow_up
         dc_header.footer_remarks = footer_remarks

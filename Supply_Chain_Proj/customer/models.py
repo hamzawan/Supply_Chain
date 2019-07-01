@@ -12,7 +12,7 @@ class RfqCustomerHeader(models.Model):
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 class RfqCustomerDetail(models.Model):
-    item_code = models.CharField(max_length = 100, unique = True)
+    item_code = models.CharField(max_length = 100)
     item_name = models.CharField(max_length = 100)
     item_description = models.TextField()
     quantity = models.IntegerField()
@@ -28,6 +28,7 @@ class QuotationHeaderCustomer(models.Model):
     leadtime = models.CharField(max_length = 100)
     validity = models.CharField(max_length = 100)
     payment = models.CharField(max_length = 100)
+    yrref = models.CharField(max_length = 100)
     remarks = models.CharField(max_length = 100)
     currency = models.CharField(max_length = 100)
     exchange_rate = models.DecimalField(max_digits = 8, decimal_places = 2)
@@ -53,7 +54,7 @@ class PoHeaderCustomer(models.Model):
     date = models.DateField(default = datetime.date.today)
     attn = models.CharField(max_length = 100)
     prc_basis = models.CharField(max_length = 100)
-    yrref = models.CharField(max_length = 100)
+    po_client = models.CharField(max_length = 100)
     leadtime = models.CharField(max_length = 100)
     validity = models.CharField(max_length = 100)
     payment = models.CharField(max_length = 100)
@@ -67,7 +68,7 @@ class PoHeaderCustomer(models.Model):
 
 
 class PoDetailCustomer(models.Model):
-    item_code = models.CharField(max_length = 100, unique = True)
+    item_code = models.CharField(max_length = 100)
     item_name = models.CharField(max_length = 100)
     item_description = models.TextField()
     quantity = models.IntegerField()
@@ -84,6 +85,8 @@ class DcHeaderCustomer(models.Model):
     footer_remarks = models.TextField()
     show_notification = models.BooleanField(default = True)
     follow_up = models.DateField(blank = True)
+    cartage_amount = models.DecimalField(max_digits = 8, decimal_places = 2)
+    comments = models.CharField(max_length = 100)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 class DcDetailCustomer(models.Model):

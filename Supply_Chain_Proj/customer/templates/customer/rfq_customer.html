@@ -19,12 +19,11 @@
           <thead>
               <tr>
                   <th width="60px">S NO.</th>
-                  <th width="100px">RFQ no</th>
-                  <th width="100px">Customer</th>
+                  <th width="150px">RFQ no</th>
+                  <th width="150px">Customer</th>
                   <th width="100px">Date</th>
-                  <th width="100px">From</th>
-                  <th>Attn</th>
-                  <th>Follow up</th>
+                  <th width="150px">From</th>
+                  <th width="150px">Attn</th>
                   <td>Action</td>
               </tr>
           </thead>
@@ -37,7 +36,6 @@
                 <td>{{ row.date }}</td>
                 <td> user1 </td>
                 <td>{{ row.attn }}</td>
-                <td>{{ row.follow_up }}</td>
                 <td><a class="edit_list" href="{% url 'edit-rfq-customer' pk=row.id %}"><i class="material-icons">&#xE254;</i></a><a class="delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
             </tr>
             {% endfor %}

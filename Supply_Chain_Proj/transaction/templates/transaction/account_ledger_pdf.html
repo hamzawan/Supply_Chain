@@ -93,9 +93,9 @@
     {% for value in row %}
       <tr class="">
         <td style="width: 150px; height:30px;"><font size="12px">{{value.2}}</font></td>
-        <td style="width: 300px;"><font size="12px">{{ value.0 }} {{value.4}}</font></td>
-        <td style="width: 500px; text-align:center;"><font size="12px">Invoice No: {{value.4}} / Refrence Date: {{value.2}}</font></td>
-        <td style="width: 200px; text-align:center;"><font size="12px">{{value.5|floatformat:2}}</font></td>
+        <td style="width: 300px;"><font size="12px">{{ value.0 }} {{value.3}}</font></td>
+        <td style="width: 500px; text-align:center;"><font size="12px">Invoice No: {{value.3}} / Refrence Date: {{value.2}}</font></td>
+        <td style="width: 200px; text-align:center;"><font size="12px">{{value.5|abs|floatformat:2}}</font></td>
         <td style="width: 200px; text-align:center;"><font size="12px">{{value.6|abs|floatformat:2}}</font></td>
         <td style="width: 200px; text-align:center;"><font size="12px"></font></td>
     {% endfor %}
@@ -103,7 +103,7 @@
   <tr class="">
     <td style="width: 150px; height:30px;"></td>
     <td style="width:700px; text-align:center;" colspan="2"><font size="14px"> <b>Grand Total</b> </font></td>
-    <td style="text-align:center;"><font size="12px"><b>{{debit_amount|floatformat:2}}</b></font></td>
+    <td style="text-align:center;"><font size="12px"><b>{{debit_amount|abs|floatformat:2}}</b></font></td>
     <td style="text-align:center;"><font size="12px"><b>{{credit_amount|abs|floatformat:2}}</b></font></td>
     <td style="width: 200px; text-align:center;"><font size="12px">{{debit_amount|add:credit_amount|abs|floatformat:2}}</font></td>
   </tr>

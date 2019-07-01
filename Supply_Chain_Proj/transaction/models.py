@@ -21,10 +21,12 @@ class PurchaseHeader(models.Model):
     date = models.DateField(default = datetime.date.today)
     footer_description = models.TextField()
     payment_method = models.CharField(max_length = 100)
+    credit_days = models.CharField(max_length = 100)
     cartage_amount = models.DecimalField(max_digits = 8, decimal_places = 2)
     additional_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
     withholding_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
+    follow_up = models.DateField(blank = True)
 
 class PurchaseDetail(models.Model):
     item_code = models.CharField(max_length = 100)
@@ -43,6 +45,7 @@ class PurchaseReturnHeader(models.Model):
     date = models.DateField(default = datetime.date.today)
     footer_description = models.TextField()
     payment_method = models.CharField(max_length = 100)
+    credit_days = models.CharField(max_length = 100)
     cartage_amount = models.DecimalField(max_digits = 8, decimal_places = 2)
     additional_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
     withholding_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
@@ -65,10 +68,12 @@ class SaleHeader(models.Model):
     date = models.DateField(default = datetime.date.today)
     footer_description = models.TextField()
     payment_method = models.CharField(max_length = 100)
+    credit_days = models.CharField(max_length = 100)
     cartage_amount = models.DecimalField(max_digits = 8, decimal_places = 2)
     additional_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
     withholding_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
+    follow_up = models.DateField(blank = True)
 
 
 class SaleDetail(models.Model):
@@ -81,6 +86,7 @@ class SaleDetail(models.Model):
     retail_price = models.DecimalField(max_digits = 8, decimal_places = 2)
     sales_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
     dc_ref = models.CharField(max_length = 100)
+    hs_code = models.CharField(max_length = 100)
     sale_id = models.ForeignKey(SaleHeader, on_delete = models.CASCADE)
 
 
@@ -89,6 +95,7 @@ class SaleReturnHeader(models.Model):
     date = models.DateField(default = datetime.date.today)
     footer_description = models.TextField()
     payment_method = models.CharField(max_length = 100)
+    credit_days = models.CharField(max_length = 100)
     cartage_amount = models.DecimalField(max_digits = 8, decimal_places = 2)
     additional_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
     withholding_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
