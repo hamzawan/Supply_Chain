@@ -74,8 +74,7 @@ def new_purchase(request):
         tax = ((item_amount * float(withholding_tax)) / 100)
         total_amount = tax + item_amount
         header_id = header_id.id
-        # total_amount = total_amount
-        # print(total_amount)
+
         cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
         if payment_method == 'Cash':
             tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
@@ -421,7 +420,7 @@ def direct_sale(request, pk):
         account_id = ChartOfAccount.objects.get(account_title = customer)
         date = datetime.date.today()
 
-        sale_header = SaleHeader(sale_no = sale_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = withholding_tax, account_id = account_id )
+        sale_header = SaleHeader(sale_no = sale_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = withholding_tax, account_id = account_id, follow_up = '2010-06-10' )
 
         items = json.loads(request.POST.get('items'))
         print(items)
@@ -1094,6 +1093,7 @@ def sales_tax_invoice(request,pk):
     company_info = Company_info.objects.all()
     image = Company_info.objects.filter(company_name = "Hamza Enterprises").first()
     header = SaleHeader.objects.filter(id = pk).first()
+    # print(header.footer_remarks)
     detail = SaleDetail.objects.filter(sale_id = pk).all()
     for value in detail:
         lines = lines + len(value.item_description.split('\n'))

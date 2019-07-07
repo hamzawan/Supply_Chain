@@ -96,7 +96,10 @@ def new_rfq_supplier(request):
             account_id = ChartOfAccount.objects.get(account_title = supplier)
         except ChartOfAccount.DoesNotExist:
             return JsonResponse({"result":"No Account Found "+supplier+""})
-        print(account_id.account_title)
+        if follow_up:
+            follow_up = follow_up
+        else:
+            follow_up = '2010-10-06'
         date = datetime.date.today()
         rfq_header = RfqSupplierHeader(rfq_no = get_last_rfq_no, date = date , attn = attn, follow_up = follow_up, footer_remarks = footer_remarks ,account_id = account_id)
         rfq_header.save()
@@ -134,6 +137,10 @@ def edit_rfq_supplier(request,pk):
                 account_id = ChartOfAccount.objects.get(account_title = edit_rfq_supplier_name)
             except ChartOfAccount.DoesNotExist:
                 return JsonResponse({"result":"No Account Found "+edit_rfq_supplier_name+""})
+            if edit_rfq_follow_up:
+                edit_rfq_follow_up = edit_rfq_follow_up
+            else:
+                edit_rfq_follow_up = '2010-10-06'
             rfq_header.attn = edit_rfq_attn
             rfq_header.follow_up = edit_rfq_follow_up
             rfq_header.account_id = account_id
@@ -186,6 +193,10 @@ def new_quotation_supplier(request):
         exchange_rate = request.POST.get('exchange_rate',False)
         follow_up = request.POST.get('follow_up',False)
         footer_remarks = request.POST.get('footer_remarks',False)
+        if follow_up:
+            follow_up = follow_up
+        else:
+            follow_up = '2010-10-06'
         try:
             account_id = ChartOfAccount.objects.get(account_title = supplier)
         except ChartOfAccount.DoesNotExist:
@@ -429,7 +440,8 @@ def print_po_supplier(request,pk):
     lines = 0
     total_amount = 0
     company_info = Company_info.objects.all()
-    image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+    image = Company_info.objects.filter(id = 1).first()
+    print(image.company_logo)
     header = PoHeaderSupplier.objects.filter(id = pk).first()
     print(header)
     detail = PoDetailSupplier.objects.filter(po_id = pk).all()

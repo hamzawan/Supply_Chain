@@ -2518,3 +2518,25 @@ display: none;
 #edit-sale-table.table tr th,td{
     font-size: 14px;
 }
+
+#new-sale-table-direct.table tbody tr td{
+    font-size: 15px;
+}
+#new-sale-table-direct.table tr th,td{
+    font-size: 14px;
+}
+
+.table-title .add-item-jo {
+float: right;
+height: 30px;
+font-weight: bold;
+font-size: 12px;
+text-shadow: none;
+min-width: 100px;
+border-radius: 50px;
+line-height: 13px;
+}
+
+.table-title .add-item-jo i {
+margin-right: 4px;
+}

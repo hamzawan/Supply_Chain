@@ -381,7 +381,7 @@ def print_po_customer(request,pk):
     lines = 0
     total_amount = 0
     company_info = Company_info.objects.all()
-    image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+    image = Company_info.objects.filter(id = 1).first()
     header = PoHeaderCustomer.objects.filter(id = pk).first()
     detail = PoDetailCustomer.objects.filter(po_id = pk).all()
     for value in detail:
@@ -541,7 +541,7 @@ def print_dc_customer(request,pk):
     lines = 0
     total_amount = 0
     company_info = Company_info.objects.all()
-    image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+    image = Company_info.objects.filter(id = 1).first()
     header = DcHeaderCustomer.objects.filter(id = pk).first()
     detail = DcDetailCustomer.objects.filter(dc_id = pk).all()
     for value in detail:

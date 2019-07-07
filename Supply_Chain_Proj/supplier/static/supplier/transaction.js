@@ -835,6 +835,7 @@ $('#edit-purchase-return-submit').on('submit',function(e){
 									item_code = $(this).text();
 									return item_code
 							}).closest("tr");
+
 							var empty = false;
 							var input = $(this).parents("tr").find('input[type="text"]');
 									input.each(function(){
@@ -846,6 +847,7 @@ $('#edit-purchase-return-submit').on('submit',function(e){
 										$(this).removeClass("error");
 										}
 							});
+							
 							$(this).parents("tr").find(".error").first().focus();
 							if(!empty){
 								input.each(function(){
@@ -1142,31 +1144,31 @@ $('#edit-purchase-return-submit').on('submit',function(e){
 							'dc_no': ""
 						};
 						$tds.each(function(i, el){
-							if (i === 1) {
+							if (i === 0) {
 									row["item_code"] = ($(this).text());
 							}
-							if (i === 2) {
+							if (i === 1) {
 									row["hs_code"] = ($(this).text());
 							}
-							if (i === 3) {
+							if (i === 2) {
 									row["item_name"] = ($(this).text());
 							}
-							else if (i === 4) {
+							else if (i === 3) {
 									row["item_description"] = ($(this).text());
 							}
-							else if (i === 5) {
+							else if (i === 4) {
 									row["quantity"] = ($(this).text());
 							}
-							else if (i === 6) {
+							else if (i === 5) {
 									row["unit"] = ($(this).text());
 							}
-							else if (i === 7) {
+							else if (i === 6) {
 									row["price"] = ($(this).text());
 							}
-							else if (i === 9) {
+							else if (i === 8) {
 									row["sales_tax"] = ($(this).text());
 							}
-							else if (i === 12) {
+							else if (i === 11) {
 									row["dc_no"] = ($(this).text());
 							}
 						});
