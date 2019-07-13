@@ -13,60 +13,63 @@
   <li class="list-group-item">
       <div class="form-row">
         <div class="form-group col-md-2">
+          <label for="">Purchase Return No:</label>
+          <input type="text" readonly class="form-control form-control-sm" value="{{get_last_purchase_no}}" id="">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Purchase No:</label>
+          <input type="text" readonly class="form-control form-control-sm" value="{{purchase_header.purchase_no}}">
+        </div>
+        <div class="form-group col-md-2">
           <label>Supplier Name</label>
-          <input list="account"  class="form-control form-control-sm" required id="supplier_purchase_return" value="{{purchase_header.account_id.account_title}}" >
+          <input list="account"  class="form-control form-control-sm" required id="supplier" value="{{purchase_header.account_id.account_title}}" >
           <datalist id="account">
             {% for value in all_accounts %}
             <option value="{{value.account_title}}">{{value.account_title}}</option>
             {% endfor %}
         </datalist>
         </div>
-        <div class="form-group col-md-2">
-         <label for="sel1">Payment Term:</label>
-         <select class="form-control form-control-sm" id="payment_purchase_return">
-           <option>Cash</option>
-           <option>Credit</option>
-         </select>
-        </div>
         <div class="form-group">
           <label for="exampleFormControlTextarea2">Description</label>
-          <textarea class="form-control rounded-0" rows="3" id="desc_purchase_return">{{purchase_header.footer_description}}</textarea>
+          <textarea class="form-control rounded-0" rows="3" id="footer_desc">{{purchase_header.footer_description}}</textarea>
         </div>
       </div>
     </li>
     <li class="list-group-item">
-      <div class="table table-responsive">
-        <table class="table table-bordered" id="new-purchase-return-table">
-            <thead>
-                <tr>
-                    <th width="40px" style="font-size:10px;">S No.</th>
-                    <th width="100px">Item Code</th>
-                    <th width="70px">Item Name</th>
-                    <th width="70px">Desc.</th>
-                    <th width="60px">Qty</th>
-                    <th width="60px">Unit</th>
-                    <th width="70px">Price</th>
-                    <th width="90px">Sales Tax in % </th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-              {% for value in purchase_detail %}
+    <div class="table table-responsive">
+      <table class="table table-bordered" id="new-purchase-return-table">
+          <thead>
               <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ value.item_code }}</td>
-                <td>{{ value.item_name }}</td>
-                <td>{{ value.item_description }}</td>
-                <td>{{ value.quantity }}</td>
-                <td>{{ value.unit }}</td>
-                <td>{{ value.cost_price }}</td>
-                <td>{{ value.sales_tax }}</td>
-                <td><a class="add-purchase-return" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-purchase-return" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-purchase-return" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+                  <th width="40px" style="font-size:10px;">S No.</th>
+                  <th width="100px">Item Code</th>
+                  <th width="70px">Item Name</th>
+                  <th width="70px">Desc.</th>
+                  <th width="60px">Qty</th>
+                  <th width="60px">Unit</th>
+                  <th width="70px">Price</th>
+                  <th width="90px">Sales Tax in % </th>
+                  <th>Action</th>
               </tr>
-              {% endfor %}
-            </tbody>
-        </table>
-      </div>
+          </thead>
+          <tbody>
+            {% for value in purchase_detail %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td style="display:none;">{{ value.item_id.id }}</td>
+              <td>{{ value.item_id.product_code }}</td>
+              <td>{{ value.item_id.product_name }}</td>
+              <td><pre>{{ value.item_id.product_desc }}</pre></td>
+              <td>{{ value.quantity }}</td>
+              <td>{{ value.item_id.unit }}</td>
+              <td>{{ value.cost_price }}</td>
+              <td>{{ value.sales_tax }}</td>
+              <td><a class="add-purchase-return" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-purchase-return" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-purchase-return" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+
+    </div>
     </li>
     <!-- <li class="list-group-item">
       <input type="hidden" name="" value="" id="hidden">

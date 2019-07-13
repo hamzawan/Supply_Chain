@@ -1,4 +1,5 @@
 from django.db import models
+from inventory.models import Add_products
 import datetime
 
 
@@ -29,10 +30,7 @@ class PurchaseHeader(models.Model):
     follow_up = models.DateField(blank = True)
 
 class PurchaseDetail(models.Model):
-    item_code = models.CharField(max_length = 100)
-    item_name = models.CharField(max_length = 100)
-    item_description = models.TextField()
-    unit = models.CharField(max_length = 100)
+    item_id = models.ForeignKey(Add_products, models.SET_NULL, blank = True, null = True)
     quantity = models.IntegerField()
     cost_price = models.DecimalField(max_digits = 8, decimal_places = 2)
     retail_price = models.DecimalField(max_digits = 8, decimal_places = 2)
@@ -52,10 +50,7 @@ class PurchaseReturnHeader(models.Model):
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
 
 class PurchaseReturnDetail(models.Model):
-    item_code = models.CharField(max_length = 100)
-    item_name = models.CharField(max_length = 100)
-    item_description = models.TextField()
-    unit = models.CharField(max_length = 100)
+    item_id = models.ForeignKey(Add_products, models.SET_NULL, blank = True, null = True)
     quantity = models.IntegerField()
     cost_price = models.DecimalField(max_digits = 8, decimal_places = 2)
     retail_price = models.DecimalField(max_digits = 8, decimal_places = 2)
@@ -77,10 +72,7 @@ class SaleHeader(models.Model):
 
 
 class SaleDetail(models.Model):
-    item_code = models.CharField(max_length = 100)
-    item_name = models.CharField(max_length = 100)
-    item_description = models.TextField()
-    unit = models.CharField(max_length = 100)
+    item_id = models.ForeignKey(Add_products, models.SET_NULL, blank = True, null = True)
     quantity = models.IntegerField()
     cost_price = models.DecimalField(max_digits = 8, decimal_places = 2)
     retail_price = models.DecimalField(max_digits = 8, decimal_places = 2)
@@ -102,14 +94,13 @@ class SaleReturnHeader(models.Model):
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True)
 
 class SaleReturnDetail(models.Model):
-    item_code = models.CharField(max_length = 100)
-    item_name = models.CharField(max_length = 100)
-    item_description = models.TextField()
-    unit = models.CharField(max_length = 100)
+    item_id = models.ForeignKey(Add_products, models.SET_NULL, blank = True, null = True)
     quantity = models.IntegerField()
     cost_price = models.DecimalField(max_digits = 8, decimal_places = 2)
     retail_price = models.DecimalField(max_digits = 8, decimal_places = 2)
     sales_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
+    dc_ref = models.CharField(max_length = 100)
+    hs_code = models.CharField(max_length = 100)
     sale_return_id = models.ForeignKey(SaleReturnHeader, on_delete = models.CASCADE)
 
 
@@ -125,6 +116,7 @@ class Transactions(models.Model):
 
 class VoucherHeader(models.Model):
     voucher_no = models.CharField(max_length = 100)
+    date = models.DateField(default = datetime.date.today)
     doc_no = models.CharField(max_length = 100)
     doc_date = models.DateField(default = datetime.date.today)
     cheque_no = models.CharField(max_length = 100)
@@ -136,3 +128,4 @@ class VoucherDetail(models.Model):
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True)
     debit = models.DecimalField(max_digits = 8, decimal_places = 2)
     credit = models.DecimalField(max_digits = 8, decimal_places = 2)
+    header_id = models.ForeignKey(VoucherHeader, on_delete = models.CASCADE)

@@ -32,7 +32,7 @@
          </select>
         </div>
         <div class="form-group col-md-2">
-          <label for="">No Of Days:</label>
+          <label for="">Credit Days:</label>
           <input type="text" readonly class="form-control form-control-sm" value="" id="credit_days">
         </div>
         <div class="form-group col-md-2">
@@ -63,9 +63,6 @@
               <input type="text" list="dc" placeholder="Enter Dc No here..." class="form-control form-control-sm" id="dc_code_sale">
             </div>
             <datalist id="dc">
-              {% for value in all_dc %}
-              <option value="{{value.1}}">{{value.1}}</option>
-              {% endfor %}
             </datalist>
               <div style="margin-left:20px;">
                   <button type="button" class="btn btn-info add-item-sale"><i class="fa fa-plus"></i>Insert Delivery Challan</button>

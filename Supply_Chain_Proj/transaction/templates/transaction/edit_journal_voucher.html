@@ -1,0 +1,85 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% load mathfilters %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Edit Journal Voucher</h4>
+</div>
+<ul class="list-group list-group-flush">
+<form  action="" id="edit-jv-form" autocomplete="off"  method="post">
+  {% csrf_token %}
+  <li class="list-group-item">
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label for="">Transaction ID</label>
+          <input type="text" readonly class="form-control form-control-sm" required value="{{ jv_header.voucher_no }}" id="tran_id">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Document #</label>
+          <input type="text"  class="form-control form-control-sm" required value="{{jv_header.doc_no}}" id="doc_no">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Document Date</label>
+          <input type="date"  class="form-control form-control-sm" required value="{{jv_header.doc_date|date:"Y-m-d"}}" id="doc_date">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Description</label>
+          <textarea name="name" style="width:370px; height:30px;" id="description">{{jv_header.description}}</textarea>
+        </div>
+      </div>
+      </li>
+    <li class="list-group-item">
+    <div class="table-title">
+        <div class="row">
+          <div class="col-md-2">
+            <select class="form-control form-control-sm" id="account_title">
+              {% for value in all_accounts %}
+              <option value="{{value.id}}">{{value.account_title}}</option>
+              {% endfor %}
+            </select>
+          </div>
+            <div style="margin-left:20px;">
+                <button type="button" class="btn btn-info edit-item-jv"><i class="fa fa-plus"></i>Insert Account</button>
+            </div>
+        </div>
+    </div>
+    <div class="table table-responsive">
+      <table class="table table-bordered" id="edit-jv-table">
+          <thead>
+              <tr>
+                <th width="70px" style="font-size:10px;">S No:</th>
+                  <th width="100px" style="font-size:10px;">Account Id</th>
+                  <th width="300px">Account Title</th>
+                  <th width="100px">Debit</th>
+                  <th width="100px">Credit</th>
+                  <th>Action</th>
+              </tr>
+          </thead>
+          {% for value in jv_detail %}
+          <tbody>
+            <tr>
+              <td>{{forloop.counter}}</td>
+              <td>{{value.account_id.id}}</td>
+              <td>{{value.account_id.account_title}}</td>
+              <td>{{value.debit}}</td>
+              <td>{{value.credit|abs}}</td>
+              <td><a class="add-jv-edit" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-jv-edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-jv-edit" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+            </tr>
+          </tbody>
+          {% endfor %}
+      </table>
+    </div>
+    </li>
+      <br>
+    <div class="text-center">
+      <button type="submit" class="btn btn-outline-primary has_id" id="{{pk}}">Submit <small>(Journal Voucher)</small></button>
+    </div>
+    <br>
+</form>
+</ul>
+</div>
+
+
+{% endblock body %}

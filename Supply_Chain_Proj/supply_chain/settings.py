@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'user',
     'supplier',
     'customer',
     'inventory',
@@ -147,3 +148,5 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = EMAIL_USER
 EMAIL_HOST_PASSWORD = EMAIL_PASSWORD
 EMAIL_USE_TLS = True
+LOGIN_REDIRECT_URL = 'company-fiscal'
+LOGIN_URL = 'login'

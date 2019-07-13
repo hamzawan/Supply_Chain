@@ -27,7 +27,12 @@ urlpatterns = [
     path('sale/return/<pk>', views.new_sale_return, name = 'new-sale-return'),
     path('sale/return/edit/<pk>', views.edit_sale_return, name = 'edit-sale-return'),
 
-    path('journal_voucher/new', views.journal_voucher, name = 'journal-voucher'),
+
+    path('journal_voucher_summary/', views.journal_voucher_summary, name = 'journal-voucher-summary'),
+    path('journal_voucher/new', views.journal_voucher, name = 'new-journal-voucher'),
+    path('journal_voucher/edit/<pk>', views.edit_journal_voucher, name = 'edit-journal-voucher'),
+
+
     path('bank_receiving_voucher/new', views.bank_receiving_voucher, name = 'bank-receiving-voucher'),
     path('cash_receiving_voucher/new', views.cash_receiving_voucher, name = 'cash-receiving-voucher'),
     path('cash_payment_voucher/new', views.cash_payment_voucher, name = 'cash-payment-voucher'),

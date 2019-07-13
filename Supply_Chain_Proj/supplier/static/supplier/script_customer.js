@@ -57,6 +57,7 @@ $(document).ready(function(){
 				 			var index = $("table tbody tr:last-child").index();
 				 					var row = '<tr>' +
 				 							'<td>'+count+'</td>' +
+											'<td style="display:none;">'+type[0]['pk']+'</td>' +
 				 							'<td>'+type[0].fields['product_code']+'</td>' +
 				 							'<td>'+type[0].fields['product_name']+'</td>' +
 				 							'<td><pre>'+type[0].fields['product_desc']+'</pre></td>' +
@@ -137,26 +138,14 @@ $(document).ready(function(){
 					{
 						var $tds = $(this).find('td');
 						var row = {
-							'item_code' : "",
-							'item_name' : "",
-							'item_description' : "",
-							'unit' : "",
+							'id' : "",
 							'quantity' : "",
 						};
 						$tds.each(function(i, el){
 							if (i === 1) {
-									row["item_code"] = ($(this).text());
+									row["id"] = ($(this).text());
 							}
-							if (i === 2) {
-									row["item_name"] = ($(this).text());
-							}
-							else if (i === 3) {
-									row["item_description"] = ($(this).text());
-							}
-							else if (i === 4) {
-									row["unit"] = ($(this).text());
-							}
-							else if (i === 5) {
+							else if (i === 6) {
 									row["quantity"] = ($(this).text());
 							}
 						});
@@ -208,10 +197,11 @@ $(document).ready(function(){
 								 var index = $("table tbody tr:last-child").index();
 										 var row = '<tr>' +
 												 '<td>'+count+'</td>' +
-												 '<td>'+ type[i].fields['product_code'] +'</td>' +
-												 '<td>'+ type[i].fields['product_name'] +'</td>' +
-												 '<td>'+ type[i].fields['product_desc'] +'</td>' +
-												 '<td><input type="text" class="form-control" required ></td>' +
+												 '<td style="display:none;">'+ type[i]['pk'] +'</td>' +
+												 '<td>'+type[i].fields['product_code']+'</td>' +
+												 '<td>'+type[i].fields['product_name']+'</td>' +
+												 '<td><pre>'+type[i].fields['product_desc']+'</pre></td>' +
+												 '<td>'+type[i].fields['unit'] +'</td>'+
 												 '<td><input type="text" class="form-control" required ></td>' +
 									 '<td><a class="add-rfq-edit-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-rfq-edit-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-rfq-edit-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 										 '</tr>';
@@ -254,10 +244,7 @@ $(document).ready(function(){
 					// Edit row on edit button click
 					$(document).on("click", ".edit-rfq-edit-customer", function(){
 							$(this).parents("tr").find("td:not(:last-child)").each(function(i){
-								if (i === 4 ) {
-									$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
-								}
-								if (i === 5) {
+								if (i === 6) {
 									$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 								}
 					});
@@ -295,27 +282,17 @@ $(document).ready(function(){
 							{
 								var $tds = $(this).find('td');
 								var row = {
-									'item_code' : "",
-									'item_name' : "",
-									'item_description' : "",
-									'unit' : "",
+									'id' : "",
 									'quantity' : "",
 								};
 								$tds.each(function(i, el){
 									if (i === 1) {
-											row["item_code"] = ($(this).text());
+											row["id"] = ($(this).text());
+											console.log($(this).text());
 									}
-									if (i === 2) {
-											row["item_name"] = ($(this).text());
-									}
-									else if (i === 3) {
-											row["item_description"] = ($(this).text());
-									}
-									else if (i === 4) {
-											row["unit"] = ($(this).text());
-									}
-									else if (i === 5) {
+									else if (i === 6) {
 											row["quantity"] = ($(this).text());
+											console.log($(this).text());
 									}
 								});
 								data.push(row);
@@ -364,6 +341,7 @@ $(document).ready(function(){
 						 var index = $("table tbody tr:last-child").index();
 								 var row = '<tr>' +
 										 '<td>'+count+'</td>' +
+										 '<td style="display:none;">'+type[0]['pk']+'</td>' +
 										 '<td>'+type[0].fields['product_code']+'</td>' +
 										 '<td>'+type[0].fields['product_name']+'</td>' +
 										 '<td><pre>'+type[0].fields['product_desc']+'</pre></td>' +
@@ -389,7 +367,11 @@ $(document).ready(function(){
 			$(document).on("click", ".add-quotation-customer", function(){
 			var empty = false;
 			var input = $(this).parents("tr").find('input[type="text"]');
-					input.each(function(){
+					input.each(function(i){
+			if (i == 2) {
+						$(this).removeClass("error");
+			}
+			else{
 				if(!$(this).val()){
 					$(this).addClass("error");
 					empty = true;
@@ -397,6 +379,7 @@ $(document).ready(function(){
 				else{
 						$(this).removeClass("error");
 						}
+			}
 			});
 			$(this).parents("tr").find(".error").first().focus();
 			if(!empty){
@@ -412,16 +395,13 @@ $(document).ready(function(){
 			// Edit row on edit button click
 			$(document).on("click", ".edit-quotation-customer", function(){
 					$(this).parents("tr").find("td:not(:last-child)").each(function(i){
-						if (i === 4 ) {
+						if (i === 5 ) {
 							$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 						}
-						if (i === 5) {
+						if (i === 7 ) {
 							$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 						}
-						if (i === 6 ) {
-							$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
-						}
-						if (i === 7) {
+						if (i === 8) {
 							$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 						}
 			});
@@ -467,34 +447,22 @@ $(document).ready(function(){
 						{
 							var $tds = $(this).find('td');
 							var row = {
-								'item_code' : "",
-								'item_name' : "",
-								'item_description' : "",
+								'id' : "",
 								'quantity' : "",
-								'unit' : "",
 								'unit_price': "",
 								'remarks':""
 							};
 							$tds.each(function(i, el){
 								if (i === 1) {
-										row["item_code"] = ($(this).text());
-								}
-								if (i === 2) {
-										row["item_name"] = ($(this).text());
-								}
-								else if (i === 3) {
-										row["item_description"] = ($(this).text());
-								}
-								else if (i === 4) {
-										row["quantity"] = ($(this).text());
+										row["id"] = ($(this).text());
 								}
 								else if (i === 5) {
-										row["unit"] = ($(this).text());
-								}
-								else if (i === 6) {
-										row["unit_price"] = ($(this).text());
+										row["quantity"] = ($(this).text());
 								}
 								else if (i === 7) {
+										row["unit_price"] = ($(this).text());
+								}
+								else if (i === 8) {
 										row["remarks"] = ($(this).text());
 								}
 							});
@@ -559,6 +527,7 @@ $(document).ready(function(){
 									 var index = $("table tbody tr:last-child").index();
 											 var row = '<tr>' +
 													 '<td><input type="text" readonly class="form-control" value='+count+'></td>' +
+													 '<td style="display:none;" >'+type[i]['pk']+'</td>' +
 													 '<td>'+type[i].fields['product_code']+'</td>' +
 													 '<td>'+type[i].fields['product_name']+'</td>' +
 													 '<td><pre>'+type[i].fields['product_desc']+'</pre></td>' +
@@ -585,15 +554,20 @@ $(document).ready(function(){
 						$(document).on("click", ".add-quotation-edit-customer", function(){
 						var empty = false;
 						var input = $(this).parents("tr").find('input[type="text"]');
-								input.each(function(){
-							if(!$(this).val()){
-								$(this).addClass("error");
-								empty = true;
+						input.each(function(i){
+				if (i == 2) {
+							$(this).removeClass("error");
+				}
+				else{
+					if(!$(this).val()){
+						$(this).addClass("error");
+						empty = true;
+					}
+					else{
+							$(this).removeClass("error");
 							}
-							else{
-									$(this).removeClass("error");
-									}
-						});
+				}
+				});
 						$(this).parents("tr").find(".error").first().focus();
 						if(!empty){
 							input.each(function(){
@@ -609,16 +583,13 @@ $(document).ready(function(){
 						// Edit row on edit button click
 						$(document).on("click", ".edit-quotation-edit-customer", function(){
 								$(this).parents("tr").find("td:not(:last-child)").each(function(i){
-									if (i === 4 ) {
-										$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
-									}
 									if (i === 5) {
 										$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
 									}
-									if (i === 6) {
+									if (i === 7) {
 										$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
 									}
-									if (i === 7) {
+									if (i === 8) {
 										$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
 									}
 						});
@@ -667,34 +638,22 @@ $(document).ready(function(){
 							{
 								var $tds = $(this).find('td');
 								var row = {
-									'item_code' : "",
-									'item_name' : "",
-									'item_description' : "",
+									'item_id' : "",
 									'quantity' : "",
-									'unit' : "",
 									'unit_price': "",
 									'remarks':""
 								};
 								$tds.each(function(i, el){
 									if (i === 1) {
-											row["item_code"] = ($(this).text());
-									}
-									if (i === 2) {
-											row["item_name"] = ($(this).text());
-									}
-									else if (i === 3) {
-											row["item_description"] = ($(this).text());
-									}
-									else if (i === 4) {
-											row["quantity"] = ($(this).text());
+											row["id"] = ($(this).text());
 									}
 									else if (i === 5) {
-											row["unit"] = ($(this).text());
-									}
-									else if (i === 6) {
-											row["unit_price"] = ($(this).text());
+											row["quantity"] = ($(this).text());
 									}
 									else if (i === 7) {
+											row["unit_price"] = ($(this).text());
+									}
+									else if (i === 8) {
 											row["remarks"] = ($(this).text());
 									}
 								});
@@ -754,11 +713,12 @@ $(document).ready(function(){
 						 var index = $("table tbody tr:last-child").index();
 								 var row = '<tr>' +
 										 '<td>'+count+'</td>' +
-										 '<td>'+ type[0].fields['product_code'] +'</td>' +
-										 '<td>'+ type[0].fields['product_name'] +'</td>' +
+										 '<td style="display:none;">'+type[0]['pk']+'</td>' +
+										 '<td>'+type[0].fields['product_code']+'</td>' +
+										 '<td>'+type[0].fields['product_name']+'</td>' +
 										 '<td><pre>'+ type[0].fields['product_desc'] +'</pre></td>' +
 										 '<td><input type="text" class="form-control form-control-sm" required ></td>' +
-										 '<td>'+ type[0].fields['unit'] +'</td>' +
+										 '<td>'+type[0].fields['unit']+'</td>' +
 										 '<td><input type="text" class="form-control" required ></td>' +
 										 '<td><input type="text" class="form-control" required ></td>' +
 							 '<td><a class="add-po-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-po-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-po-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
@@ -780,15 +740,20 @@ $(document).ready(function(){
 			$(document).on("click", ".add-po-customer", function(){
 			var empty = false;
 			var input = $(this).parents("tr").find('input[type="text"]');
-					input.each(function(){
-				if(!$(this).val()){
-					$(this).addClass("error");
-					empty = true;
+			input.each(function(i){
+				if (i == 2) {
+							$(this).removeClass("error");
 				}
 				else{
-						$(this).removeClass("error");
-						}
-			});
+					if(!$(this).val()){
+						$(this).addClass("error");
+						empty = true;
+					}
+					else{
+							$(this).removeClass("error");
+							}
+				}
+				});
 			$(this).parents("tr").find(".error").first().focus();
 			if(!empty){
 				input.each(function(){
@@ -804,16 +769,13 @@ $(document).ready(function(){
 			// Edit row on edit button click
 			$(document).on("click", ".edit-po-customer", function(){
 					$(this).parents("tr").find("td:not(:last-child)").each(function(i){
-						if (i === 4 ) {
-							$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
-						}
 						if (i === 5) {
 							$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 						}
-						if (i === 6 ) {
+						if (i === 7 ) {
 							$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 						}
-						if (i === 7) {
+						if (i === 8) {
 							$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 						}
 			});
@@ -861,34 +823,22 @@ $(document).ready(function(){
 					{
 						var $tds = $(this).find('td');
 						var row = {
-							'item_code' : "",
-							'item_name' : "",
-							'item_description' : "",
+							'id' : "",
 							'quantity' : "",
-							'unit' : "",
 							'unit_price': "",
 							'remarks':""
 						};
 						$tds.each(function(i, el){
 							if (i === 1) {
-									row["item_code"] = ($(this).text());
-							}
-							if (i === 2) {
-									row["item_name"] = ($(this).text());
-							}
-							else if (i === 3) {
-									row["item_description"] = ($(this).text());
-							}
-							else if (i === 4) {
-									row["quantity"] = ($(this).text());
+									row["id"] = ($(this).text());
 							}
 							else if (i === 5) {
-									row["unit"] = ($(this).text());
-							}
-							else if (i === 6) {
-									row["unit_price"] = ($(this).text());
+									row["quantity"] = ($(this).text());
 							}
 							else if (i === 7) {
+									row["unit_price"] = ($(this).text());
+							}
+							else if (i === 8) {
 									row["remarks"] = ($(this).text());
 							}
 						});
@@ -945,6 +895,7 @@ $(document).ready(function(){
 								 var index = $("table tbody tr:last-child").index();
 										 var row = '<tr>' +
 												 '<td><input type="text" readonly class="form-control" value='+count+'></td>' +
+												 '<td style="display:none;" >'+type[i]['pk']+'</td>' +
 												 '<td>'+type[i].fields['product_code']+'</td>' +
 												 '<td>'+type[i].fields['product_name']+'</td>' +
 												 '<td><pre>'+type[i].fields['product_desc']+'</pre></td>' +
@@ -973,15 +924,20 @@ $(document).ready(function(){
 					$(document).on("click", ".add-po-edit-customer", function(){
 					var empty = false;
 					var input = $(this).parents("tr").find('input[type="text"]');
-							input.each(function(){
-						if(!$(this).val()){
-							$(this).addClass("error");
-							empty = true;
+					input.each(function(i){
+						if (i == 2) {
+									$(this).removeClass("error");
 						}
 						else{
-								$(this).removeClass("error");
-								}
-					});
+							if(!$(this).val()){
+								$(this).addClass("error");
+								empty = true;
+							}
+							else{
+									$(this).removeClass("error");
+									}
+						}
+						});
 					$(this).parents("tr").find(".error").first().focus();
 					if(!empty){
 						input.each(function(){
@@ -997,16 +953,13 @@ $(document).ready(function(){
 					// Edit row on edit button click
 					$(document).on("click", ".edit-po-edit-customer", function(){
 							$(this).parents("tr").find("td:not(:last-child)").each(function(i){
-								if (i === 4 ) {
-									$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
-								}
 								if (i === 5) {
 									$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
 								}
-								if (i === 6) {
+								if (i === 7) {
 									$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
 								}
-								if (i === 7) {
+								if (i === 8) {
 									$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
 								}
 					});
@@ -1055,34 +1008,22 @@ $(document).ready(function(){
 						{
 							var $tds = $(this).find('td');
 							var row = {
-								'item_code' : "",
-								'item_name' : "",
-								'item_description' : "",
+								'id' : "",
 								'quantity' : "",
-								'unit' : "",
 								'unit_price': "",
 								'remarks':""
 							};
 							$tds.each(function(i, el){
 								if (i === 1) {
-										row["item_code"] = ($(this).text());
-								}
-								if (i === 2) {
-										row["item_name"] = ($(this).text());
-								}
-								else if (i === 3) {
-										row["item_description"] = ($(this).text());
-								}
-								else if (i === 4) {
-										row["quantity"] = ($(this).text());
+										row["id"] = ($(this).text());
 								}
 								else if (i === 5) {
-										row["unit"] = ($(this).text());
-								}
-								else if (i === 6) {
-										row["unit_price"] = ($(this).text());
+										row["quantity"] = ($(this).text());
 								}
 								else if (i === 7) {
+										row["unit_price"] = ($(this).text());
+								}
+								else if (i === 8) {
 										row["remarks"] = ($(this).text());
 								}
 							});
@@ -1139,14 +1080,17 @@ $(document).ready(function(){
 						 .done(function done(data){
 							 if (data.row) {
 								 var type = JSON.parse(data.row);
+								 console.log(type);
 								 var index = $("table tbody tr:last-child").index();
 										 var row = '<tr>' +
 												 '<td>'+count+'</td>' +
+												 '<td style="display:none;">'+type[0]['pk']+'</td>' +
 												 '<td id="get_item_code">'+type[0].fields['product_code']+'</td>' +
 												 '<td>'+type[0].fields['product_name']+'</td>' +
 												 '<td><pre>'+type[0].fields['product_desc']+'</pre></td>' +
 												 '<td id="quantity"><input type="text" class="form-control form-control-sm" required ></td>' +
 												 '<td>'+type[0].fields['unit']+'</td>' +
+												 '<td style="display:none;"></td>' +
 									 '<td><a class="add-dc-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-dc-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-dc-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 										 '</tr>';
 									 $("table").append(row);
@@ -1163,19 +1107,66 @@ $(document).ready(function(){
 					});
 
 
+					$(".add-new-po-customer-dc").click(function(){
+						var item_code_po_dc = $('#item_code_po_dc').val()
+						console.log(item_code_po_dc);
+						req =	$.ajax({
+							 headers: { "X-CSRFToken": getCookie("csrftoken") },
+							 type: 'POST',
+							 url : '/customer/delivery_challan/new',
+							 data:{
+								 'item_code_po_dc': item_code_po_dc,
+							 },
+							 dataType: 'json'
+						 })
+						 .done(function done(data){
+							 if (data.row) {
+								 console.log(data.row);
+								 var index = $("table tbody tr:last-child").index();
+								 for (var i = 0; i < data.row.length; i++) {
+									 var row = '<tr>' +
+											 '<td>'+count+'</td>' +
+											 '<td style="display:none;" >'+data.row[i][0]+'</td>' +
+											 '<td id="get_item_code">'+data.row[i][1]+'</td>' +
+											 '<td>'+data.row[i][2]+'</td>' +
+											 '<td><pre>'+data.row[i][7]+'</pre></td>' +
+											 '<td id="quantity"><input type="text" class="form-control form-control-sm" required ></td>' +
+											 '<td>'+data.row[i][3]+'</td>' +
+											 '<td style="display:none;" >'+data.id+'</td>' +
+								 '<td><a class="add-dc-customer-po" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-dc-customer-po" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-dc-customer-po" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+									 '</tr>';
+	 									 $("table").append(row);
+										 $("table tbody tr").eq(index + 1).find(".add-dc-customer-po, .edit-dc-customer-po").toggle();
+										 $('[data-toggle="tooltip"]').tooltip();
+										 $('#item_code_dc').val("");
+										 $(".add-new-po-customer-dc").attr("disabled", "disabled");
+										 $(".has_id").attr("disabled", "disabled");
+								 }
+							 }
+							 else{
+								 alert(data.message)
+							 }
+						 })
+					});
+
 					// Add row on add button click
 					$(document).on("click", ".add-dc-customer", function(){
 					var empty = false;
 					var input = $(this).parents("tr").find('input[type="text"]');
-							input.each(function(){
-						if(!$(this).val()){
-							$(this).addClass("error");
-							empty = true;
+					input.each(function(i){
+						if (i == 2) {
+									$(this).removeClass("error");
 						}
 						else{
-								$(this).removeClass("error");
-								}
-					});
+							if(!$(this).val()){
+								$(this).addClass("error");
+								empty = true;
+							}
+							else{
+									$(this).removeClass("error");
+									}
+						}
+						});
 					$(this).parents("tr").find(".error").first().focus();
 					if(!empty){
 						input.each(function(){
@@ -1183,6 +1174,103 @@ $(document).ready(function(){
 						});
 						$(this).parents("tr").find(".add-dc-customer, .edit-dc-customer").toggle();
 						$(".add-new-dc-customer").removeAttr("disabled");
+						$(".add-new-po-customer-dc").removeAttr("disabled");
+						$(".has_id").removeAttr("disabled");
+					}
+					var get_quantity = $($(this).parents("tr").find("#quantity")).filter(function() {
+									quantity = $(this).text();
+									return quantity
+							}).closest("tr");
+					console.log(quantity);
+					var get_item_code = $($(this).parents("tr").find("#get_item_code")).filter(function() {
+									item_code = $(this).text();
+									return item_code
+							}).closest("tr");
+				item_code = $('#item_code').val()
+				req =	$.ajax({
+					 headers: { "X-CSRFToken": getCookie("csrftoken") },
+					 type: 'POST',
+					 url : '/customer/delivery_challan/new',
+					 data:{
+						 'quantity':quantity,
+						 'item_code':item_code
+					 },
+					 dataType: 'json'
+				 })
+				 .done(function done(data){
+
+					 if(data.message === "False"){
+						alert("Not enough stock")
+					// 	var table = $('#new-dc-customer-table');
+					// 	table.find("tr").find("td:not(:last-child)").each(function(i){
+					// 			if (i === 5) {
+					// 				$(this).html('<input type="text" style="border: 1px solid red;" class="form-control form-control-warning" value="' + $(this).text() + '">');
+					// 			}
+					// });
+					table.find("tr").find(".add-transaction-sale, .edit-transaction-sale").toggle();
+					$(".add-item-sale").attr("disabled", "disabled");
+					 }
+					 else{
+
+					 }
+				});
+
+					});
+
+
+					// Edit row on edit button click
+					$(document).on("click", ".edit-dc-customer", function(){
+							$(this).parents("tr").find("td:not(:last-child)").each(function(i){
+
+								if (i === 5) {
+									$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
+								}
+					});
+					$(this).parents("tr").find(".add-dc-customer, .edit-dc-customer").toggle();
+					$(".add-new-dc-customer").attr("disabled", "disabled");
+					$(".add-new-po-customer-dc").attr("disabled", "disabled");
+					$(".has_id").attr("disabled", "disabled");
+					});
+
+					// Delete row on delete button click
+					$(document).on("click", ".delete-dc-customer", function(){
+						var row =  $(this).closest('tr');
+						var siblings = row.siblings();
+						siblings.each(function(index) {
+						$(this).children('td').first().text(index + 1);
+						});
+						$(this).parents("tr").remove();
+						$(".add-new-dc-customer").removeAttr("disabled");
+						$(".add-new-po-customer-dc").removeAttr("disabled");
+						$(".has_id").removeAttr("disabled");
+					});
+
+
+					$(document).on("click", ".add-dc-customer-po", function(){
+					var empty = false;
+					var input = $(this).parents("tr").find('input[type="text"]');
+					input.each(function(i){
+						if (i == 2) {
+									$(this).removeClass("error");
+						}
+						else{
+							if(!$(this).val()){
+								$(this).addClass("error");
+								empty = true;
+							}
+							else{
+									$(this).removeClass("error");
+									}
+						}
+						});
+					$(this).parents("tr").find(".error").first().focus();
+					if(!empty){
+						input.each(function(){
+							$(this).parent("td").html($(this).val());
+						});
+						$(this).parents("tr").find(".add-dc-customer-po, .edit-dc-customer-po").toggle();
+						$(".add-new-dc-customer").removeAttr("disabled");
+						$(".add-new-po-customer-dc").removeAttr("disabled");
 						$(".has_id").removeAttr("disabled");
 					}
 					var get_quantity = $($(this).parents("tr").find("#quantity")).filter(function() {
@@ -1209,12 +1297,12 @@ $(document).ready(function(){
 
 					 if(data.message === "False"){
 						alert("Not enough stock")
-						var table = $('#new-dc-customer-table');
-						table.find("tr").find("td:not(:last-child)").each(function(i){
-								if (i === 4) {
-									$(this).html('<input type="text" style="border: 1px solid red;" class="form-control form-control-warning" value="' + $(this).text() + '">');
-								}
-					});
+					// 	var table = $('#new-dc-customer-table');
+					// 	table.find("tr").find("td:not(:last-child)").each(function(i){
+					// 			if (i === 5) {
+					// 				$(this).html('<input type="text" style="border: 1px solid red;" class="form-control form-control-warning" value="' + $(this).text() + '">');
+					// 			}
+					// });
 					table.find("tr").find(".add-transaction-sale, .edit-transaction-sale").toggle();
 					$(".add-item-sale").attr("disabled", "disabled");
 					 }
@@ -1227,28 +1315,21 @@ $(document).ready(function(){
 
 
 					// Edit row on edit button click
-					$(document).on("click", ".edit-dc-customer", function(){
+					$(document).on("click", ".edit-dc-customer-po", function(){
 							$(this).parents("tr").find("td:not(:last-child)").each(function(i){
-								if (i === 4 ) {
-									$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
-								}
+
 								if (i === 5) {
 									$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 								}
-								if (i === 6 ) {
-									$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
-								}
-								if (i === 7) {
-									$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
-								}
 					});
-					$(this).parents("tr").find(".add-dc-customer, .edit-dc-customer").toggle();
+					$(this).parents("tr").find(".add-dc-customer-po, .edit-dc-customer-po").toggle();
 					$(".add-new-dc-customer").attr("disabled", "disabled");
+					$(".add-new-po-customer-dc").attr("disabled", "disabled");
 					$(".has_id").attr("disabled", "disabled");
 					});
 
 					// Delete row on delete button click
-					$(document).on("click", ".delete-dc-customer", function(){
+					$(document).on("click", ".delete-dc-customer-po", function(){
 						var row =  $(this).closest('tr');
 						var siblings = row.siblings();
 						siblings.each(function(index) {
@@ -1256,6 +1337,7 @@ $(document).ready(function(){
 						});
 						$(this).parents("tr").remove();
 						$(".add-new-dc-customer").removeAttr("disabled");
+						$(".add-new-po-customer-dc").removeAttr("disabled");
 						$(".has_id").removeAttr("disabled");
 					});
 
@@ -1279,35 +1361,19 @@ $(document).ready(function(){
 								{
 									var $tds = $(this).find('td');
 									var row = {
-										'item_code' : "",
-										'item_name' : "",
-										'item_description' : "",
+										'id' : "",
 										'quantity' : "",
-										'unit' : "",
-										'unit_price': "",
-										'remarks':""
+										'po_no': "",
 									};
 									$tds.each(function(i, el){
 										if (i === 1) {
-												row["item_code"] = ($(this).text());
-										}
-										if (i === 2) {
-												row["item_name"] = ($(this).text());
-										}
-										else if (i === 3) {
-												row["item_description"] = ($(this).text());
-										}
-										else if (i === 4) {
-												row["quantity"] = ($(this).text());
+												row["id"] = ($(this).text());
 										}
 										else if (i === 5) {
-												row["unit"] = ($(this).text());
-										}
-										else if (i === 6) {
-												row["unit_price"] = ($(this).text());
+												row["quantity"] = ($(this).text());
 										}
 										else if (i === 7) {
-												row["remarks"] = ($(this).text());
+												row["po_no"] = ($(this).text());
 										}
 									});
 									data.push(row);
@@ -1354,13 +1420,13 @@ $(document).ready(function(){
 											 var index = $("table tbody tr:last-child").index();
 													 var row = '<tr>' +
 															 '<td><input type="text" readonly class="form-control" value='+count+'></td>' +
+															 '<td style="display:none;" >'+type[i]['pk']+'</td>' +
 															 '<td>'+type[i].fields['product_code']+'</td>' +
 															 '<td>'+type[i].fields['product_name']+'</td>' +
 															 '<td><pre>'+type[i].fields['product_desc']+'</pre></td>' +
 															 '<td><input type="text" class="form-control" required ></td>' +
 															 '<td>'+type[i].fields['unit']+'</td>' +
-															 '<td><input type="text" class="form-control" required ></td>' +
-															 '<td><input type="text" class="form-control" required ></td>' +
+															 '<td style="display:none;"></td>' +
 												 '<td><a class="add-dc-edit-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-dc-edit-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-dc-edit-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 													 '</tr>';
 													 count++;
@@ -1379,8 +1445,107 @@ $(document).ready(function(){
 									 });
 								});
 
+
+								$(".edit-po-customer-dc").click(function(){
+									var item_code_po_dc = $('#item_code_po_dc').val()
+									console.log(item_code_po_dc);
+									req =	$.ajax({
+										 headers: { "X-CSRFToken": getCookie("csrftoken") },
+										 type: 'POST',
+										 url : `/customer/delivery_challan/edit/${edit_id}`,
+										 data:{
+											 'item_code_po_dc': item_code_po_dc,
+										 },
+										 dataType: 'json'
+									 })
+									 .done(function done(data){
+										 if (data.row) {
+											 console.log(data.row);
+											 var index = $("table tbody tr:last-child").index();
+											 for (var i = 0; i < data.row.length; i++) {
+												 var row = '<tr>' +
+														 '<td>'+count+'</td>' +
+														 '<td style="display:none;" >'+data.row[i][0]+'</td>' +
+														 '<td id="get_item_code">'+data.row[i][1]+'</td>' +
+														 '<td>'+data.row[i][2]+'</td>' +
+														 '<td><pre>'+data.row[i][7]+'</pre></td>' +
+														 '<td id="quantity"><input type="text" class="form-control form-control-sm" required ></td>' +
+														 '<td>'+data.row[i][3]+'</td>' +
+														 '<td style="display:none;" >'+data.id+'</td>' +
+											 '<td><a class="add-edit-dc-customer-po" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-edit-dc-customer-po" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="edit-delete-dc-customer-po" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+												 '</tr>';
+													 $("table").append(row);
+													 $("table tbody tr").eq(index + 1).find(".add-edit-dc-customer-po, .edit-edit-dc-customer-po").toggle();
+													 $('[data-toggle="tooltip"]').tooltip();
+													 $('#item_code_dc').val("");
+													 $(".edit-po-customer-dc").attr("disabled", "disabled");
+													 $(".has_id").attr("disabled", "disabled");
+											 }
+										 }
+										 else{
+											 alert(data.message)
+										 }
+									 })
+								});
+
+
 								// Add row on add button click
+								$(document).on("click", ".add-edit-dc-customer-po", function(){
+								var empty = false;
+								var input = $(this).parents("tr").find('input[type="text"]');
+										input.each(function(){
+									if(!$(this).val()){
+										$(this).addClass("error");
+										empty = true;
+									}
+									else{
+											$(this).removeClass("error");
+											}
+								});
+								$(this).parents("tr").find(".error").first().focus();
+								if(!empty){
+									input.each(function(){
+										$(this).parent("td").html($(this).val());
+									});
+									$(this).parents("tr").find(".add-edit-dc-customer-po, .edit-edit-dc-customer-po").toggle();
+									$(".edit-po-customer-dc").removeAttr("disabled");
+									$(".has_id").removeAttr("disabled");
+								}
+								});
+
+
+								// Edit row on edit button click
+								$(document).on("click", ".edit-edit-dc-customer-po", function(){
+										$(this).parents("tr").find("td:not(:last-child)").each(function(i){
+											if (i === 4 ) {
+												$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
+											}
+											if (i === 6) {
+												$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
+											}
+											if (i === 7) {
+												$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
+											}
+								});
+								$(this).parents("tr").find(".add-edit-dc-customer-po, .edit-edit-dc-customer-po").toggle();
+								$(".edit-po-customer-dc").attr("disabled", "disabled");
+								$(".has_id").attr("disabled", "disabled");
+								});
+
+								// Delete row on delete button click
+								$(document).on("click", ".edit-delete-dc-customer-po", function(){
+									var row =  $(this).closest('tr');
+									var siblings = row.siblings();
+									siblings.each(function(index) {
+									$(this).children('td').first().text(index + 1);
+									});
+									$(this).parents("tr").remove();
+									$(".edit-po-customer-dc").removeAttr("disabled");
+									$(".has_id").removeAttr("disabled");
+								});
+
 								$(document).on("click", ".add-dc-edit-customer", function(){
+									console.log("hamza");
 								var empty = false;
 								var input = $(this).parents("tr").find('input[type="text"]');
 										input.each(function(){
@@ -1407,13 +1572,7 @@ $(document).ready(function(){
 								// Edit row on edit button click
 								$(document).on("click", ".edit-dc-edit-customer", function(){
 										$(this).parents("tr").find("td:not(:last-child)").each(function(i){
-											if (i === 4 ) {
-												$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
-											}
-											if (i === 6) {
-												$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
-											}
-											if (i === 7) {
+											if (i === 5 ) {
 												$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
 											}
 								});
@@ -1449,35 +1608,19 @@ $(document).ready(function(){
 							{
 								var $tds = $(this).find('td');
 								var row = {
-									'item_code' : "",
-									'item_name' : "",
-									'item_description' : "",
+									'id' : "",
 									'quantity' : "",
-									'unit' : "",
-									'unit_price': "",
-									'remarks':""
+									'po_no': "",
 								};
 								$tds.each(function(i, el){
 									if (i === 1) {
-											row["item_code"] = ($(this).text());
-									}
-									if (i === 2) {
-											row["item_name"] = ($(this).text());
-									}
-									else if (i === 3) {
-											row["item_description"] = ($(this).text());
-									}
-									else if (i === 4) {
-											row["quantity"] = ($(this).text());
+											row["id"] = ($(this).text());
 									}
 									else if (i === 5) {
-											row["unit"] = ($(this).text());
-									}
-									else if (i === 6) {
-											row["unit_price"] = ($(this).text());
+											row["quantity"] = ($(this).text());
 									}
 									else if (i === 7) {
-											row["remarks"] = ($(this).text());
+											row["po_no"] = ($(this).text());
 									}
 								});
 								data.push(row);

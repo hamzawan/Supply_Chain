@@ -8,20 +8,9 @@
 </div>
 <ul class="list-group list-group-flush">
   <li class="list-group-item">
-    <div class="input-group">
-      <input type="text" class="form-control col-md-4"  id="search" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
-      <div class="input-group-append">
-        <button class="btn btn-primary" type="button">
-          <i class="fas fa-search"></i>
-        </button>
-      </div>
-      <div class="col-md-8">
-        <a role="button" href="{% url 'new-purchase' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
-      </div>
-    </div>
     <br>
     <div class="table table-responsive content-loader">
-      <table class="table table-bordered" id="dataTable">
+      <table class="table table-bordered sort" id="dataTable">
           <thead>
               <tr>
                   <th width="70px">S No.</th>

@@ -163,7 +163,14 @@
           <a class="dropdown-item" href="{% url 'purchase-return-summary' %}">Purchase Return</a>
           <a class="dropdown-item" href="{% url 'sale' %}">Sale</a>
           <a class="dropdown-item" href="{% url 'sale-return-summary' %}">Sale Return</a>
-          <a class="dropdown-item" href="{% url 'journal-voucher' %}">Journal Voucher</a>
+          <h5 class="dropdown-header">Vouchers :</h5>
+          <a class="dropdown-item" href="{% url 'journal-voucher-summary' %}">Journal Voucher</a>
+          <h6 class="dropdown-header">Receiving :</h6>
+          <a class="dropdown-item" href="{% url 'bank-receiving-voucher' %}">Bank Receiving Voucher</a>
+          <a class="dropdown-item" href="{% url 'cash-receiving-voucher' %}">Cash Receiving Voucher</a>
+          <h6 class="dropdown-header">Payment :</h6>
+          <a class="dropdown-item" href="{% url 'bank-payment-voucher' %}">Bank Payment Voucher</a>
+          <a class="dropdown-item" href="{% url 'cash-payment-voucher' %}">Cash Payment Voucher</a>
         </div>
       </li>
       <li class="nav-item dropdown">

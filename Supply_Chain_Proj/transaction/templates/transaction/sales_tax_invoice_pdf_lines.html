@@ -138,11 +138,11 @@
       </thead>
       <tbody>
         {% for detail in detail %}
-        {% with quantity=detail.quantity unit=detail.unit price=detail.cost_price sales_tax=detail.sales_tax value_of_goods=detail.cost_price|mul:detail.quantity tax=detail.cost_price|mul:detail.quantity|mul:detail.sales_tax|div:100 %}
+        {% with quantity=detail.6 unit=detail.5 price=detail.7 sales_tax=detail.8 value_of_goods=detail.7|mul:detail.6 tax=detail.7|mul:detail.6|mul:detail.8|div:100 %}
         <tr>
           <td style="width: 70px; text-align: center; border-left:1px solid black; border-right:1px solid black; border-bottom:1px solid black;"><font style="margin-top:-100px;">{{forloop.counter}}</font></td>
-          <td style="border-left:1px solid black; border-right:1px solid black; border-bottom:1px solid black;"><font>{{detail.item_name}}<font>
-              <pre style="padding:0px; margin-top:-100px;">{{detail.item_description}}</pre>
+          <td style="border-left:1px solid black; border-right:1px solid black; border-bottom:1px solid black;"><font>{{detail.3}}<font>
+              <pre style="padding:0px; margin-top:-100px;">{{detail.4}}</pre>
           </td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{quantity}}</td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{unit}}</td>

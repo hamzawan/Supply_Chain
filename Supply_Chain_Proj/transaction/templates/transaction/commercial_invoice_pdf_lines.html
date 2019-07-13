@@ -87,20 +87,20 @@
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.date}}</font></td>
 
          </tr>
-         <tr>
+         <!-- <tr>
            <th align="left"><font size="12px" color="#0a012c">Purchase Order No.</font></th>
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">102029</font></td>
            <th align="left"><font size="12px" color="#0a012c">Delivery Challan</font</th>
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">145950</font></td>
 
-           <!-- <th align="left"><font size="12px" color="#0a012c">Delivery Challan #</font</th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c"></font>DC/CU/101</td> -->
-         </tr>
+           <th align="left"><font size="12px" color="#0a012c">Delivery Challan #</font</th>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c"></font>DC/CU/101</td>
+         </tr> -->
          <tr>
            <th align="left"><font size="12px" color="#0a012c">Sales Tax Number</font</th>
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.stn}}</font></td>
            <th align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">Delivery Date</font></th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">June 08, 2019</font></td>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.date}}</font></td>
          </tr>
          <tr>
            <th align="left"><font size="12px" color="#0a012c">NTN No</font</th>
@@ -138,34 +138,33 @@
       </thead>
       <tbody>
         {% for detail in detail %}
-        {% with quantity=detail.quantity unit=detail.unit price=detail.cost_price sales_tax=detail.sales_tax value_of_goods=detail.cost_price|mul:detail.quantity tax=detail.cost_price|mul:detail.quantity|mul:detail.sales_tax|div:100 %}
+        {% with quantity=detail.6 unit=detail.5 price=detail.7 sales_tax=detail.8 value_of_goods=detail.7|mul:detail.6 tax=detail.7|mul:detail.6|mul:detail.8|div:100 %}
+        {% ifchanged detail.1 and detail.2 %}
         <tr>
-          <td style=" width: 70px; text-align: center; border-left:1px solid black; border-right:1px solid black; border-bottom:1px solid black;"><font style="margin-top:-100px;">{{forloop.counter}}</font></td>
-          <td style="border-left:1px solid black; border-right:1px solid black; border-bottom:1px solid black;"><font>{{detail.item_name}}<font>
-              <pre style="padding:0px; margin-top:-100px;">{{detail.item_description}}</pre>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"><b>DC No:</b> {{detail.1}} <b>Po No:</b> {{detail.2}}</td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
+        </tr>
+        {% endifchanged %}
+        <tr>
+          <td style="width: 70px; text-align: center; border-left:1px solid black; border-right:1px solid black; border-bottom:1px solid black;"><font style="margin-top:-100px;">{{forloop.counter}}</font></td>
+          <td style="border-left:1px solid black; border-right:1px solid black; border-bottom:1px solid black;"><font>{{detail.3}}<font>
+              <pre style="padding:0px; margin-top:-100px;">{{detail.4}}</pre>
           </td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{quantity}}</td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{unit}}</td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-right:1px solid black; border-bottom:1px solid black;">{{price}}</td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-right:1px solid black; border-bottom:1px solid black;">{{value_of_goods|floatformat:2}}</td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-right:1px solid black; border-bottom:1px solid black;">{{tax|floatformat:2}}</td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-right:1px solid black; border-bottom:1px solid black;">{{value_of_goods|add:tax|floatformat:2}}</td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{price}}</td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{value_of_goods|floatformat:2}}</td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{tax|floatformat:2}}</td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{value_of_goods|add:tax|floatformat:2}}</td>
         </tr>
         {% endwith %}
         {% endfor %}
-
-      {% for i in i|rjust:total_lines %}
-      <tr style="height:6px;">
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black;"></td>
-      </tr>
-      {% endfor %}
 
       <tr class="heading_row">
         <td style="width: 70px;"></td>
@@ -176,6 +175,68 @@
         <td></td>
         <td style="text-align:center;" ><b>Total in {{header.currency}}</b></td>
         <td style="text-align:center;" >{{total_amount|floatformat:2}}</td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
+  <br>
+  <br>
+  <table>
+    <tbody>
+      <tr>
+        <td style="width: 70px;"></td>
+        <td style="width:400px;"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td style=" text-align: center; width:300px;" ><b>Cartage Amount:</b></td>
+        <td style="text-align:center; border-bottom:1px solid black;" ></td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
+  <table>
+    <tbody>
+      <tr>
+        <td style="width: 70px;"></td>
+        <td style="width:400px;"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td style=" text-align: center; width:300px;" ><b>Sales Tax Amount:</b></td>
+        <td style="text-align:center; border-bottom:1px solid black;" ></td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
+  <table>
+    <tbody>
+      <tr>
+        <td style="width: 70px;"></td>
+        <td style="width:400px;"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td style=" text-align: center; width:300px;" ><b>Additional Tax Amount:</b></td>
+        <td style="text-align:center; border-bottom:1px solid black;" >0.00</td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
+  <table>
+    <tbody>
+      <tr>
+        <td style="width: 70px;"></td>
+        <td style="width:400px;"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td style=" text-align: center; width:300px;" ><b>Total Amount:</b></td>
+        <td style="text-align:center; border-bottom:1px solid black;" >{{total_amount|floatformat:2}}</td>
       </tr>
     </tbody>
   </table>

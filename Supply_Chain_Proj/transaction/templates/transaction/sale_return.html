@@ -13,7 +13,11 @@
   <li class="list-group-item">
       <div class="form-row">
         <div class="form-group col-md-2">
-          <label>Sale Name</label>
+          <label for="">Sale Return No:</label>
+          <input type="text" readonly class="form-control form-control-sm" value="{{get_last_sale_no}}" id="">
+        </div>
+        <div class="form-group col-md-2">
+          <label>Customer Name</label>
           <input list="account"  class="form-control form-control-sm" required id="customer_sale_return" value="{{sale_header.account_id.account_title}}" >
           <datalist id="account">
             {% for value in all_accounts %}
@@ -23,33 +27,22 @@
         </div>
         <div class="form-group col-md-2">
          <label for="sel1">Payment Term:</label>
-         <select class="form-control form-control-sm" id="payment_sale_return">
+         <select class="form-control form-control-sm" id="payment_method">
            <option>Cash</option>
            <option>Credit</option>
          </select>
         </div>
+        <div class="form-group col-md-2">
+          <label for="">Credit Days:</label>
+          <input type="text" readonly class="form-control form-control-sm" value="{{sale_header.credit_days}}" id="credit_days">
+        </div>
         <div class="form-group">
           <label for="exampleFormControlTextarea2">Description</label>
-          <textarea class="form-control rounded-0" rows="3" id="desc_sale_return">{{sale_header.footer_description}}</textarea>
+          <textarea class="form-control rounded-0" rows="3" id="footer_desc">{{sale_header.footer_description}}</textarea>
         </div>
       </div>
     </li>
     <li class="list-group-item">
-    <!-- <div class="table-title">
-        <div class="row">
-          <div class="form-group col-md-3">
-            <input type="text" list="item" placeholder="Enter Item Code here..." class="form-control form-control-sm" id="item_code_purchase">
-          </div>
-          <datalist id="item">
-            {% for value in all_item_code %}
-            <option value="{{value.product_code}}" />
-            {% endfor %}
-          </datalist>
-            <div style="margin-left:20px;">
-                <button type="button" class="btn btn-info add-item-purchase"><i class="fa fa-plus"></i>Insert Item</button>
-            </div>
-        </div>
-    </div> -->
     <div class="table table-responsive">
       <table class="table table-bordered" id="new-sale-return-table">
           <thead>
@@ -69,13 +62,15 @@
             {% for value in sale_detail %}
             <tr>
               <td>{{ forloop.counter }}</td>
-              <td>{{ value.item_code }}</td>
-              <td>{{ value.item_name }}</td>
-              <td>{{ value.item_description }}</td>
+              <td style="display:none;">{{ value.item_id.id }}</td>
+              <td>{{ value.item_id.product_code }}</td>
+              <td>{{ value.item_id.product_name }}</td>
+              <td><pre>{{ value.item_id.product_desc }}</pre></td>
               <td>{{ value.quantity }}</td>
               <td>{{ value.unit }}</td>
               <td>{{ value.cost_price }}</td>
               <td>{{ value.sales_tax }}</td>
+              <td style="display:none;">{{ value.dc_ref }}</td>
               <td><a class="add-sale-return" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-sale-return" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-sale-return" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
             </tr>
             {% endfor %}

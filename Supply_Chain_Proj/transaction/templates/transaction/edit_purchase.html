@@ -40,7 +40,7 @@
          </select>
         </div>
         <div class="form-group col-md-2">
-          <label for="">No Of Days:</label>
+          <label for="">Credit Days:</label>
           <input type="text" readonly class="form-control form-control-sm" value="{{purchase_header.credit_days}}" id="credit_days">
         </div>
         {% if purchase_header.follow_up|date:"Y-m-d" == "2010-06-10" %}
@@ -96,11 +96,12 @@
           <tbody>
             {% for value in purchase_detail %}
               <tr>
-                <td> {{value.item_code}} </td>
-                <td> {{value.item_name}} </td>
-                <td><pre>{{value.item_description}}</pre></td>
+                <td style="display:none;"> {{value.item_id.id}} </td>
+                <td> {{value.item_id.product_code}} </td>
+                <td> {{value.item_id.product_name}} </td>
+                <td><pre>{{value.item_id.product_desc}}</pre></td>
                 <td id="quantity_edit"> {{value.quantity}} </td>
-                <td> {{value.unit}} </td>
+                <td> {{value.item_id.unit}} </td>
                 <td id="price_edit">{{value.cost_price}}</td>
                 <td id="value_of_goods_edit">{{value.quantity|mul:value.cost_price}}</td>
                 <td id="sales_tax_edit">{{value.sales_tax}}</td>

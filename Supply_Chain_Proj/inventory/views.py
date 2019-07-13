@@ -9,22 +9,22 @@ from django.db import connection
 def item_stock(request):
     cursor = connection.cursor()
     cursor.execute('''Select itemID,Size,item_code, item_name,Item_description,Unit,Size,SUM(quantity) As qty From (
-                        Select 'Opening Stock' As TranType,ID As ItemID, Size,Product_Code As Item_Code,Product_Name As Item_name,Product_desc As Item_description,Unit As unit,Opening_Stock as Quantity
-                        From inventory_add_products
-                        union all
-                        Select 'Purchase' As TranType,P.ID As ItemID,P.Size,Item_Code,Item_name,Item_description,H.unit,Quantity
-                        From transaction_purchasedetail H Inner join inventory_add_products P On H.item_code = P.product_code
-                        union All
-                        Select 'Purchase Return' As TranType,P.ID As ItemID,P.Size,Item_Code,Item_name,Item_description,H.unit,Quantity * -1
-                        From transaction_purchasereturndetail H Inner join inventory_add_products P On H.item_code = P.product_code
-                        union all
-                        Select 'Sale' As TranType,P.ID AS ItemID,P.Size,Item_Code,Item_name,Item_description,H.unit,Quantity * -1
-                        From transaction_saledetail H Inner join inventory_add_products P On H.item_code = P.product_code
-                        union all
-                        Select 'Sale Return' As TranType,P.ID AS ItemID,P.Size,Item_Code,Item_name,Item_description,H.unit,Quantity
-                        From transaction_salereturndetail H Inner join inventory_add_products P On H.item_code = P.product_code
-                        ) As tblTemp
-                        Group by Item_Code
+                    Select 'Opening Stock' As TranType,ID As ItemID, Size,Product_Code As Item_Code,Product_Name As Item_name,Product_desc As Item_description,Unit As unit,Opening_Stock as Quantity
+                    From inventory_add_products
+                    union all
+                    Select 'Purchase' As TranType,P.ID As ItemID,P.Size,P.Product_Code,P.Product_name,P.Product_desc,P.unit,Quantity
+                    From transaction_purchasedetail H Inner join inventory_add_products P On H.item_id_id = P.id
+                    union All
+                    Select 'Purchase Return' As TranType,P.ID As ItemID,P.Size,P.Product_Code,P.Product_name,P.Product_desc,P.unit,Quantity * -1
+                    From transaction_purchasereturndetail H Inner join inventory_add_products P On H.item_id_id = P.id
+                    union all
+                    Select 'Sale' As TranType,P.ID AS ItemID,P.Size,P.Product_Code,P.Product_name,P.Product_desc,P.unit,Quantity * -1
+                    From transaction_saledetail H Inner join inventory_add_products P On H.item_id_id = P.id
+                    union all
+                    Select 'Sale Return' As TranType,P.ID AS ItemID,P.Size,P.Product_Code,P.Product_name,P.Product_desc,P.unit,Quantity
+                    From transaction_salereturndetail H Inner join inventory_add_products P On H.item_id_id = P.id
+                    ) As tblTemp
+                    Group by Item_Code
                     ''')
     row = cursor.fetchall()
     return render(request, 'inventory/item_stock.html',{'row':row})

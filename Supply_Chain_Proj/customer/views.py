@@ -38,13 +38,10 @@ def new_rfq_customer(request):
     item_code = request.POST.get('item_code',False)
     if item_code:
         data = Add_products.objects.filter(product_code = item_code)
-        for value in data:
-            print(value.product_code)
         row = serializers.serialize('json',data)
         return HttpResponse(json.dumps({'row':row}))
     if request.method == 'POST':
         customer = request.POST.get('customer',False)
-        print(customer)
         attn = request.POST.get('attn',False)
         follow_up = request.POST.get('follow_up',False)
         footer_remarks = request.POST.get('footer_remarks',False)
@@ -59,8 +56,8 @@ def new_rfq_customer(request):
         rfq_header.save()
         header_id = RfqCustomerHeader.objects.get(rfq_no=get_last_rfq_no)
         for value in items:
-            rfq_detail = RfqCustomerDetail(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"],
-                                            quantity = value["quantity"], unit = value["unit"], rfq_id = header_id)
+            item_id = Add_products.objects.get(id = value["id"])
+            rfq_detail = RfqCustomerDetail(item_id = item_id, quantity = value["quantity"],rfq_id = header_id)
             rfq_detail.save()
         return JsonResponse({"result": "success"})
     return render(request,'customer/new_rfq_customer.html',{'get_last_rfq_no':get_last_rfq_no,'all_item_code':all_item_code, 'all_accounts':all_accounts})
@@ -74,8 +71,9 @@ def edit_rfq_customer(request,pk):
     try:
         item_code = request.POST.get('item_code',False)
         if item_code:
-            data = Add_products.objects.filter(product_code = item_code)
-            item_code_exist = RfqCustomerDetail.objects.filter(item_code = item_code, rfq_id = pk).first()
+            item_id = Add_products.objects.get(product_code = item_code)
+            data = Add_products.objects.filter(id = item_id.id)
+            item_code_exist = RfqCustomerDetail.objects.filter(item_id = item_id, rfq_id = pk).first()
             if item_code_exist:
                 return HttpResponse(json.dumps({'message':"Item Already Exist"}))
             row = serializers.serialize('json',data)
@@ -101,7 +99,9 @@ def edit_rfq_customer(request,pk):
             header_id = RfqCustomerHeader.objects.get(id = pk)
             items = json.loads(request.POST.get('items'))
             for value in items:
-                rfq_detail_update = RfqCustomerDetail(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"], unit = value["unit"], rfq_id = header_id)
+                item_id = Add_products.objects.get(id = value["id"])
+                print(item_id)
+                rfq_detail_update = RfqCustomerDetail(item_id = item_id, quantity = value["quantity"], rfq_id = header_id)
                 rfq_detail_update.save()
             return JsonResponse({"result":"success"})
     except IntegrityError:
@@ -110,6 +110,8 @@ def edit_rfq_customer(request,pk):
 
 
 def quotation_customer(request):
+    # company_id = Company_info.objects.get(id = request.session['company'])
+    # all_quotation = QuotationHeaderCustomer.objects.filter(company_id = company_id).all()
     all_quotation = QuotationHeaderCustomer.objects.all()
     return render(request, 'customer/quotation_customer.html',{'all_quotation':all_quotation})
 
@@ -157,8 +159,8 @@ def new_quotation_customer(request):
         items = json.loads(request.POST.get('items'))
         header_id = QuotationHeaderCustomer.objects.get(quotation_no = get_last_quotation_no)
         for value in items:
-            quotation_detail = QuotationDetailCustomer(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"],
-                                            quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_id = header_id)
+            item_id = Add_products.objects.get(id = value["id"])
+            quotation_detail = QuotationDetailCustomer(item_id = item_id, quantity = value["quantity"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_id = header_id)
             quotation_detail.save()
         last_id = QuotationHeaderCustomer.objects.last()
         last_id = last_id.id
@@ -166,7 +168,6 @@ def new_quotation_customer(request):
     return render(request, 'customer/new_quotation_customer.html',{'all_item_code':all_item_code,'get_last_quotation_no':get_last_quotation_no,'all_accounts':all_accounts})
 
 def send_email(request, pk,id):
-    print(id)
     account_id = ChartOfAccount.objects.get(id = id)
     msg = EmailMessage('Quotation', 'This is Quotation for Valve','ah.awan33@gmail.com',[account_id.email_address])
     msg.attach_file('/Downloads/Quotation_Customer_QU_CU_150.pdf')
@@ -180,8 +181,9 @@ def edit_quotation_customer(request,pk):
     all_accounts = ChartOfAccount.objects.all()
     item_code = request.POST.get('item_code',False)
     if item_code:
-        data = Add_products.objects.filter(product_code = item_code)
-        item_code_exist = QuotationDetailCustomer.objects.filter(item_code = item_code, quotation_id = pk).first()
+        item_id = Add_products.objects.get(product_code = item_code)
+        item_code_exist = QuotationDetailCustomer.objects.filter(item_id = item_id, quotation_id = pk).first()
+        data = Add_products.objects.filter(id = item_id.id)
         if item_code_exist:
             return HttpResponse(json.dumps({'message':"Item Already Exist"}))
         row = serializers.serialize('json',data)
@@ -226,7 +228,9 @@ def edit_quotation_customer(request,pk):
         items = json.loads(request.POST.get('items'))
         print(items)
         for value in items:
-            quotation_detail_update = QuotationDetailCustomer(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_id = header_id)
+            item_id = Add_products.objects.get(id = value['id'])
+            print(value['unit_price'])
+            quotation_detail_update = QuotationDetailCustomer(item_id = item_id, quantity = value["quantity"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_id = header_id)
             quotation_detail_update.save()
         return JsonResponse({"result":"success"})
     return render(request,'customer/edit_quotation_customer.html',{'quotation_header':quotation_header,'pk':pk,'quotation_detail':quotation_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts})
@@ -235,19 +239,15 @@ def edit_quotation_customer(request,pk):
 def print_quotation_customer(request,pk):
     lines = 0
     total_amount = 0
-    company_info = Company_info.objects.all()
-    image = Company_info.objects.filter(company_name = "Hamza Enterprises").first()
+    company_id = Company_info.objects.get(id = request.session['company'])
+    company_info = Company_info.objects.filter(id = company_id.id)
+    image = Company_info.objects.filter(id = company_id.id).first()
     header = QuotationHeaderCustomer.objects.filter(id = pk).first()
     detail = QuotationDetailCustomer.objects.filter(quotation_id = pk).all()
     for value in detail:
-        lines = lines + len(value.item_description.split('\n'))
         amount = float(value.unit_price * value.quantity)
         total_amount = total_amount + amount
-    lines = lines + len(detail) + len(detail)
-    print(lines)
-    total_lines = 26 - lines
-    print(total_lines)
-    pdf = render_to_pdf('customer/quotation_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount})
+    pdf = render_to_pdf('customer/quotation_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_amount':total_amount})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "Quotation_Customer_%s.pdf" %(header.quotation_no)
@@ -305,11 +305,10 @@ def new_purchase_order_customer(request):
                                                 exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, footer_remarks = footer_remarks ,account_id = account_id)
         po_header.save()
         items = json.loads(request.POST.get('items'))
-        print(items)
         header_id = PoHeaderCustomer.objects.get(po_no = get_last_po_no)
         for value in items:
-            po_detail = PoDetailCustomer(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"],
-                                            quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_no = "to be define" ,po_id = header_id)
+            item_id = Add_products.objects.get(id = value["id"])
+            po_detail = PoDetailCustomer(item_id = item_id, quantity = value["quantity"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_no = "to be define" ,po_id = header_id)
             po_detail.save()
         return JsonResponse({'result':'success'})
     return render(request, 'customer/new_purchase_order_customer.html',{'get_last_po_no':get_last_po_no,'all_item_code':all_item_code, 'all_accounts':all_accounts})
@@ -321,10 +320,10 @@ def edit_purchase_order_customer(request,pk):
     all_item_code = list(Add_products.objects.values('product_code'))
     all_accounts = ChartOfAccount.objects.all()
     item_code = request.POST.get('item_code',False)
-    print(item_code)
     if item_code:
-        data = Add_products.objects.filter(product_code = item_code)
-        item_code_exist = PoDetailCustomer.objects.filter(item_code = item_code, po_id = pk).first()
+        item_id = Add_products.objects.get(product_code = item_code)
+        data = Add_products.objects.filter(id = item_id.id)
+        item_code_exist = PoDetailCustomer.objects.filter(item_id = item_id, po_id = pk).first()
         if item_code_exist:
             return HttpResponse(json.dumps({'message':"Item Already Exist"}))
             print(data)
@@ -372,7 +371,8 @@ def edit_purchase_order_customer(request,pk):
         items = json.loads(request.POST.get('items'))
         print(items)
         for value in items:
-            po_detail_update = PoDetailCustomer(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], po_id = header_id)
+            item_id = Add_products.objects.get(id = value["id"])
+            po_detail_update = PoDetailCustomer(item_id = item_id, quantity = value["quantity"],unit_price = value["unit_price"], remarks = value["remarks"], po_id = header_id)
             po_detail_update.save()
         return JsonResponse({"result":"success"})
     return render(request,'customer/edit_purchase_order_customer.html',{'po_header':po_header,'pk':pk,'po_detail':po_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts})
@@ -405,25 +405,27 @@ def delivery_challan_customer(request):
     all_dc = DcHeaderCustomer.objects.all()
     cursor = connection.cursor()
     is_dc = cursor.execute('''Select Distinct id,dc_no From (
-                            Select distinct dc_id_id,DC.item_code,DC.Item_name,
+                            Select distinct dc_id_id, IP.product_code,IP.product_name,
                             DC.Quantity As DcQuantity,
                             ifnull(sum(SD.Quantity),0) As SaleQuantity,
                             (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
                             from customer_dcdetailcustomer DC
+                            inner join inventory_add_products IP on DC.item_id_id = IP.id
                             Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
-                            And SD.item_code = DC.item_code
-                            group by dc_id_id,dc.item_code,dc.Item_name
+                            And SD.item_id_id = IP.id
+                            group by dc_id_id,IP.product_code,IP.product_name
                             ) As tblData
                             Inner Join customer_dcheadercustomer  HD on  HD.id = tblData.dc_id_id
                             Where RemainingQuantity > 0''')
     is_dc = is_dc.fetchall()
-    for value in is_dc:
-        print(value[1])
     return render(request, 'customer/delivery_challan_customer.html',{'all_dc':all_dc,'is_dc':is_dc})
 
 
 def new_delivery_challan_customer(request):
+    row = [];
+    cursor = connection.cursor()
     all_item_code = Add_products.objects.all()
+    all_po_code = PoHeaderCustomer.objects.all()
     get_last_dc_no = DcHeaderCustomer.objects.last()
     all_accounts = ChartOfAccount.objects.all()
     if get_last_dc_no:
@@ -437,14 +439,22 @@ def new_delivery_challan_customer(request):
     item_code_dc = request.POST.get('item_code_dc',False)
     if item_code_dc:
         data = Add_products.objects.filter(product_code = item_code_dc)
-        for value in data:
-            print(value.product_code)
         row = serializers.serialize('json',data)
         return HttpResponse(json.dumps({'row':row}))
+    item_code_po_dc = request.POST.get('item_code_po_dc',False)
+
+    if item_code_po_dc:
+        id = PoHeaderCustomer.objects.get(po_client = item_code_po_dc)
+        item_id = PoDetailCustomer.objects.filter(po_id = id).all()
+        for value in item_id:
+            row.append(value.item_id.id)
+        a = (str(row)[1:-1])
+        row = cursor.execute(f'''select * from inventory_add_products where id in ({a})''')
+        row = row.fetchall()
+        return JsonResponse({'row':row,'id':id.id})
     get_item_code = request.POST.get('item_code', False)
     quantity = request.POST.get('quantity', False)
     if get_item_code:
-        cursor = connection.cursor()
         cursor.execute('''Select item_code, item_name,Item_description,Unit,SUM(quantity) As qty From (
                         Select 'Opening Stock' As TranType,Product_Code As Item_Code,Product_Name As Item_name,Product_desc As Item_description,Unit As unit,Opening_Stock as Quantity From inventory_add_products
                         where product_code = %s
@@ -466,7 +476,6 @@ def new_delivery_challan_customer(request):
         print(row)
         a = row[0][4]
         b = quantity
-        # print(quantity)
         if int(a) >= int(b):
             return JsonResponse({"message":"True"})
         else:
@@ -492,26 +501,41 @@ def new_delivery_challan_customer(request):
         items = json.loads(request.POST.get('items'))
         header_id = DcHeaderCustomer.objects.get(dc_no = get_last_dc_no)
         for value in items:
-            dc_detail = DcDetailCustomer(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"],
-                                            quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0,  unit = value["unit"], unit_price = "0.00", remarks = value["remarks"], po_no = "to be define" ,dc_id = header_id)
+            item_id = Add_products.objects.get(id = value["id"])
+            dc_detail = DcDetailCustomer(item_id = item_id, quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, po_no = value["po_no"] ,dc_id = header_id)
             dc_detail.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'customer/new_delivery_challan_customer.html',{'all_item_code':all_item_code,'get_last_dc_no':get_last_dc_no,'all_accounts':all_accounts})
+    return render(request, 'customer/new_delivery_challan_customer.html',{'all_item_code':all_item_code,'get_last_dc_no':get_last_dc_no,'all_accounts':all_accounts,'all_po_code':all_po_code})
 
 
 def edit_delivery_challan_customer(request,pk):
+    data = ''
+    row = []
+    cursor = connection.cursor()
     dc_header = DcHeaderCustomer.objects.filter(id = pk).first()
     dc_detail = DcDetailCustomer.objects.filter(dc_id = pk).all()
+    all_po_code = PoHeaderCustomer.objects.all()
     all_item_code = list(Add_products.objects.values('product_code'))
     all_accounts = ChartOfAccount.objects.all()
     item_code = request.POST.get('item_code')
     if item_code:
-        data = Add_products.objects.filter(product_code = item_code)
-        item_code_exist = DcDetailCustomer.objects.filter(item_code = item_code, dc_id = pk).first()
+        item_id = Add_products.objects.get(product_code = item_code)
+        data = Add_products.objects.filter(id = item_id.id)
+        item_code_exist = DcDetailCustomer.objects.filter(item_id = item_id, dc_id = pk).first()
         if item_code_exist:
             return HttpResponse(json.dumps({'message':"Item Already Exist"}))
         row = serializers.serialize('json',data)
         return HttpResponse(json.dumps({'row':row}))
+    item_code_po_dc = request.POST.get('item_code_po_dc',False)
+    if item_code_po_dc:
+        id = PoHeaderCustomer.objects.get(po_client = item_code_po_dc)
+        item_id = PoDetailCustomer.objects.filter(po_id = id).all()
+        for value in item_id:
+            row.append(value.item_id.id)
+        a = (str(row)[1:-1])
+        row = cursor.execute(f'''select * from inventory_add_products where id in ({a})''')
+        row = row.fetchall()
+        return JsonResponse({'row':row,'id':id.id})
     if request.method == 'POST':
         dc_detail.delete()
 
@@ -531,10 +555,13 @@ def edit_delivery_challan_customer(request,pk):
 
         items = json.loads(request.POST.get('items'))
         for value in items:
-            dc_detail_update = DcDetailCustomer(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], dc_id = header_id)
+            item_id = Add_products.objects.get(id = value["id"])
+            print("hamza")
+            print(item_id)
+            dc_detail_update = DcDetailCustomer(item_id = item_id, quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, po_no = value["po_no"] ,dc_id = header_id)
             dc_detail_update.save()
         return JsonResponse({"result":"success"})
-    return render(request,'customer/edit_delivery_challan_customer.html',{'dc_header':dc_header,'pk':pk,'dc_detail':dc_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts})
+    return render(request,'customer/edit_delivery_challan_customer.html',{'dc_header':dc_header,'pk':pk,'dc_detail':dc_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'all_po_code':all_po_code})
 
 
 def print_dc_customer(request,pk):

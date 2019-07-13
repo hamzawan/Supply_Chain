@@ -39,7 +39,7 @@
     </li>
     <li class="list-group-item">
     <div class="table-title">
-        <div class="row">
+        <!-- <div class="row">
           <div class="form-group col-md-3">
             <input type="text" list="item" placeholder="Enter Item Code here..." class="form-control form-control-sm" id="item_code_sale">
           </div>
@@ -51,7 +51,7 @@
             <div style="margin-left:20px;">
                 <button type="button" class="btn btn-info add-item-sale"><i class="fa fa-plus"></i>Insert Item</button>
             </div>
-        </div>
+        </div> -->
     </div>
     <div class="table table-responsive">
       <table class="table table-bordered" id="new-sale-table-direct">
@@ -61,12 +61,12 @@
                   <th width="100px">Item Code</th>
                   <th width="70px">Item Name</th>
                   <th width="70px">Desc.</th>
-                  <th width="60px">Qty</th>
+                  <th width="90px">Qty</th>
                   <th width="60px">Unit</th>
-                  <th width="70px">Price</th>
-                  <th width="90px">Value Of Goods</th>
-                  <th width="90px">Sales Tax in % </th>
-                  <th width="110px">Sales Tax Amount</th>
+                  <th width="100px">Price</th>
+                  <th width="90px">VOG</th>
+                  <th width="90px">ST <small>in %</small></th>
+                  <th width="110px">ST Amount</th>
                   <th width="90px">Total</th>
                   <th>Action</th>
               </tr>
@@ -75,17 +75,18 @@
             {% for value in dc_detail %}
             <tr>
               <td>{{ forloop.counter }}</td>
-              <td id="get_item_code">{{ value.1 }}</td>
+              <td style="display:none;">{{ value.1 }}</td>
               <td>{{ value.2 }}</td>
               <td>{{ value.3 }}</td>
-              <td id="quantity"><input type="text" name="" class="form-control form-control-sm" value="{{ value.7 }}"></td>
-              <td>{{ value.4 }}</td>
+              <td><pre>{{ value.4 }}</pre></td>
+              <td id="quantity"><input type="text" name="" class="form-control form-control-sm" value="{{ value.8 }}"></td>
+              <td>{{ value.5 }}</td>
               <td id="price"><input type="text" class="form-control form-control-sm" name="" value=""></td>
               <td id="value_of_goods">0.00</td>
               <td id="sales_tax"><input type="text" class="form-control form-control-sm" name="" value=""></td>
               <td id="sales_tax_amount">0.00</td>
               <td id="total" style="font-weight:bold;" class="sum"><b>0.00</b></td>
-              <td style="display:none;">{{pk}}</td>
+              <td style="display:none;">{{ value.0 }}</td>
               <td><a class="edit-transaction-sale" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="add-transaction-sale" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="delete-transaction-sale" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
             </tr>
             {% endfor %}

@@ -1714,42 +1714,11 @@ $(document).ready(function(){
 					});
 
 
-				// END EDIT DC SUPPLIER
+
+
+ 
 
 				$(document).ready(function() {
-				    $('.sort').DataTable();
+						$('.sort').DataTable();
 				} );
-
-				//Submit edit form of inventory items
-				$('#edit-item-form').on('submit',function(e){
-					e.preventDefault();
-
-						var type = $('#type').val()
-						var size = $('#size').val()
-						var product_name = $('#product_name').val()
-						var product_desc = $('#product_desc').val()
-						var select_unit = $('#select_unit').val()
-						var opening_stock = $('#opening_stock').val()
-
-						 req =	$.ajax({
-								headers: { "X-CSRFToken": getCookie("csrftoken") },
-								type: 'POST',
-								url : `/inventory/edit_item/${edit_id}/`,
-								data:{
-									'type':type,
-									'size':size,
-									'product_name':product_name,
-									'product_desc':product_desc,
-									'select_unit':select_unit,
-									'opening_stock':opening_stock,
-								},
-								dataType: 'json'
-							})
-							.done(function done(){
-								alert("Item Updated");
-								location.reload();
-							})
-				});
-
-
 });
