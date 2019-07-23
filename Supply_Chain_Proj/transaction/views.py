@@ -92,6 +92,8 @@ def new_purchase(request):
     return render(request, 'transaction/new_purchase.html',{'all_item_code':all_item_code,'get_last_purchase_no':get_last_purchase_no, 'all_accounts':all_accounts})
 
 def edit_purchase(request,pk):
+    item_amount = 0
+    total_amount = 0
     all_item_code = Add_products.objects.all()
     purchase_header = PurchaseHeader.objects.filter(id = pk).first()
     purchase_detail = PurchaseDetail.objects.filter(purchase_id = pk).all()
@@ -114,7 +116,6 @@ def edit_purchase(request,pk):
         additional_tax = request.POST.get('additional_tax',False)
         withholding_tax = request.POST.get('withholding_tax',False)
         account_id = ChartOfAccount.objects.get(account_title = supplier)
-        print(follow_up)
         if follow_up:
             follow_up = follow_up
         else:
@@ -138,6 +139,36 @@ def edit_purchase(request,pk):
             item_id = Add_products.objects.get(id = value["id"])
             purchase_detail = PurchaseDetail(item_id = item_id, quantity = value["quantity"], cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], purchase_id = header_id)
             purchase_detail.save()
+            quantity = float(value["quantity"])
+            price =  float((value["price"]))
+            sales_tax = float(value["sales_tax"])
+            amount = (((quantity * price) * sales_tax) / 100)
+            amount = ((quantity * price ) + amount)
+            item_amount = item_amount + amount
+        item_amount = item_amount + float(cartage_amount) + float(additional_tax)
+        # tax = ((item_amount * float(withholding_tax)) / 100)
+        total_amount = item_amount
+        header_id = header_id.id
+        cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
+        if purchase_header.payment_method == 'Cash':
+            refrence_id = Q(refrence_id = header_id)
+            tran_type = Q(tran_type = "Purchase Invoice")
+            delete = Transactions.objects.filter(refrence_id, tran_type)
+            delete.delete()
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran2.save()
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Purchase Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran1.save()
+        else:
+            refrence_id = Q(refrence_id = header_id)
+            tran_type = Q(tran_type = "Purchase Invoice")
+            delete = Transactions.objects.filter(refrence_id, tran_type)
+            delete.delete()
+            purchase_account = ChartOfAccount.objects.get(account_title = 'Purchases')
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran1.save()
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = purchase_account, tran_type = "Purchase Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/edit_purchase.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'purchase_header':purchase_header, 'purchase_detail':purchase_detail, 'pk':pk})
 
@@ -164,10 +195,14 @@ def new_purchase_return(request,pk):
     purchase_detail = PurchaseDetail.objects.filter(purchase_id = pk).all()
     if request.method == 'POST':
         supplier = request.POST.get('supplier',False)
+        credit_days = purchase_header.credit_days
+        payment_method = purchase_header.payment_method
+        cartage_amount = request.POST.get('cartage_amount',False)
+        additional_tax = request.POST.get('additional_tax',False)
         description = request.POST.get('description',False)
         date = datetime.date.today()
         account_id = ChartOfAccount.objects.get(account_title = supplier)
-        purchase_return_header = PurchaseReturnHeader(purchase_no = get_last_purchase_no, date = date, footer_description = description, payment_method = "payment_method", cartage_amount = 0, additional_tax = 0, withholding_tax = 0, account_id = account_id )
+        purchase_return_header = PurchaseReturnHeader(purchase_no = get_last_purchase_no, date = date, footer_description = description, payment_method = payment_method, credit_days = credit_days ,cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = 0, account_id = account_id )
         purchase_return_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = PurchaseReturnHeader.objects.get(purchase_no = get_last_purchase_no)
@@ -181,36 +216,74 @@ def new_purchase_return(request,pk):
             sales_tax = float(value["sales_tax"])
             amount = (((quantity * price) * sales_tax) / 100)
             amount = ((quantity * price ) + amount)
-            total_amount = item_amount + amount
+            total_amount = item_amount + amount + float(cartage_amount) + float(additional_tax)
         header_id = header_id.id
-        tran = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Return", amount = total_amount, date = date, remarks = "Purchase return against "+purchase_header.purchase_no+" invoice")
-        tran.save()
+        cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
+        if purchase_header.payment_method == 'Cash':
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Return Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran2.save()
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Purchase Return Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran1.save()
+        else:
+            purchase_account = ChartOfAccount.objects.get(account_title = 'Purchase Returns')
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Return Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran1.save()
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = purchase_account, tran_type = "Purchase Return Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/purchase_return.html',{'purchase_header':purchase_header, 'purchase_detail': purchase_detail,'pk':pk,'get_last_purchase_no':get_last_purchase_no})
 
 def edit_purchase_return(request,pk):
+    amount = 0
+    item_amount = 0
+    total_amount = 0
     purchase_header = PurchaseReturnHeader.objects.filter(id = pk).first()
     purchase_detail = PurchaseReturnDetail.objects.filter(purchase_return_id = pk).all()
     all_accounts = ChartOfAccount.objects.all()
     if request.method == 'POST':
         purchase_detail.delete()
-        purchase_id = request.POST.get('purchase_id',False)
+        purchase_id = purchase_header.purchase_no
         supplier = request.POST.get('supplier',False)
-        description = request.POST.get('footer_desc',False)
+        cartage_amount = request.POST.get('cartage_amount',False)
+        additional_tax = request.POST.get('additional_tax',False)
+        description = request.POST.get('description',False)
         date = datetime.date.today()
-
         account_id = ChartOfAccount.objects.get(account_title = supplier)
         purchase_header.footer_description = description
         purchase_header.account_id = account_id
+        purchase_header.cartage_amount = cartage_amount
+        purchase_header.additional_tax = additional_tax
 
         purchase_header.save()
         items = json.loads(request.POST.get('items'))
-        print(items)
         header_id = PurchaseReturnHeader.objects.get(purchase_no = purchase_id)
         for value in items:
-            purchase_return_detail = PurchaseReturnDetail(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"],unit = value["unit"] ,cost_price = value["price"], retail_price = 0.00, sales_tax = value["sales_tax"], purchase_return_id = header_id)
+            item_id = Add_products.objects.get(id = value["id"])
+            purchase_return_detail = PurchaseReturnDetail(item_id = item_id, quantity = value["quantity"] ,cost_price = value["price"], retail_price = 0.00, sales_tax = value["sales_tax"], purchase_return_id = header_id)
             purchase_return_detail.save()
-            print(value["sales_tax"])
+            quantity = float(value["quantity"])
+            price =  float((value["price"]))
+            sales_tax = float(value["sales_tax"])
+            amount = (((quantity * price) * sales_tax) / 100)
+            amount = ((quantity * price ) + amount)
+            total_amount = item_amount + amount + float(cartage_amount) + float(additional_tax)
+        header_id = header_id.id
+        refrence_id = Q(refrence_id = header_id)
+        tran_type = Q(tran_type = "Purchase Return Invoice")
+        delete = Transactions.objects.filter(refrence_id, tran_type)
+        delete.delete()
+        purchase_account = ChartOfAccount.objects.get(account_title = 'Purchase Returns')
+        if purchase_header.payment_method == 'Cash':
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Return Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Credit")
+            tran2.save()
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Purchase Return Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran1.save()
+        else:
+            purchase_account = ChartOfAccount.objects.get(account_title = 'Purchase Returns')
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Return Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran1.save()
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = purchase_account, tran_type = "Purchase Return Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/edit_purchase_return.html',{'purchase_header':purchase_header, 'purchase_detail': purchase_detail,'pk':pk,'all_accounts':all_accounts})
 
@@ -454,8 +527,8 @@ def direct_sale(request, pk):
         sale_header.save()
         header_id = SaleHeader.objects.get(sale_no = sale_id)
         for value in items:
-            print(value["dc_no"])
-            sale_detail = SaleDetail(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"],unit = value["unit"], cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], dc_ref = value["dc_no"] ,sale_id = header_id, hs_code = value["hs_code"])
+            item_id = Add_products.objects.get(id = value["id"])
+            sale_detail = SaleDetail(item_id = item_id,  quantity = value["quantity"], cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], dc_ref = value["dc_no"] ,sale_id = header_id, hs_code = value["hs_code"])
             sale_detail.save()
             quantity = float(value["quantity"])
             price =  float((value["price"]))
@@ -464,8 +537,7 @@ def direct_sale(request, pk):
             amount = ((quantity * price ) + amount)
             item_amount = item_amount + amount
         item_amount = item_amount + float(cartage_amount) + float(additional_tax)
-        tax = ((item_amount * float(withholding_tax)) / 100)
-        total_amount = tax + item_amount
+        total_amount = item_amount
         header_id = header_id.id
         cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
         if payment_method == 'Cash':
@@ -484,29 +556,59 @@ def direct_sale(request, pk):
 
 
 def edit_sale(request,pk):
+    item_amount = 0
+    total_amount = 0
+    cursor = connection.cursor()
     all_item_code = Add_products.objects.all()
     sale_header = SaleHeader.objects.filter(id = pk).first()
     sale_detail = SaleDetail.objects.filter(sale_id = pk).all()
     all_accounts = ChartOfAccount.objects.all()
-    item_code = request.POST.get('item_code_sale',False)
-    cursor = connection.cursor()
-    all_dc = cursor.execute('''Select Distinct id,dc_no From (
-                            Select distinct dc_id_id, IP.product_code,IP.product_name,
-                            DC.Quantity As DcQuantity,
-                            ifnull(sum(SD.Quantity),0) As SaleQuantity,
-                            (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
-                            from customer_dcdetailcustomer DC
-                            inner join inventory_add_products IP on DC.item_id_id = IP.id
-                            Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
-                            And SD.item_id_id = IP.id
-                            group by dc_id_id,IP.product_code,IP.product_name
-                            ) As tblData
-                            Inner Join customer_dcheadercustomer  HD on  HD.id = tblData.dc_id_id
-                            Where RemainingQuantity > 0''')
-    all_dc = all_dc.fetchall()
-    dc_code_sale_edit = request.POST.get('dc_code_sale_edit')
-    if dc_code_sale_edit:
-        header_id = DcHeaderCustomer.objects.get(dc_no = dc_code_sale_edit)
+    customer_name_sale = request.POST.get('customer_name_sale')
+    if customer_name_sale:
+        try:
+            get_account = ChartOfAccount.objects.get(account_title = customer_name_sale)
+            if get_account:
+                customer_dc = cursor.execute('''Select Distinct id,dc_no,accountid,account_title From (
+                                            Select distinct dc_id_id,COA.id As accountid,COA.account_title,IP.product_code,IP.product_name,
+                                            DC.Quantity As DcQuantity,ifnull(sum(SD.Quantity),0) As SaleQuantity,
+                                            (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
+                                            from customer_dcdetailcustomer DC
+                                            inner join customer_dcHeadercustomer HDDC on DC.dc_id_id = HDDC.id
+                                            inner join transaction_chartofaccount COA on HDDC.account_id_id = COA.id
+                                            inner join inventory_add_products IP on DC.item_id_id = IP.id
+                                            Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+                                            And SD.item_id_id = IP.id
+                                            group by dc_id_id,COA.id,COA.account_title,IP.product_code,IP.product_name
+                                            ) As tblData
+                                            Inner Join customer_dcheadercustomer HD on  HD.id = tblData.dc_id_id
+                                            Where RemainingQuantity > 0 AND accountid = %s ''',[get_account.id])
+                customer_dc = customer_dc.fetchall()
+                return JsonResponse({'customer_dc':customer_dc})
+        except ObjectDoesNotExist:
+            return JsonResponse({'customer_dc':'False'})
+
+    all_dc = request.POST.get('all_dc')
+    if all_dc:
+        all_dc = cursor.execute('''Select Distinct id,dc_no,accountid,account_title From (
+                                Select distinct dc_id_id,COA.id As accountid,COA.account_title,IP.product_code,IP.product_name,
+                                DC.Quantity As DcQuantity,ifnull(sum(SD.Quantity),0) As SaleQuantity,
+                                (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
+                                from customer_dcdetailcustomer DC
+                                inner join customer_dcHeadercustomer HDDC on DC.dc_id_id = HDDC.id
+                                inner join transaction_chartofaccount COA on HDDC.account_id_id = COA.id
+                                inner join inventory_add_products IP on DC.item_id_id = IP.id
+                                Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+                                And SD.item_id_id = IP.id
+                                group by dc_id_id,COA.id,COA.account_title,IP.product_code,IP.product_name
+                                ) As tblData
+                                Inner Join customer_dcheadercustomer HD on  HD.id = tblData.dc_id_id
+                                Where RemainingQuantity > 0''')
+        all_dc = all_dc.fetchall()
+        return JsonResponse({'all_dc':all_dc})
+    dc_code_sale = request.POST.get('dc_code_sale')
+    if dc_code_sale:
+
+        header_id = DcHeaderCustomer.objects.get(dc_no = dc_code_sale)
         data = cursor.execute('''Select * From (
                             Select distinct dc_id_id,IP.id,IP.product_code,IP.product_name, IP.product_desc, IP.unit,
                             DC.Quantity As DcQuantity,
@@ -521,7 +623,9 @@ def edit_sale(request,pk):
                             Where RemainingQuantity > 0 And dc_id_id = %s
                             ''',[header_id.id])
         row = data.fetchall()
-        return JsonResponse({"row":row,'dc_ref':header_id.id})
+        hs_code = cursor.execute('''select hs_code from transaction_saledetail group by hs_code''')
+        hs_code = hs_code.fetchall()
+        return JsonResponse({"row":row,'dc_ref':header_id.id, 'hs_code':hs_code})
     if request.method == 'POST':
         sale_detail.delete()
 
@@ -558,9 +662,37 @@ def edit_sale(request,pk):
         header_id = SaleHeader.objects.get(sale_no = sale_id)
         for value in items:
             item_id = Add_products.objects.get(id = value["id"])
-            print(item_id)
-            sale_detail = SaleDetail(item_id = item_id, quantity = value["quantity"], cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], sale_id = header_id, dc_ref = value["dc_no"])
+            sale_detail = SaleDetail(item_id = item_id, quantity = value["quantity"], cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], sale_id = header_id, dc_ref = value["dc_no"], hs_code = value["hs_code"])
             sale_detail.save()
+            quantity = float(value["quantity"])
+            price =  float((value["price"]))
+            sales_tax = float(value["sales_tax"])
+            amount = (((quantity * price) * sales_tax) / 100)
+            amount = ((quantity * price ) + amount)
+            item_amount = item_amount + amount
+        item_amount = item_amount + float(cartage_amount) + float(additional_tax)
+        total_amount = item_amount
+        header_id = header_id.id
+        cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
+        if sale_header.payment_method == 'Cash':
+            refrence_id = Q(refrence_id = header_id)
+            tran_type = Q(tran_type = "Sale Invoice")
+            delete = Transactions.objects.filter(refrence_id, tran_type)
+            delete.delete()
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran1.save()
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran2.save()
+        else:
+            refrence_id = Q(refrence_id = header_id)
+            tran_type = Q(tran_type = "Sale Invoice")
+            delete = Transactions.objects.filter(refrence_id, tran_type)
+            delete.delete()
+            sale_account = ChartOfAccount.objects.get(account_title = 'Sales')
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran1.save()
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_account, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/edit_sale.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'sale_header':sale_header, 'sale_detail':sale_detail, 'pk':pk, 'all_dc':all_dc})
 
@@ -582,38 +714,53 @@ def new_sale_return(request,pk):
         get_last_sale_no = 'SAL/RET/' + str(num)
     else:
         get_last_sale_no = 'SAL/RET/101'
-    print(get_last_sale_no)
     sale_header = SaleHeader.objects.filter(id = pk).first()
     sale_detail = SaleDetail.objects.filter(sale_id = pk).all()
     if request.method == 'POST':
         customer = request.POST.get('customer',False)
         payment_method = request.POST.get('payment_method',False)
         description = request.POST.get('description',False)
+        cartage_amount = request.POST.get('cartage_amount',False)
+        additional_tax = request.POST.get('additional_tax',False)
         date = datetime.date.today()
         account_id = ChartOfAccount.objects.get(account_title = customer)
-        sale_return_header = SaleReturnHeader(sale_no = get_last_sale_no, date = date, footer_description = description, payment_method = payment_method, cartage_amount = 0, additional_tax = 0, withholding_tax = 0, account_id = account_id )
+        sale_return_header = SaleReturnHeader(sale_no = get_last_sale_no, date = date, footer_description = description, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = 0, account_id = account_id )
         sale_return_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = SaleReturnHeader.objects.get(sale_no = get_last_sale_no)
         for value in items:
-            item_id = Add_products.objects.get(id = value["id"])
-            sale_return_detail = SaleReturnDetail(item_id = item_id , quantity = value["quantity"], cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], sale_return_id = header_id, dc_ref = value["dc_ref"])
+            item_id = Add_products.objects.get(id = value["item_id"])
+            sale_return_detail = SaleReturnDetail(item_id = item_id , quantity = value["quantity"], cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], sale_return_id = header_id)
             sale_return_detail.save()
             quantity = float(value["quantity"])
             price =  float((value["price"]))
             sales_tax = float(value["sales_tax"])
             amount = (((quantity * price) * sales_tax) / 100)
             amount = ((quantity * price ) + amount)
-            total_amount = item_amount + amount
+            item_amount = item_amount + amount
+        item_amount = item_amount + float(cartage_amount) + float(additional_tax)
+        total_amount = item_amount
         header_id = header_id.id
-        total_amount = -abs(total_amount)
-        tran = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Return", amount = total_amount, date = date, remarks = "Sale return against "+sale_header.sale_no+" invoice")
-        tran.save()
+        total_amount = total_amount
+        cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
+        if sale_header.payment_method == 'Cash':
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Return Invoice", amount = -abs(total_amount), date = date, remarks = "")
+            tran1.save()
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Return Invoice", amount = total_amount, date = date, remarks = "")
+            tran2.save()
+        else:
+            sale_return_account = ChartOfAccount.objects.get(account_title = 'Sales Returns')
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Return Invoice On Credit", amount = -abs(total_amount), date = date, remarks = "")
+            tran1.save()
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_return_account, tran_type = "Sale Return Invoice On Credit", amount = total_amount, date = date, remarks = "")
+            tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk,'get_last_sale_no':get_last_sale_no})
 
 
 def edit_sale_return(request,pk):
+    item_amount = 0
+    total_amount = 0
     sale_header = SaleReturnHeader.objects.filter(id = pk).first()
     sale_detail = SaleReturnDetail.objects.filter(sale_return_id = pk).all()
     all_accounts = ChartOfAccount.objects.all()
@@ -621,10 +768,11 @@ def edit_sale_return(request,pk):
         sale_detail.delete()
         sale_id = request.POST.get('sale_id',False)
         customer = request.POST.get('customer',False)
+        cartage_amount = request.POST.get('cartage_amount',False)
+        additional_tax = request.POST.get('additional_tax',False)
         payment_method = request.POST.get('payment_method',False)
-        description = request.POST.get('footer_desc',False)
+        description = request.POST.get('description',False)
         date = datetime.date.today()
-
         account_id = ChartOfAccount.objects.get(account_title = customer)
         sale_header.payment_method = payment_method
         sale_header.footer_description = description
@@ -632,11 +780,36 @@ def edit_sale_return(request,pk):
 
         sale_header.save()
         items = json.loads(request.POST.get('items'))
-        print(items)
-        header_id = SaleReturnHeader.objects.get(sale_no = sale_id)
+        header_id = SaleReturnHeader.objects.get(sale_no = sale_header.sale_no)
         for value in items:
-            sale_return_detail = SaleReturnDetail(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"],unit = value["unit"] ,cost_price = value["price"], retail_price = 0.00, sales_tax = value["sales_tax"], sale_return_id = header_id)
+            item_id = Add_products.objects.get(id = value["id"])
+            sale_return_detail = SaleReturnDetail(item_id = item_id, quantity = value["quantity"], cost_price = value["price"], retail_price = 0.00, sales_tax = value["sales_tax"], sale_return_id = header_id)
             sale_return_detail.save()
+            quantity = float(value["quantity"])
+            price =  float((value["price"]))
+            sales_tax = float(value["sales_tax"])
+            amount = (((quantity * price) * sales_tax) / 100)
+            amount = ((quantity * price ) + amount)
+            item_amount = item_amount + amount
+        item_amount = item_amount + float(cartage_amount) + float(additional_tax)
+        total_amount = item_amount
+        header_id = header_id.id
+        refrence_id = Q(refrence_id = header_id)
+        tran_type = Q(tran_type = "Sale Return Invoice")
+        delete = Transactions.objects.filter(refrence_id, tran_type)
+        delete.delete()
+        purchase_account = ChartOfAccount.objects.get(account_title = 'Sales Returns')
+        if sale_header.payment_method == 'Cash':
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Return Invoice", amount = -abs(total_amount), date = date, remarks = "")
+            tran1.save()
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Return Invoice", amount = total_amount, date = date, remarks = "")
+            tran2.save()
+        else:
+            sale_return_account = ChartOfAccount.objects.get(account_title = 'Sales Returns')
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Return Invoice", amount = -abs(total_amount), date = date, remarks = "")
+            tran1.save()
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_return_account, tran_type = "Sale Return Invoice", amount = total_amount, date = date, remarks = "")
+            tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/edit_sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk,'all_accounts':all_accounts})
 
@@ -658,6 +831,11 @@ def chart_of_account(request):
         remarks = request.POST.get('remarks')
         op_type = request.POST.get('optradio')
         credit_limits = request.POST.get('credit_limits')
+
+        if credit_limits is "":
+            credit_limits = 0.00
+        else:
+            credit_limits = credit_limits
 
         if opening_balance is "":
             opening_balance = 0
@@ -831,7 +1009,7 @@ def cash_receiving_voucher(request):
     get_last_tran_id = get_last_tran_id.fetchall()
 
     if get_last_tran_id:
-        get_last_tran_id = get_last_tran_id[0][6]
+        get_last_tran_id = get_last_tran_id[0][1]
         print(get_last_tran_id)
         get_last_tran_id = get_last_tran_id[-3:]
         print(get_last_tran_id)
@@ -842,35 +1020,56 @@ def cash_receiving_voucher(request):
         get_last_tran_id = 'CRV101'
     account_id = request.POST.get('account_title',False)
     all_accounts = ChartOfAccount.objects.all()
-    if account_id:
-        account_info = ChartOfAccount.objects.filter(id = account_id).first()
-        account_title = account_info.account_title
-        account_id = account_info.id
-        return JsonResponse({'account_title':account_title, 'account_id':account_id})
+    if account_id == "1":
+        pi = cursor.execute('''Select * From (
+                            Select HD.ID,HD.account_id_id,HD.sale_no,account_title,Sum(quantity*cost_price) As InvAmount,0 As RcvAmount
+                            from transaction_saleheader HD
+                            Inner join transaction_saledetail DT on DT.sale_id_id = HD.id
+                            Left Join transaction_chartofaccount COA on HD.account_id_id = COA.id
+                            Where Payment_method = 'Credit' And HD.account_id_id = '14' AND HD.ID Not In
+                            (Select ref_inv_tran_id from transaction_transactions Where ref_inv_tran_type = 'Sale CRV')
+                            Group by HD.ID,HD.account_id_id,account_title
+                            Union All
+                            Select HD.ID,HD.account_id_id,HD.sale_no,account_title,Sum(quantity*cost_price) As InvAmount,
+                            (Select Sum(Amount) * -1 From transaction_transactions
+                            Where ref_inv_tran_id = HD.ID AND account_id_id = '14') As RcvAmount
+                            from transaction_saleheader HD
+                            Inner join transaction_saledetail DT on DT.sale_id_id = HD.id
+                            Inner Join transaction_chartofaccount COA on HD.account_id_id = COA.id
+                            Where Payment_method = 'Credit' AND HD.account_id_id = '14'
+                            Group By HD.ID,HD.account_id_id,account_title
+                            Having InvAmount > RcvAmount
+                            ) As tblPendingInvoice
+                            Order By ID''')
+        pi = pi.fetchall()
+        return JsonResponse({'pi':pi})
     if request.method == "POST":
-        doc_no = request.POST.get('doc_no', False)
+        invoice_no = request.POST.get('invoice_no', False)
         doc_date = request.POST.get('doc_date', False)
         description = request.POST.get('description', False)
+        customer = request.POST.get('customer', False)
+        date = request.POST.get('date', False)
         items = json.loads(request.POST.get('items', False))
-        jv_header = VoucherHeader(voucher_no = get_last_tran_id, doc_no = doc_no, doc_date = doc_date, cheque_no = "-",cheque_date = doc_date, description = description)
+        jv_header = VoucherHeader(voucher_no = get_last_tran_id, doc_no = invoice_no, doc_date = doc_date, cheque_no = "-",cheque_date = doc_date, description = description)
         jv_header.save()
         for value in items:
-            account_id = ChartOfAccount.objects.get(account_title = value["account_title"])
-            if value["debit"] > "0" and value["debit"] > "0.00":
-                tran1 = Transactions(refrence_id = doc_no, refrence_date = doc_date, tran_type = 'CRV', amount = abs(float(value["debit"])),
-                                    date = datetime.date.today(), remarks = description, account_id = account_id,)
-                tran1.save()
-                jv_detail1 = VoucherDetail(account_id = account_id, debit = abs(float(value["debit"])), credit = 0.00)
-                jv_detail1.save()
-            print(value["debit"])
-            if value["credit"] > "0" and value["credit"] > "0.00":
-                print("run")
-                print(value["credit"])
-                tran2 = Transactions(refrence_id = doc_no, refrence_date = doc_date, tran_type = 'CRV', amount = -abs(float(value["credit"])),
-                                    date = datetime.date.today(), remarks = description, account_id = account_id,)
-                tran2.save()
-                jv_detail2 = VoucherDetail(account_id = account_id,  debit = 0.00, credit = -abs(float(value["credit"])))
-                jv_detail2.save()
+            invoice_no = SaleHeader.objects.get(sale_no = value["invoice_no"])
+
+            account_id = ChartOfAccount.objects.get(account_title = customer)
+            cash_account = ChartOfAccount.objects.get(account_title = 'Cash')
+            amount = float(value["debit"]) - float(value['balance'])
+
+            tran1 = Transactions(refrence_id = 0, refrence_date = doc_date, tran_type = '', amount = amount,
+                                date = date, remarks = description, account_id = cash_account,ref_inv_tran_id = invoice_no.id,ref_inv_tran_type = "Sale CRV" )
+            tran1.save()
+            tran2 = Transactions(refrence_id = 0, refrence_date = doc_date, tran_type = '', amount = -abs(amount),
+                                date = date, remarks = description, account_id = account_id,ref_inv_tran_id = invoice_no.id,ref_inv_tran_type = "Sale CRV" )
+            tran2.save()
+            header_id = VoucherHeader.objects.get(voucher_no = get_last_tran_id)
+            jv_detail1 = VoucherDetail(account_id = cash_account, debit = amount, credit = 0.00, header_id = header_id, invoice_id = invoice_no)
+            jv_detail1.save()
+            jv_detail2 = VoucherDetail(account_id = account_id,  debit = 0.00, credit = -abs(amount),header_id = header_id, invoice_id = invoice_no)
+            jv_detail2.save()
         return JsonResponse({"result":"success"})
     return render(request, 'transaction/cash_receiving_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id})
 
@@ -1086,26 +1285,29 @@ def sale_detail_item_wise(request):
     if request.method == "POST":
         from_date = request.POST.get('from_date')
         to_date = request.POST.get('to_date')
-        company_info = Company_info.objects.filter(id=1).first()
+        company_info = Company_info.objects.filter(id=1)
         print(company_info)
         image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
         cursor = connection.cursor()
         cursor.execute('''Select item_code, item_name, item_description,Sum(Total) As TotalAmount From (
-                        select item_code, item_name, item_description, sum(cost_price * quantity) As Total
-                        from transaction_saleheader
-                        inner join transaction_saledetail
-                        on transaction_saledetail.sale_id_id = transaction_saleheader.id
-                        where transaction_saleheader.date Between %s And %s
-                        Group by item_code
-                        Union All
-                        select item_code, item_name, item_description, -sum(cost_price * quantity) As Total
-                        from transaction_salereturnheader
-                        inner join transaction_salereturndetail
-                        on transaction_salereturndetail.sale_return_id_id = transaction_salereturnheader.id
-                        where transaction_salereturnheader.date Between %s And %s
-                        Group by item_code
-                        ) tblData
-                        group by item_code''',[from_date, to_date,from_date, to_date])
+                    select IP.product_code as item_code , IP.product_name as item_name, IP.product_desc as item_description, sum(SD.cost_price * SD.quantity) As Total
+                    from transaction_saleheader SH
+                    inner join inventory_add_products IP on IP.id = SD.item_id_id
+                    inner join transaction_saledetail SD
+                    on SD.sale_id_id = SH.id
+                    where SH.date Between %s And %s
+                    Group by item_code
+                    Union All
+                    select IP.product_code as item_code, IP.product_name as item_name, IP.product_desc as item_description, sum(SRD.cost_price * SRD.quantity) As Total
+                    from transaction_salereturnheader SRH
+                    inner join inventory_add_products IP on IP.id = SRD.item_id_id
+                    inner join transaction_salereturndetail SRD
+                    on SRD.sale_return_id_id = SRH.id
+                    where SRH.date Between %s And %s
+                    Group by item_code
+                    ) tblData
+                    group by item_code
+                    ''',[from_date, to_date,from_date, to_date])
         row = cursor.fetchall()
         for value in row:
             total = total + value[3]
@@ -1133,25 +1335,25 @@ def sale_summary_item_wise(request):
         # image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
         all_accounts = ChartOfAccount.objects.all()
         cursor = connection.cursor()
-        cursor.execute('''Select account_id_id,account_title,item_code,item_name,item_description,ifNull(sum(TotalSale),0) As TotalSale
-                        From (
-                        select account_id_id,item_code,item_name,item_description,ifNull(Sum(quantity*cost_price),0) As TotalSale
-                        from transaction_saleheader
-                        inner join transaction_saledetail
-                        on transaction_saledetail.id = transaction_saleheader.id
-                        where transaction_saleheader.date Between %s And %s
-                        Group By account_id_id,item_code,item_name
-                        Union All
-                        select account_id_id,item_code,item_name,item_description,-ifNull(Sum(quantity*cost_price),0) As TotalSale
-                        from transaction_salereturnheader
-                        inner join transaction_salereturndetail
-                        on transaction_salereturndetail.id = transaction_salereturnheader.id
-                        where transaction_salereturnheader.date Between %s And %s
-                        Group By account_id_id,item_code,item_name
-                        ) tblData
-                        Inner Join transaction_chartofaccount on transaction_chartofaccount.id=tblData.account_id_id
-                        where transaction_chartofaccount.id = %s
-                        Group By account_id_id,item_code,item_name ''',[from_date, to_date,from_date, to_date, account_id])
+        cursor.execute('''Select item_code, item_name, item_description,Sum(Total) As TotalAmount From (
+                            select IP.product_code as item_code , IP.product_name as item_name, IP.product_desc as item_description, sum(SD.cost_price * SD.quantity) As Total
+                            from transaction_saleheader SH
+                            inner join inventory_add_products IP on IP.id = SD.item_id_id
+                            inner join transaction_saledetail SD
+                            on SD.sale_id_id = SH.id
+                            where SH.date Between %s And %s
+                            Group by item_code
+                            Union All
+                            select IP.product_code as item_code, IP.product_name as item_name, IP.product_desc as item_description, sum(SRD.cost_price * SRD.quantity) As Total
+                            from transaction_salereturnheader SRH
+                            inner join inventory_add_products IP on IP.id = SRD.item_id_id
+                            inner join transaction_salereturndetail SRD
+                            on SRD.sale_return_id_id = SRH.id
+                            where SRH.date Between %s And %s
+                            Group by item_code
+                            ) tblData
+                            group by item_code
+                             ''',[from_date, to_date,from_date, to_date, account_id])
         row = cursor.fetchall()
         for value in row:
             total = total + value[5]

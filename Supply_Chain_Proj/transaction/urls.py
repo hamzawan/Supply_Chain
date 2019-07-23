@@ -34,7 +34,7 @@ urlpatterns = [
 
 
     path('bank_receiving_voucher/new', views.bank_receiving_voucher, name = 'bank-receiving-voucher'),
-    path('cash_receiving_voucher/new', views.cash_receiving_voucher, name = 'cash-receiving-voucher'),
+    path('cash_receiving_voucher/new/', views.cash_receiving_voucher, name = 'cash-receiving-voucher'),
     path('cash_payment_voucher/new', views.cash_payment_voucher, name = 'cash-payment-voucher'),
     path('bank_payment_voucher/new', views.bank_payment_voucher, name = 'bank-payment-voucher'),
 

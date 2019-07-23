@@ -9,6 +9,18 @@
 <ul class="list-group list-group-flush">
   <li class="list-group-item">
     <br>
+    <ul style="list-style-type:none;" class="messages">
+      {% if messages %}
+        {% for msg in messages %}
+          <li>
+            <div class="alert {{msg.level_tag}}">
+              {{msg.message}}
+            </div>
+          </li>
+        {% endfor %}
+      {% endif %}
+    </ul>
+    <br>
     <div class="table table-responsive">
     <table class="table table-bordered sort" id="dataTable">
         <thead>
@@ -33,7 +45,7 @@
               <td><pre>{{ value.4 }}</pre></td>
               <td>{{ value.7 }}</td>
               <td>{{ value.5 }}</td>
-  			      <td><a class="cart" href=""><i class="fas fa-shopping-cart"></i></a><a class="edit_list" href="{% url 'edit-item' pk=value.0 %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a class="delete_item_row" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+  			      <td><a class="cart" href=""><i class="fas fa-shopping-cart"></i></a><a class="edit_list" href="{% url 'edit-item' pk=value.0 %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a class="delete_item_row" href="{% url 'delete-item' pk=value.0 %}" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
           </tr>
           {% endfor %}
         </tbody>

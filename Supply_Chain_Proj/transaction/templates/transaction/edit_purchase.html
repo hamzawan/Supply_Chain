@@ -90,11 +90,13 @@
                   <th width="70px">VOG</th>
                   <th width="90px">ST in % </th>
                   <th width="90px">ST Amount</th>
+                  <th width="90px">Total Amount</th>
                   <th>Action</th>
               </tr>
           </thead>
           <tbody>
             {% for value in purchase_detail %}
+            {% with vog=value.quantity|mul:value.cost_price sales_tax_amount=value.sales_tax|mul:value.quantity|mul:value.cost_price|div:100 %}
               <tr>
                 <td style="display:none;"> {{value.item_id.id}} </td>
                 <td> {{value.item_id.product_code}} </td>
@@ -103,11 +105,13 @@
                 <td id="quantity_edit"> {{value.quantity}} </td>
                 <td> {{value.item_id.unit}} </td>
                 <td id="price_edit">{{value.cost_price}}</td>
-                <td id="value_of_goods_edit">{{value.quantity|mul:value.cost_price}}</td>
+                <td id="value_of_goods_edit">{{vog|floatformat:2}}</td>
                 <td id="sales_tax_edit">{{value.sales_tax}}</td>
-                <td id="sales_tax_amount_edit">{{value.sales_tax|mul:value.quantity|mul:value.cost_price|div:100|floatformat:2}}</td>
+                <td id="sales_tax_amount_edit">{{sales_tax_amount|floatformat:2}}</td>
+                <td id="total_amount">{{sales_tax_amount|add:vog|floatformat:2}}</td>
                 <td><a class="add-transaction-edit" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-transaction-edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-transaction-edit" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
               </tr>
+              {% endwith %}
             {% endfor %}
           </tbody>
       </table>
@@ -119,19 +123,25 @@
         <div class="form-inline">
           <div class="form-group">
             <label for="text" style="font-size:14px;" >Cartage Amount:</label>
-              <input type="text" class="form-control form-control-sm" id="cartage_amount" value="{{purchase_header.cartage_amount}}" style="border-top: 0px; border-right:0px; border-left:0px;" required value="0.00">
+              <input type="text" class="form-control form-control-sm" id="cartage_amount_edit" value="{{purchase_header.cartage_amount}}" style="border-top: 0px; border-right:0px; border-left:0px;" >
           </div>
         </div>
         <div class="form-inline">
           <div class="form-group">
             <label for="text" style="font-size:14px;">Additional Tax: &nbsp;&nbsp;&nbsp;</label>
-            <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="additional_tax" value="{{purchase_header.additional_tax}}" required value="0.00">
+            <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="additional_tax_edit" value="{{purchase_header.additional_tax}}" >
           </div>
         </div>
         <div class="form-inline">
           <div class="form-group">
-            <label for="text" style="font-size:14px;">Withholding Tax:&nbsp;</label>
-            <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="withholding_tax" value="{{purchase_header.withholding_tax}}" required value="0">
+            <label for="text" style="font-size:14px;">Sales Tax:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <input type="text" readonly class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="total_sales_tax">
+          </div>
+        </div>
+        <div class="form-inline">
+          <div class="form-group">
+            <label for="text" style="font-size:14px;">Grand Total:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <input type="text" readonly class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="last_grand_total"  value="0">
           </div>
         </div>
       </div>

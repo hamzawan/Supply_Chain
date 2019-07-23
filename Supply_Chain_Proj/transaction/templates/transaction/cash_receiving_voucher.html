@@ -16,11 +16,11 @@
           <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_tran_id }}" id="tran_id">
         </div>
         <div class="form-group col-md-2">
-          <label for="">Invoice #</label>
-          <input type="text"  class="form-control form-control-sm" required value="" id="doc_no">
+          <label for="">Date</label>
+          <input type="date"  class="form-control form-control-sm" required value="" id="date">
         </div>
         <div class="form-group col-md-2">
-          <label for="">Document Date</label>
+          <label for="">Doc Date</label>
           <input type="date"  class="form-control form-control-sm" required value="" id="doc_date">
         </div>
         <div class="form-group col-md-2">
@@ -28,53 +28,42 @@
           <textarea name="name" style="width:370px; height:30px;" id="description"></textarea>
         </div>
       </div>
-      </li>
-      <!-- <li class="list-group-item">
-      <div class="form-row">
-        <label class="checkbox-inline"><b>Cheque Info</b>
-          <input type="checkbox" value="" onclick="cheque_enable(this.checked)">
-        </label>
-      </div>
-      <div class="form-row">
-        <div class="form-group col-md-2">
-          <label for="">Cheque #</label>
-          <input type="text" disabled class="form-control form-control-sm"  value="" id="cheque_no">
-        </div>
-        <div class="form-group col-md-2">
-          <label for="">Cheque Date</label>
-          <input type="date" disabled  class="form-control form-control-sm"  value="" id="cheque_date">
-        </div>
-        <div class="form-group col-md-2">
-          <label for="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-          <label class="">Realize<input type="radio" disabled name="optradio" id="realize"></label>&nbsp;
-          <label class="">Un-Realize<input type="radio" disabled name="optradio" id="un-realize"></label>
-        </div>
-      </div>
-    </li> -->
-    <li class="list-group-item">
-    <div class="table-title">
-        <div class="row">
-          <div class="col-md-2">
-            <select class="form-control form-control-sm" id="account_title">
-              {% for value in all_accounts %}
-              <option value="{{value.id}}">{{value.account_title}}</option>
-              {% endfor %}
-            </select>
-          </div>
-            <div style="margin-left:20px;">
-                <button type="button" class="btn btn-info add-item-crv"><i class="fa fa-plus"></i>Insert Account</button>
+      <div class="table-title">
+          <div class="row">
+            <div class="col-md-2">
+              <label for="">Customers</label>
+              <select class="form-control form-control-sm" id="account_title">
+                {% for value in all_accounts %}
+                <option value="{{value.id}}">{{value.account_title}}</option>
+                {% endfor %}
+              </select>
             </div>
-        </div>
-    </div>
+              <div class="form-group col-md-2">
+                <input type="checkbox" name="check" id="box" class="check" >
+                <label for="">Invoice #</label>
+                <input type="text" id="invoice_no" class="form-control form-control-sm" disabled/>
+              </div>
+              <div class="form-group col-md-2">
+                <label for="">Amount</label>
+                <input type="text" id="amount" class="form-control form-control-sm"/>
+              </div>
+              <div class="form-group col-md-2">
+                <button type="button" style="margin-top:30px;" class="btn btn-info load-invoices"><i class="fa fa-plus"></i>Load Invoices</button>
+              </div>
+          </div>
+      </div>
+      </li>
+    <li class="list-group-item">
     <div class="table table-responsive">
       <table class="table table-bordered" id="new-jv-table">
           <thead>
               <tr>
                   <th width="100px" style="font-size:10px;">Account Id</th>
                   <th width="300px">Account Title</th>
+                  <th width="100px">Invoice No</th>
                   <th width="100px">Debit</th>
                   <th width="100px">Credit</th>
-                  <th>Action</th>
+                  <th width="100px">Balance</th>
               </tr>
           </thead>
           <tbody>

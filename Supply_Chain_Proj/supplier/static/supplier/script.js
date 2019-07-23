@@ -12,6 +12,18 @@ $(document).ready(function(){
 			 edit_id = this.id;
 		});
 
+		$('#account').on('focusout', function(){
+			txtSearch = $(this).val();
+			var objList = document.getElementById("account_title")  ;
+			for (var i = 0; i < objList.options.length; i++) {
+			 if ( objList.options[i].value.trim().toUpperCase() == txtSearch.trim().toUpperCase() ) {
+					return true }
+			 }
+				 alert( 'Account Does not Exist!') ;
+				 $(this).val("");
+				 return false ; // text does not matched ;
+		})
+
 			function getCookie(c_name)
 			{
 			    if (document.cookie.length > 0)
@@ -1408,6 +1420,7 @@ $(document).ready(function(){
 						var product_name = $('#product_name').val();
 						var product_desc = $('#product_desc').val();
 						var unit = $('#select_unit').find(":selected").text();
+
 						var opening_stock = $('#opening_stock').val();
 						console.log(unit);
 						req =	$.ajax({
@@ -1716,7 +1729,7 @@ $(document).ready(function(){
 
 
 
- 
+
 
 				$(document).ready(function() {
 						$('.sort').DataTable();

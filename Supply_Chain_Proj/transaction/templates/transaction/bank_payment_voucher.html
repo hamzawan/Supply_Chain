@@ -15,9 +15,20 @@
           <label for="">Transaction ID</label>
           <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_tran_id }}" id="tran_id">
         </div>
-        <div class="form-group col-md-2">
-          <label for="">Invoice #</label>
-          <input type="text"  class="form-control form-control-sm" required value="" id="doc_no">
+        <div class="col-md-2">
+          <label for="">Account Title</label>
+          <input type="text" class="form-control form-control-sm" list="account_title" id="account">
+          <datalist id="account_title">
+            {% for v in all_accounts %}
+            <option value="{{v.account_title}}">
+            {% endfor %}
+          </datalist>
+        </div>
+        <div class="col-md-2">
+          <label for="">Account Title</label>
+          <input type="text" class="form-control form-control-sm" list="invoice" id="text_invoice">
+          <datalist id="invoice">
+          </datalist>
         </div>
         <div class="form-group col-md-2">
           <label for="">Invoice Date</label>

@@ -103,17 +103,6 @@ class SaleReturnDetail(models.Model):
     hs_code = models.CharField(max_length = 100)
     sale_return_id = models.ForeignKey(SaleReturnHeader, on_delete = models.CASCADE)
 
-
-class Transactions(models.Model):
-    refrence_id = models.CharField(max_length = 100)
-    refrence_date = models.DateField(blank = True)
-    account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True)
-    tran_type = models.CharField(max_length = 100)
-    amount = models.DecimalField(max_digits = 8, decimal_places = 2)
-    date = models.DateField(default = datetime.date.today)
-    remarks = models.CharField(max_length = 100)
-
-
 class VoucherHeader(models.Model):
     voucher_no = models.CharField(max_length = 100)
     date = models.DateField(default = datetime.date.today)
@@ -128,4 +117,17 @@ class VoucherDetail(models.Model):
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True)
     debit = models.DecimalField(max_digits = 8, decimal_places = 2)
     credit = models.DecimalField(max_digits = 8, decimal_places = 2)
+    invoice_id = models.ForeignKey(SaleHeader, models.SET_NULL, blank=True,null=True)
     header_id = models.ForeignKey(VoucherHeader, on_delete = models.CASCADE)
+
+
+class Transactions(models.Model):
+    refrence_id = models.CharField(max_length = 100)
+    refrence_date = models.DateField(blank = True)
+    account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True)
+    tran_type = models.CharField(max_length = 100)
+    amount = models.DecimalField(max_digits = 8, decimal_places = 2)
+    date = models.DateField(default = datetime.date.today)
+    ref_inv_tran_id = models.IntegerField()
+    ref_inv_tran_type = models.CharField(max_length = 100)
+    remarks = models.CharField(max_length = 100)

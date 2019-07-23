@@ -4,17 +4,13 @@
 
 <div class="card" style="width: 100%;">
 <div class="card-header">
-  <h4>RFQ Customer</h4>
+  <h4>Users</h4>
 </div>
 <ul class="list-group list-group-flush">
   <li class="list-group-item">
     <div class="input-group">
       <div class="col-md-12">
-        {% if allow_role.0.add == 1 %}
           <a role="button" href="{% url 'new-rfq-customer' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
-        {% else %}
-          <a role="button" href="#" style="float:right;" class="btn btn-outline-secondary disabled" name="button"><i class="fas fa-plus"></i> Add New</a>
-        {% endif %}
       </div>
     </div>
     <br>
@@ -23,32 +19,33 @@
           <thead>
               <tr>
                   <th width="60px">S NO.</th>
-                  <th width="150px">RFQ no</th>
-                  <th width="150px">Customer</th>
-                  <th width="100px">Date</th>
-                  <th width="150px">From</th>
-                  <th width="150px">Attn</th>
+                  <th width="150px">First Name</th>
+                  <th width="150px">Last Name</th>
+                  <th width="150px">User Name</th>
+                  <th width="150px">Email</th>
+                  <th width="150px">Status</th>
+                  <th width="100px">Date Joined</th>
                   <td>Action</td>
               </tr>
           </thead>
           <tbody>
-            {% for row in all_rfq %}
+            {% for row in all_user %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ row.rfq_no }}</td>
-                <td> {{row.account_id.account_title}} </td>
-                <td>{{ row.date }}</td>
-                <td> user1 </td>
-                <td>{{ row.attn }}</td>
+                <td>{{ row.first_name }}</td>
+                <td>{{row.last_name}}</td>
+                <td>{{ row.username }}</td>
+                <td>{{ row.email }}</td>
+                {% if row.is_active == 1 %}
+                  <td>Active</td>
+                {% else %}
+                  <td>Deactive</td>
+                {% endif %}
+                <td>{{ row.date_joined }}</td>
                 <td>
-                  {% for v in allow_role %}
-                    {% if v.edit == 1 %}
-                      <a class="edit_list" href="{% url 'edit-rfq-customer' pk=row.id %}"><i class="material-icons">&#xE254;</i></a>
-                    {% endif %}
-                    {% if v.delete == 1 %}
+                      <a class="edit_list" href="#"><i class="material-icons">&#xE254;</i></a>
+                      <a class="delete" href="{% url 'user-roles' pk=row.id %}"><i class="fas fa-tasks"></i></a>
                       <a class="delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
-                    {% endif %}
-                  {% endfor %}
                 </td>
             </tr>
             {% endfor %}

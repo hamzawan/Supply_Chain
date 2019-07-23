@@ -1,12 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from .models import (Add_products)
 from transaction.models import (PurchaseDetail, SaleDetail)
 from itertools import chain
 import json
 from django.db import connection
-
+from django.contrib import messages
+from supplier.views import quotation_roles
 def item_stock(request):
+    allow_quotation_roles = quotation_roles()
     cursor = connection.cursor()
     cursor.execute('''Select itemID,Size,item_code, item_name,Item_description,Unit,Size,SUM(quantity) As qty From (
                     Select 'Opening Stock' As TranType,ID As ItemID, Size,Product_Code As Item_Code,Product_Name As Item_name,Product_desc As Item_description,Unit As unit,Opening_Stock as Quantity
@@ -27,12 +29,13 @@ def item_stock(request):
                     Group by Item_Code
                     ''')
     row = cursor.fetchall()
-    return render(request, 'inventory/item_stock.html',{'row':row})
+    return render(request, 'inventory/item_stock.html',{'row':row,'allow_quotation_roles':allow_quotation_roles})
 
 def new_item_stock(request):
     return render(request, 'inventory/new_item_stock.html')
 
 def add_product(request):
+    allow_quotation_roles = quotation_roles()
     get_item_code = Add_products.objects.last()
     if get_item_code:
         get_item_code = get_item_code.product_code
@@ -65,10 +68,11 @@ def add_product(request):
             new_products.save()
             serial_no = serial_no + 1
         return JsonResponse({"result":"success"})
-    return render(request, 'inventory/add_product.html')
+    return render(request, 'inventory/add_product.html',{'allow_quotation_roles':allow_quotation_roles})
 
 
 def edit_item(request,pk):
+    allow_quotation_roles = quotation_roles()
     all_detail = Add_products.objects.filter(id = pk).first()
     if request.method == "POST":
         type = request.POST.get('type')
@@ -86,4 +90,36 @@ def edit_item(request,pk):
         all_detail.opening_stock = opening_stock
         all_detail.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'inventory/edit_item.html', {'all_detail':all_detail,'pk':pk})
+    return render(request, 'inventory/edit_item.html', {'all_detail':all_detail,'pk':pk,'allow_quotation_roles':allow_quotation_roles})
+
+def item_avaliable(pk):
+    cusror = connection.cursor()
+    row = cusror.execute('''select case
+                             when exists (select id from customer_rfqcustomerdetail  where item_id_id = %s)
+                               or exists (select id from customer_quotationdetailcustomer where item_id_id = %s)
+                               or exists (select id from customer_podetailcustomer  where item_id_id = %s)
+                        	   or exists (select id from customer_dcdetailcustomer  where item_id_id = %s)
+                        	   or exists (select id from transaction_saledetail  where item_id_id = %s)
+                        	   or exists (select id from transaction_purchasedetail  where item_id_id = %s)
+                              then 'y'
+                             else 'n'
+                             end
+                            ''',[pk,pk,pk,pk,pk,pk])
+    row = row.fetchall()
+    res_list = [x[0] for x in row]
+    if res_list[0] == "n":
+        Add_products.objects.filter(id = pk).delete()
+        messages.add_message(request, messages.SUCCESS, "Item Deleted")
+        return True
+    else:
+        return False
+
+
+def delete_item(request, pk):
+    item = item_avaliable(pk)
+    if item == True:
+        messages.add_message(request, messages.SUCCESS, "Item Deleted")
+        return redirect('item-stock')
+    else:
+        messages.add_message(request, messages.ERROR, "You cannot delete this item, it is refrenced")
+        return redirect('item-stock')

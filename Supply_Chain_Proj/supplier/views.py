@@ -18,10 +18,31 @@ from django.views.generic import View
 from .utils import render_to_pdf
 from django.template.loader import get_template
 from django.db import connection
+from django.db.models import Q
 import xlwt
 from django.contrib.auth.models import User
+from user.models import UserRoles
+
+def quotation_roles():
+    user_id = Q(user_id = 1)
+    form_id = Q(form_id = 1)
+    form_name = Q(form_name = "Customer")
+    allow_quotation_roles = UserRoles.objects.filter(user_id,form_id, form_name).all()
+    print(allow_quotation_roles)
+    return allow_quotation_roles
+
+
+def po_roles():
+    user_id = Q(user_id = 1)
+    form_id = Q(form_id = 2)
+    form_name = Q(form_name = "Supplier")
+    allow_po_roles = UserRoles.objects.filter(user_id, form_id, form_name).all()
+    return allow_po_roles
+
+
 
 def home(request):
+    allow_quotation_roles = quotation_roles()
     today = datetime.date.today()
     cursor = connection.cursor()
     cursor.execute('''select rfq_no , date, account_id_id
@@ -61,13 +82,16 @@ def home(request):
                                 ''',[today,today,today,today])
     supplier_row = supplier_row.fetchall()
     total_notification_supplier = len(supplier_row)
-    return render(request,'supplier/index.html',{'total_notification':total_notification,'total_notification_supplier':total_notification_supplier ,'customer_row':customer_row, 'supplier_row':supplier_row})
+    return render(request,'supplier/base.html',{'total_notification':total_notification,'total_notification_supplier':total_notification_supplier ,'customer_row':customer_row, 'supplier_row':supplier_row, 'allow_quotation_roles':allow_quotation_roles})
 
 def rfq_supplier(request):
+    allow_quotation_roles = quotation_roles()
     all_rfq = RfqSupplierHeader.objects.all()
-    return render(request, 'supplier/rfq_supplier.html',{'all_rfq':all_rfq})
+    return render(request, 'supplier/rfq_supplier.html',{'all_rfq':all_rfq, 'allow_quotation_roles':allow_quotation_roles})
 
 def new_rfq_supplier(request):
+    allow_quotation_roles = quotation_roles()
+    allow_po_roles = po_roles()
     get_last_rfq_no = RfqSupplierHeader.objects.last()
     all_item_code = Add_products.objects.all()
     if get_last_rfq_no:
@@ -109,10 +133,11 @@ def new_rfq_supplier(request):
                                             quantity = value["quantity"], unit = value["unit"], rfq_id = header_id)
             rfq_detail.save()
         return JsonResponse({"result": "success"})
-    return render(request,'supplier/new_rfq_supplier.html',{'get_last_rfq_no':get_last_rfq_no, 'all_item_code':all_item_code, 'all_accounts':all_accounts})
+    return render(request,'supplier/new_rfq_supplier.html',{'get_last_rfq_no':get_last_rfq_no, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles, 'allow_po_roles':allow_po_roles})
 
 
 def edit_rfq_supplier(request,pk):
+    allow_quotation_roles = quotation_roles()
     rfq_header = RfqSupplierHeader.objects.filter(id = pk).first()
     rfq_detail = RfqSupplierDetail.objects.filter(rfq_id = pk).all()
     all_item_code = list(Add_products.objects.values('product_code'))
@@ -154,15 +179,17 @@ def edit_rfq_supplier(request,pk):
             return JsonResponse({"result":"success"})
     except IntegrityError:
         print("Data Already Exist")
-    return render(request,'supplier/edit_rfq_supplier.html',{'rfq_header':rfq_header,'pk':pk,'rfq_detail':rfq_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts})
+    return render(request,'supplier/edit_rfq_supplier.html',{'rfq_header':rfq_header,'pk':pk,'rfq_detail':rfq_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
 
 def quotation_supplier(request):
+    allow_quotation_roles = quotation_roles()
     all_quotation = QuotationHeaderSupplier.objects.all()
-    return render(request, 'supplier/quotation_supplier.html',{'all_quotation':all_quotation})
+    return render(request, 'supplier/quotation_supplier.html',{'all_quotation':all_quotation,'allow_quotation_roles':allow_quotation_roles})
 
 
 def new_quotation_supplier(request):
+    allow_quotation_roles = quotation_roles()
     get_last_quotation_no = QuotationHeaderSupplier.objects.last()
     all_item_code = Add_products.objects.all()
     all_accounts = ChartOfAccount.objects.all()
@@ -213,10 +240,11 @@ def new_quotation_supplier(request):
                                             quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_id = header_id)
             quotation_detail.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'supplier/new_quotation_supplier.html',{'all_item_code':all_item_code,'get_last_quotation_no':get_last_quotation_no,'all_accounts':all_accounts})
+    return render(request, 'supplier/new_quotation_supplier.html',{'all_item_code':all_item_code,'get_last_quotation_no':get_last_quotation_no,'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
 
 def edit_quotation_supplier(request,pk):
+    allow_quotation_roles = quotation_roles()
     quotation_header = QuotationHeaderSupplier.objects.filter(id = pk).first()
     quotation_detail = QuotationDetailSupplier.objects.filter(quotation_id = pk).all()
     all_accounts = ChartOfAccount.objects.all()
@@ -270,7 +298,7 @@ def edit_quotation_supplier(request,pk):
             quotation_detail_update = QuotationDetailSupplier(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_id = header_id)
             quotation_detail_update.save()
         return JsonResponse({"result":"success"})
-    return render(request,'supplier/edit_quotation_supplier.html',{'quotation_header':quotation_header,'pk':pk,'quotation_detail':quotation_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts})
+    return render(request,'supplier/edit_quotation_supplier.html',{'quotation_header':quotation_header,'pk':pk,'quotation_detail':quotation_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
 
 def print_quotation_supplier(request,pk):
@@ -329,11 +357,13 @@ def quotation_export_supplier(request):
     return response
 
 def purchase_order_supplier(request):
+    allow_quotation_roles = quotation_roles()
     all_po = PoHeaderSupplier.objects.all()
-    return render(request, 'supplier/purchase_order_supplier.html',{'all_po':all_po})
+    return render(request, 'supplier/purchase_order_supplier.html',{'all_po':all_po,'allow_quotation_roles':allow_quotation_roles})
 
 
 def new_purchase_order_supplier(request):
+    allow_quotation_roles = quotation_roles()
     get_last_po_no = PoHeaderSupplier.objects.last()
     all_item_code = Add_products.objects.all
     all_accounts = ChartOfAccount.objects.all()
@@ -380,10 +410,11 @@ def new_purchase_order_supplier(request):
                                             quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_no = "to be define" ,po_id = header_id)
             po_detail.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'supplier/new_purchase_order_supplier.html',{'all_item_code':all_item_code,'get_last_po_no':get_last_po_no, 'all_accounts': all_accounts})
+    return render(request, 'supplier/new_purchase_order_supplier.html',{'all_item_code':all_item_code,'get_last_po_no':get_last_po_no, 'all_accounts': all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
 
 def edit_purchase_order_supplier(request,pk):
+    allow_quotation_roles = quotation_roles()
     po_header = PoHeaderSupplier.objects.filter(id = pk).first()
     po_detail = PoDetailSupplier.objects.filter(po_id = pk).all()
     all_item_code = list(Add_products.objects.values('product_code'))
@@ -434,7 +465,7 @@ def edit_purchase_order_supplier(request,pk):
             po_detail_update = PoDetailSupplier(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], po_id = header_id)
             po_detail_update.save()
         return JsonResponse({"result":"success"})
-    return render(request,'supplier/edit_purchase_order_supplier.html',{'po_header':po_header,'pk':pk,'po_detail':po_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts})
+    return render(request,'supplier/edit_purchase_order_supplier.html',{'po_header':po_header,'pk':pk,'po_detail':po_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
 def print_po_supplier(request,pk):
     lines = 0
@@ -463,11 +494,13 @@ def print_po_supplier(request,pk):
 
 
 def delivery_challan_supplier(request):
+    allow_quotation_roles = quotation_roles()
     all_dc = DcHeaderSupplier.objects.all()
-    return render(request, 'supplier/delivery_challan_supplier.html',{'all_dc':all_dc})
+    return render(request, 'supplier/delivery_challan_supplier.html',{'all_dc':all_dc,'allow_quotation_roles':allow_quotation_roles})
 
 
 def new_delivery_challan_supplier(request):
+    allow_quotation_roles = quotation_roles()
     all_item_code = Add_products.objects.all()
     get_last_dc_no = DcHeaderSupplier.objects.last()
     all_accounts = ChartOfAccount.objects.all()
@@ -505,10 +538,11 @@ def new_delivery_challan_supplier(request):
                                             quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0,  unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], po_no = "to be define" ,dc_id = header_id)
             dc_detail.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'supplier/new_delivery_challan_supplier.html',{'all_item_code':all_item_code,'get_last_dc_no':get_last_dc_no,'all_accounts':all_accounts})
+    return render(request, 'supplier/new_delivery_challan_supplier.html',{'all_item_code':all_item_code,'get_last_dc_no':get_last_dc_no,'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
 
 def edit_delivery_challan_supplier(request,pk):
+    allow_quotation_roles = quotation_roles()
     dc_header = DcHeaderSupplier.objects.filter(id = pk).first()
     dc_detail = DcDetailSupplier.objects.filter(dc_id = pk).all()
     all_accounts = ChartOfAccount.objects.all()
@@ -541,7 +575,7 @@ def edit_delivery_challan_supplier(request,pk):
             dc_detail_update = DcDetailSupplier(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], dc_id = header_id)
             dc_detail_update.save()
         return JsonResponse({"result":"success"})
-    return render(request,'supplier/edit_delivery_challan_supplier.html',{'dc_header':dc_header,'pk':pk,'dc_detail':dc_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts})
+    return render(request,'supplier/edit_delivery_challan_supplier.html',{'dc_header':dc_header,'pk':pk,'dc_detail':dc_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
 
 def print_dc_supplier(request,pk):
@@ -566,11 +600,13 @@ def print_dc_supplier(request,pk):
 
 
 def mrn_supplier(request):
+    allow_quotation_roles = quotation_roles()
     all_dc = DcHeaderSupplier.objects.all()
-    return render(request, 'supplier/mrn_supplier.html',{'all_dc':all_dc})
+    return render(request, 'supplier/mrn_supplier.html',{'all_dc':all_dc,'allow_quotation_roles':allow_quotation_roles})
 
 
 def edit_mrn_supplier(request,pk):
+    allow_quotation_roles = quotation_roles()
     dc_header = DcHeaderSupplier.objects.filter(id=pk).first()
     dc_detail = DcDetailSupplier.objects.filter(dc_id=pk).all()
     if request.method == 'POST':
@@ -582,10 +618,11 @@ def edit_mrn_supplier(request,pk):
             value.accepted_quantity = items[i]["accepted_quantity"]
             value.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'supplier/edit_mrn_supplier.html',{'dc_header':dc_header,'dc_detail':dc_detail,'pk':pk})
+    return render(request, 'supplier/edit_mrn_supplier.html',{'dc_header':dc_header,'dc_detail':dc_detail,'pk':pk,'allow_quotation_roles':allow_quotation_roles})
 
 
 def show_notification(request):
+    allow_quotation_roles = quotation_roles()
     eventId = request.POST.get('eventId', False)
     if eventId:
         if eventId[:2] == "DC":
@@ -608,7 +645,7 @@ def show_notification(request):
             tran_no = account_info.rfq_no
             account_title = account_info.account_id.account_title
             return JsonResponse({'account_title':account_title, 'tran_no': tran_no})
-    return render(request, 'supplier/index.html')
+    return render(request, 'supplier/index.html',{'allow_quotation_roles':allow_quotation_roles})
 
 def update_notification_customer(request):
     if request.method == "POST":

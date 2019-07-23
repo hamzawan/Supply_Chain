@@ -2083,7 +2083,7 @@ min-width: 24px;
 }
 #edit-purchase-table.table td a.add-transaction-edit i {
     font-size: 19px;
-  margin-right: -1px;
+    margin-right: -1px;
     position: relative;
     top: 3px;
 }
@@ -2176,14 +2176,12 @@ display: none;
     font-size: 14px;
 }
 /* ================================================================================================= */
-#new-purchase-return-table.table tr td{
+
+#new-purchase-return-table.table tr th{
     font-size: 14px;
 }
-#new-purchase-return-table.table tr th{
-    font-size: 10px;
-}
-#new-purchase-return-table.table tr td{
-    font-size: 10px;
+#new-purchase-return-table.table tbody tr td{
+    font-size: 14px;
 }
 #new-purchase-return-table.table tr th, #new-purchase-return-table.table tr td {
     border-color: #e9e9e9;
@@ -2233,6 +2231,119 @@ border-color: #f50000;
 #new-purchase-return-table.table td .add-purchase-return {
 display: none;
 }
+
+
+#edit-purchase-return-table.table tr th{
+    font-size: 14px;
+}
+#edit-purchase-return-table.table tbody tr td{
+    font-size: 14px;
+}
+#edit-purchase-return-table.table tr th, #edit-purchase-return-table.table tr td {
+    border-color: #e9e9e9;
+}
+#edit-purchase-return-table.table th i {
+    font-size: 13px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+#edit-purchase-return-table.table th:last-child {
+    width: 70px;
+}
+#edit-purchase-return-table.table td a {
+cursor: pointer;
+    display: inline-block;
+    margin: 0 5px;
+min-width: 24px;
+}
+#edit-purchase-return-table.table td a.add-purchase-return-edit {
+    color: #27C46B;
+}
+#edit-purchase-return-table.table td a.edit-purchase-return-edit {
+    color: #FFC107;
+}
+#edit-purchase-return-table.table td a.delete-purchase-return-edit {
+    color: #E34724;
+}
+
+#edit-purchase-return-table.table td i {
+    font-size: 16px;
+}
+#edit-purchase-return-table.table td a.add-purchase-return-edit i {
+    font-size: 19px;
+  margin-right: -1px;
+    position: relative;
+    top: 3px;
+}
+#edit-purchase-return-table.table .form-control {
+    height: 32px;
+    line-height: 32px;
+    box-shadow: none;
+    border-radius: 2px;
+}
+#edit-purchase-return-table.table .form-control.error {
+border-color: #f50000;
+}
+#edit-purchase-return-table.table td .add-purchase-return-edit {
+display: none;
+}
+
+
+#edit-sale-return-table.table tr th{
+    font-size: 14px;
+}
+#edit-sale-return-table.table tbody tr td{
+    font-size: 14px;
+}
+#edit-sale-return-table.table tr th, #edit-sale-return-table.table tr td {
+    border-color: #e9e9e9;
+}
+#edit-sale-return-table.table th i {
+    font-size: 13px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+#edit-sale-return-table.table th:last-child {
+    width: 70px;
+}
+#edit-sale-return-table.table td a {
+cursor: pointer;
+    display: inline-block;
+    margin: 0 5px;
+min-width: 24px;
+}
+#edit-sale-return-table.table td a.add-sale-return-edit {
+    color: #27C46B;
+}
+#edit-sale-return-table.table td a.edit-sale-return-edit {
+    color: #FFC107;
+}
+#edit-sale-return-table.table td a.delete-sale-return-edit {
+    color: #E34724;
+}
+
+#edit-sale-return-table.table td i {
+    font-size: 16px;
+}
+#edit-sale-return-table.table td a.add-sale-return-edit i {
+    font-size: 19px;
+  margin-right: -1px;
+    position: relative;
+    top: 3px;
+}
+#edit-sale-return-table.table .form-control {
+    height: 32px;
+    line-height: 32px;
+    box-shadow: none;
+    border-radius: 2px;
+}
+#edit-sale-return-table.table .form-control.error {
+border-color: #f50000;
+}
+#edit-sale-return-table.table td .add-sale-return-edit {
+display: none;
+}
+
 
 /* ================================================================================================= */
 
@@ -2355,15 +2466,6 @@ min-width: 24px;
     position: relative;
     top: 3px;
 }
-#edit-sale-table.table .form-control {
-    height: 32px;
-    line-height: 32px;
-    box-shadow: none;
-    border-radius: 2px;
-}
-#edit-sale-table.table .form-control.error {
-border-color: #f50000;
-}
 #edit-sale-table.table td .add-sale-edit {
 display: none;
 }
@@ -2452,7 +2554,7 @@ line-height: 13px;
 margin-right: 4px;
 }
 
-.table-title .add-item-crv {
+.table-title .load-invoices {
 float: right;
 height: 30px;
 font-weight: bold;
@@ -2462,7 +2564,7 @@ min-width: 100px;
 border-radius: 50px;
 line-height: 13px;
 }
-.table-title .add-item-crv i {
+.table-title .load-invoices i {
 margin-right: 4px;
 }
 
@@ -2524,10 +2626,10 @@ margin-right: 4px;
     /*table-layout: fixed*/;
 }
 #new-jv-table.table tr th{
-    font-size: 10px;
+    font-size: 14px;
 }
 #new-jv-table.table tr td{
-    font-size: 10px;
+    font-size: 14px;
 }
 #new-jv-table.table tr th, #new-jv-table.table tr td {
     border-color: #e9e9e9;

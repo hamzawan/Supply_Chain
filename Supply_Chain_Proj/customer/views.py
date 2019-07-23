@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, request
 from .models import (RfqCustomerHeader, RfqCustomerDetail,
                     QuotationHeaderCustomer, QuotationDetailCustomer,
                     PoHeaderCustomer, PoDetailCustomer,
@@ -14,16 +14,134 @@ import datetime
 from supplier.utils import render_to_pdf
 from django.template.loader import get_template
 from django.db import connection
+from django.db.models import Q
 from django.core import mail
 from django.core.mail import EmailMessage
+from user.models import UserRoles
+from django.contrib.auth.decorators import user_passes_test
+from supplier.views import quotation_roles
+
+def allow_rfq_display(request):
+    user_id = Q(user_id = 1)
+    form_id = Q(form_id = 1)
+    child_form = Q(child_form = 11)
+    display = Q(display = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, display)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_rfq_add(request):
+    user_id = Q(user_id = 1)
+    form_id = Q(form_id = 1)
+    child_form = Q(child_form = 11)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return allow_role
+    else:
+        return allow_role
+
+def bool_allow_rfq_add(request):
+    user_id = Q(user_id = 1)
+    form_id = Q(form_id = 1)
+    child_form = Q(child_form = 11)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_rfq_edit(request):
+    user_id = Q(user_id = 1)
+    form_id = Q(form_id = 1)
+    child_form = Q(child_form = 11)
+    edit = Q(edit = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, edit)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_rfq_delete(request):
+    user_id = Q(user_id = 1)
+    form_id = Q(form_id = 1)
+    child_form = Q(child_form = 11)
+    delete = Q(delete = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_quotation_display(request):
+    user_id = Q(user_id = 1)
+    form_id = Q(form_id = 1)
+    child_form = Q(child_form = 11)
+    display = Q(display = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, display)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_quotation_add(request):
+    user_id = Q(user_id = 1)
+    form_id = Q(form_id = 1)
+    child_form = Q(child_form = 12)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return allow_role
+    else:
+        return allow_role
+
+def bool_allow_quotation_add(request):
+    user_id = Q(user_id = 1)
+    form_id = Q(form_id = 1)
+    child_form = Q(child_form = 12)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_quotation_edit(request):
+    user_id = Q(user_id = 1)
+    form_id = Q(form_id = 1)
+    child_form = Q(child_form = 11)
+    edit = Q(edit = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, edit)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_quotation_delete(request):
+    user_id = Q(user_id = 1)
+    form_id = Q(form_id = 1)
+    child_form = Q(child_form = 11)
+    delete = Q(delete = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
+    if allow_role:
+        return False
+    else:
+        return False
 
 
+@user_passes_test(allow_rfq_display)
 def rfq_customer(request):
+    allow_quotation_roles = quotation_roles()
     all_rfq = RfqCustomerHeader.objects.all()
-    return render(request, 'customer/rfq_customer.html',{'all_rfq':all_rfq})
+    allow_role = allow_rfq_add(request)
+    return render(request, 'customer/rfq_customer.html',{'all_rfq':all_rfq,  'allow_role':allow_role,'allow_quotation_roles':allow_quotation_roles})
 
-
+@user_passes_test(bool_allow_rfq_add)
 def new_rfq_customer(request):
+    allow_quotation_roles = quotation_roles()
     get_last_rfq_no = RfqCustomerHeader.objects.last()
     all_item_code = Add_products.objects.all()
     all_accounts = ChartOfAccount.objects.all()
@@ -60,10 +178,11 @@ def new_rfq_customer(request):
             rfq_detail = RfqCustomerDetail(item_id = item_id, quantity = value["quantity"],rfq_id = header_id)
             rfq_detail.save()
         return JsonResponse({"result": "success"})
-    return render(request,'customer/new_rfq_customer.html',{'get_last_rfq_no':get_last_rfq_no,'all_item_code':all_item_code, 'all_accounts':all_accounts})
+    return render(request,'customer/new_rfq_customer.html',{'get_last_rfq_no':get_last_rfq_no,'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
-
+@user_passes_test(allow_rfq_edit)
 def edit_rfq_customer(request,pk):
+    allow_quotation_roles = quotation_roles()
     rfq_header = RfqCustomerHeader.objects.filter(id = pk).first()
     rfq_detail = RfqCustomerDetail.objects.filter(rfq_id = pk).all()
     all_accounts = ChartOfAccount.objects.all()
@@ -106,17 +225,20 @@ def edit_rfq_customer(request,pk):
             return JsonResponse({"result":"success"})
     except IntegrityError:
         print("Data Already Exist")
-    return render(request,'customer/edit_rfq_customer.html',{'rfq_header':rfq_header,'pk':pk,'rfq_detail':rfq_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts})
+    return render(request,'customer/edit_rfq_customer.html',{'rfq_header':rfq_header,'pk':pk,'rfq_detail':rfq_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
 
 def quotation_customer(request):
     # company_id = Company_info.objects.get(id = request.session['company'])
     # all_quotation = QuotationHeaderCustomer.objects.filter(company_id = company_id).all()
+    allow_quotation_roles = quotation_roles()
+    allow_role = allow_quotation_add(request)
     all_quotation = QuotationHeaderCustomer.objects.all()
-    return render(request, 'customer/quotation_customer.html',{'all_quotation':all_quotation})
+    return render(request, 'customer/quotation_customer.html',{'all_quotation':all_quotation,'allow_quotation_roles':allow_quotation_roles,'allow_role':allow_role})
 
-
+@user_passes_test(bool_allow_quotation_add)
 def new_quotation_customer(request):
+    allow_quotation_roles = quotation_roles()
     all_item_code = Add_products.objects.all()
     get_last_quotation_no = QuotationHeaderCustomer.objects.last()
     all_accounts = ChartOfAccount.objects.all()
@@ -165,7 +287,7 @@ def new_quotation_customer(request):
         last_id = QuotationHeaderCustomer.objects.last()
         last_id = last_id.id
         return JsonResponse({'result':'success',"last_id":last_id})
-    return render(request, 'customer/new_quotation_customer.html',{'all_item_code':all_item_code,'get_last_quotation_no':get_last_quotation_no,'all_accounts':all_accounts})
+    return render(request, 'customer/new_quotation_customer.html',{'all_item_code':all_item_code,'get_last_quotation_no':get_last_quotation_no,'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles,'allow_quotation_roles':allow_quotation_roles})
 
 def send_email(request, pk,id):
     account_id = ChartOfAccount.objects.get(id = id)
@@ -175,6 +297,7 @@ def send_email(request, pk,id):
     return redirect('new-quotation-customer')
 
 def edit_quotation_customer(request,pk):
+    allow_quotation_roles = quotation_roles()
     quotation_header = QuotationHeaderCustomer.objects.filter(id = pk).first()
     quotation_detail = QuotationDetailCustomer.objects.filter(quotation_id = pk).all()
     all_item_code = list(Add_products.objects.values('product_code'))
@@ -233,15 +356,14 @@ def edit_quotation_customer(request,pk):
             quotation_detail_update = QuotationDetailCustomer(item_id = item_id, quantity = value["quantity"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_id = header_id)
             quotation_detail_update.save()
         return JsonResponse({"result":"success"})
-    return render(request,'customer/edit_quotation_customer.html',{'quotation_header':quotation_header,'pk':pk,'quotation_detail':quotation_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts})
+    return render(request,'customer/edit_quotation_customer.html',{'quotation_header':quotation_header,'pk':pk,'quotation_detail':quotation_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
 
 def print_quotation_customer(request,pk):
     lines = 0
     total_amount = 0
-    company_id = Company_info.objects.get(id = request.session['company'])
-    company_info = Company_info.objects.filter(id = company_id.id)
-    image = Company_info.objects.filter(id = company_id.id).first()
+    company_info = Company_info.objects.filter(id = 1)
+    image = Company_info.objects.filter(id = 1).first()
     header = QuotationHeaderCustomer.objects.filter(id = pk).first()
     detail = QuotationDetailCustomer.objects.filter(quotation_id = pk).all()
     for value in detail:
@@ -259,11 +381,13 @@ def print_quotation_customer(request,pk):
 
 
 def purchase_order_customer(request):
+    allow_quotation_roles = quotation_roles()
     all_po = PoHeaderCustomer.objects.all()
-    return render(request, 'customer/purchase_order_customer.html',{'all_po':all_po})
+    return render(request, 'customer/purchase_order_customer.html',{'all_po':all_po,'allow_quotation_roles':allow_quotation_roles})
 
 
 def new_purchase_order_customer(request):
+    allow_quotation_roles = quotation_roles()
     get_last_po_no = PoHeaderCustomer.objects.last()
     all_item_code = Add_products.objects.all()
     all_accounts = ChartOfAccount.objects.all()
@@ -311,10 +435,11 @@ def new_purchase_order_customer(request):
             po_detail = PoDetailCustomer(item_id = item_id, quantity = value["quantity"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_no = "to be define" ,po_id = header_id)
             po_detail.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'customer/new_purchase_order_customer.html',{'get_last_po_no':get_last_po_no,'all_item_code':all_item_code, 'all_accounts':all_accounts})
+    return render(request, 'customer/new_purchase_order_customer.html',{'get_last_po_no':get_last_po_no,'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
 
 def edit_purchase_order_customer(request,pk):
+    allow_quotation_roles = quotation_roles()
     po_header = PoHeaderCustomer.objects.filter(id = pk).first()
     po_detail = PoDetailCustomer.objects.filter(po_id = pk).all()
     all_item_code = list(Add_products.objects.values('product_code'))
@@ -375,23 +500,19 @@ def edit_purchase_order_customer(request,pk):
             po_detail_update = PoDetailCustomer(item_id = item_id, quantity = value["quantity"],unit_price = value["unit_price"], remarks = value["remarks"], po_id = header_id)
             po_detail_update.save()
         return JsonResponse({"result":"success"})
-    return render(request,'customer/edit_purchase_order_customer.html',{'po_header':po_header,'pk':pk,'po_detail':po_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts})
+    return render(request,'customer/edit_purchase_order_customer.html',{'po_header':po_header,'pk':pk,'po_detail':po_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
 def print_po_customer(request,pk):
     lines = 0
     total_amount = 0
-    company_info = Company_info.objects.all()
+    company_info = Company_info.objects.filter(id = 1)
     image = Company_info.objects.filter(id = 1).first()
     header = PoHeaderCustomer.objects.filter(id = pk).first()
     detail = PoDetailCustomer.objects.filter(po_id = pk).all()
     for value in detail:
-        lines = lines + len(value.item_description.split('\n'))
         amount = float(value.unit_price * value.quantity)
         total_amount = total_amount + amount
-    print(total_amount)
-    lines = lines + len(detail) + len(detail)
-    total_lines = 36 - lines
-    pdf = render_to_pdf('customer/po_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount})
+    pdf = render_to_pdf('customer/po_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_amount':total_amount})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "Quotation_Supplier_%s.pdf" %("123")
@@ -402,6 +523,7 @@ def print_po_customer(request,pk):
 
 
 def delivery_challan_customer(request):
+    allow_quotation_roles = quotation_roles()
     all_dc = DcHeaderCustomer.objects.all()
     cursor = connection.cursor()
     is_dc = cursor.execute('''Select Distinct id,dc_no From (
@@ -418,10 +540,11 @@ def delivery_challan_customer(request):
                             Inner Join customer_dcheadercustomer  HD on  HD.id = tblData.dc_id_id
                             Where RemainingQuantity > 0''')
     is_dc = is_dc.fetchall()
-    return render(request, 'customer/delivery_challan_customer.html',{'all_dc':all_dc,'is_dc':is_dc})
+    return render(request, 'customer/delivery_challan_customer.html',{'all_dc':all_dc,'is_dc':is_dc,'allow_quotation_roles':allow_quotation_roles})
 
 
 def new_delivery_challan_customer(request):
+    allow_quotation_roles = quotation_roles()
     row = [];
     cursor = connection.cursor()
     all_item_code = Add_products.objects.all()
@@ -505,10 +628,11 @@ def new_delivery_challan_customer(request):
             dc_detail = DcDetailCustomer(item_id = item_id, quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, po_no = value["po_no"] ,dc_id = header_id)
             dc_detail.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'customer/new_delivery_challan_customer.html',{'all_item_code':all_item_code,'get_last_dc_no':get_last_dc_no,'all_accounts':all_accounts,'all_po_code':all_po_code})
+    return render(request, 'customer/new_delivery_challan_customer.html',{'all_item_code':all_item_code,'get_last_dc_no':get_last_dc_no,'all_accounts':all_accounts,'all_po_code':all_po_code,'allow_quotation_roles':allow_quotation_roles})
 
 
 def edit_delivery_challan_customer(request,pk):
+    allow_quotation_roles = quotation_roles()
     data = ''
     row = []
     cursor = connection.cursor()
@@ -561,7 +685,7 @@ def edit_delivery_challan_customer(request,pk):
             dc_detail_update = DcDetailCustomer(item_id = item_id, quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, po_no = value["po_no"] ,dc_id = header_id)
             dc_detail_update.save()
         return JsonResponse({"result":"success"})
-    return render(request,'customer/edit_delivery_challan_customer.html',{'dc_header':dc_header,'pk':pk,'dc_detail':dc_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'all_po_code':all_po_code})
+    return render(request,'customer/edit_delivery_challan_customer.html',{'dc_header':dc_header,'pk':pk,'dc_detail':dc_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'all_po_code':all_po_code,'allow_quotation_roles':allow_quotation_roles})
 
 
 def print_dc_customer(request,pk):
@@ -589,11 +713,13 @@ def print_dc_customer(request,pk):
 
 
 def mrn_customer(request):
+    allow_quotation_roles = quotation_roles()
     all_dc = DcHeaderCustomer.objects.all()
-    return render(request, 'customer/mrn_customer.html',{'all_dc':all_dc})
+    return render(request, 'customer/mrn_customer.html',{'all_dc':all_dc,'allow_quotation_roles':allow_quotation_roles})
 
 
 def edit_mrn_customer(request,pk):
+    allow_quotation_roles = quotation_roles()
     dc_header = DcHeaderCustomer.objects.filter(id=pk).first()
     dc_detail = DcDetailCustomer.objects.filter(dc_id=pk).all()
     if request.method == 'POST':
@@ -605,4 +731,4 @@ def edit_mrn_customer(request,pk):
             value.accepted_quantity = items[i]["accepted_quantity"]
             value.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'customer/edit_mrn_customer.html',{'dc_header':dc_header,'dc_detail':dc_detail,'pk':pk})
+    return render(request, 'customer/edit_mrn_customer.html',{'dc_header':dc_header,'dc_detail':dc_detail,'pk':pk,'allow_quotation_roles':allow_quotation_roles})

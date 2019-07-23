@@ -1,6 +1,7 @@
 {% extends "supplier/base.html" %}
 {% load crispy_forms_tags %}
 {% load supplier_extras %}
+{% load mathfilters %}
 {% block body %}
 
 <div class="card" style="width: 100%;">
@@ -17,11 +18,7 @@
           <input type="text" readonly class="form-control form-control-sm" value="{{get_last_purchase_no}}" id="">
         </div>
         <div class="form-group col-md-2">
-          <label for="">Purchase No:</label>
-          <input type="text" readonly class="form-control form-control-sm" value="{{purchase_header.purchase_no}}">
-        </div>
-        <div class="form-group col-md-2">
-          <label>Supplier Name</label>
+          <label>Customer Name</label>
           <input list="account"  class="form-control form-control-sm" required id="supplier" value="{{purchase_header.account_id.account_title}}" >
           <datalist id="account">
             {% for value in all_accounts %}
@@ -48,48 +45,54 @@
                   <th width="60px">Unit</th>
                   <th width="70px">Price</th>
                   <th width="90px">Sales Tax in % </th>
+                  <th width="70px">ST Amount</th>
+                  <th width="90px">Total</th>
                   <th>Action</th>
               </tr>
           </thead>
           <tbody>
             {% for value in purchase_detail %}
+            {% with sales_tax_amount=value.quantity|mul:value.cost_price|mul:value.sales_tax|div:100 goods_amount=value.quantity|mul:value.cost_price %}
             <tr>
               <td>{{ forloop.counter }}</td>
               <td style="display:none;">{{ value.item_id.id }}</td>
               <td>{{ value.item_id.product_code }}</td>
               <td>{{ value.item_id.product_name }}</td>
               <td><pre>{{ value.item_id.product_desc }}</pre></td>
-              <td>{{ value.quantity }}</td>
+              <td id="quantity">{{ value.quantity }}</td>
               <td>{{ value.item_id.unit }}</td>
-              <td>{{ value.cost_price }}</td>
-              <td>{{ value.sales_tax }}</td>
+              <td id="price">{{ value.cost_price }}</td>
+              <td id="sales_tax">{{ value.sales_tax }}</td>
+              <td id="sales_tax_amount">{{sales_tax_amount|floatformat:2}}</td>
+              <td id="total">{{sales_tax_amount|add:goods_amount|floatformat:2}}</td>
               <td><a class="add-purchase-return" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-purchase-return" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-purchase-return" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
             </tr>
+            {% endwith %}
             {% endfor %}
           </tbody>
       </table>
 
     </div>
     </li>
-    <!-- <li class="list-group-item">
+    <li class="list-group-item">
       <input type="hidden" name="" value="" id="hidden">
       <div class="float-right">
         <div class="form-inline">
           <div class="form-group">
             <label for="text" style="font-size:14px;" >Cartage Amount:</label>
-              <input type="text" class="form-control form-control-sm" id="cartage_amount" style="border-top: 0px; border-right:0px; border-left:0px;" required value="0.00">
+              <input type="text" class="form-control form-control-sm" id="cartage_amount" style="border-top: 0px; border-right:0px; border-left:0px;" required value="{{purchase_header.cartage_amount}}">
           </div>
         </div>
         <div class="form-inline">
           <div class="form-group">
             <label for="text" style="font-size:14px;">Additional Tax: &nbsp;&nbsp;&nbsp;</label>
-            <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="additional_tax" required value="0.00">
+            <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="additional_tax" required value="{{purchase_header.additional_tax}}">
           </div>
         </div>
         <div class="form-inline">
           <div class="form-group">
-            <label for="text" style="font-size:14px;">Withholding Tax:&nbsp;</label>
-            <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="withholding_tax" required value="0">
+            <label for="text" style="font-size:14px;">Sales Tax:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <input type="text" readonly class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="total_sales_tax" required value="0.00">
           </div>
         </div>
         <div class="form-inline">
@@ -104,7 +107,7 @@
       <br>
       <br>
       <br>
-      </li> -->
+      </li>
       <br>
     <div class="text-center">
       <button type="submit" class="btn btn-outline-primary has_id" id="{{pk}}">Submit <small>(Purchase Return)</small></button>
