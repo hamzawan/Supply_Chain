@@ -51,19 +51,20 @@ def user_roles(request,pk):
         edit = request.POST.getlist('edit[]')
         delete = request.POST.getlist('delete[]')
         c_print = request.POST.getlist('c_print[]')
-
+        print(add)
         s_add = request.POST.getlist('s_add[]')
         s_edit = request.POST.getlist('s_edit[]')
         s_delete = request.POST.getlist('s_delete[]')
         s_print = request.POST.getlist('s_print[]')
 
         for i,value in enumerate(allow_role):
+            value.form_id = form_id
+            value.save()
             if i == 0:
                 matching_add = [c for c in add if "c_rfq_add" in c]
                 matching_edit = [c for c in edit if "c_rfq_edit" in c]
                 matching_delete = [c for c in delete if "c_rfq_delete" in c]
                 matching_print = [c for c in c_print if "c_rfq_print" in c]
-                print(matching_print)
                 if matching_add:
                     value.add = 1
                     value.save()
@@ -175,8 +176,6 @@ def user_roles(request,pk):
                 else:
                     value.r_print = 0
                     value.save()
-            value.form_id = form_id
-            value.save()
         #
         #
         # for i,value in enumerate(allow_role_supplier):
@@ -297,8 +296,6 @@ def user_roles(request,pk):
             #     else:
             #         value.r_print = 0
             #         value.save()
-            # value.form_id = form_id
-            # value.save()
 
     return render(request, 'user/user_roles.html',{'user':user,'allow_role':allow_role,'allow_role_supplier':allow_role_supplier,'allow_quotation_roles':allow_quotation_roles})
 
