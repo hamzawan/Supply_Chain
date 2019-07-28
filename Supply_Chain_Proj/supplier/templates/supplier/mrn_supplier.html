@@ -1,37 +1,43 @@
-{% extends "supplier/base.html" %}
-{% load crispy_forms_tags %}
-{% block body %}
+{% extends "supplier/base.html" %} {% load crispy_forms_tags %} {% block body %}
 
 <div class="card" style="width: 100%;">
-<div class="card-header">
-  <h4>MRN Supplier</h4>
-</div>
-<ul class="list-group list-group-flush">
-  <li class="list-group-item">
-    <br>
-    <div class="table table-responsive content-loader">
-      <table class="table table-bordered sort" id="dataTable">
+  <div class="card-header">
+    <h4>MRN Supplier</h4>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">
+      <br />
+      <div class="table table-responsive content-loader">
+        <table class="table table-bordered sort" id="dataTable">
           <thead>
-              <tr>
-                  <th width="70px" >S NO.</th>
-                  <th width="140px">DC no</th>
-                  <th width="70px">Action</th>
-              </tr>
+            <tr>
+              <th width="70px">S NO.</th>
+              <th width="140px">DC no</th>
+              <th width="70px">Action</th>
+            </tr>
           </thead>
           <tbody>
             {% for value in all_dc reversed %}
             <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ value.dc_no }}</td>
-                <td><a class="edit_list" href="{% url 'edit-mrn-supplier' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a></td>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ value.dc_no }}</td>
+              <td>
+                {% if permission.edit == 1 %}
+                <a
+                  class="edit_list"
+                  href="{% url 'edit-mrn-supplier' pk=value.id %}"
+                  data-toggle=""
+                  ><i class="material-icons">&#xE254;</i></a
+                >
+                {% endif %}
+              </td>
             </tr>
             {% endfor %}
           </tbody>
-      </table>
-    </div>
-  </li>
-</ul>
+        </table>
+      </div>
+    </li>
+  </ul>
 </div>
-
 
 {% endblock body %}

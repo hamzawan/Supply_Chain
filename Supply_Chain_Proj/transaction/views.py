@@ -13,12 +13,286 @@ from supplier.utils import render_to_pdf
 from django.template.loader import get_template
 from django.db import connection
 from django.core.exceptions import ObjectDoesNotExist
+from user.models import UserRoles
+from django.contrib.auth.decorators import user_passes_test
 
+def allow_coa_display(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 31)
+    display = Q(display = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, display)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_coa_add(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 31)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_purchase_display(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 32)
+    display = Q(display = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, display)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_purchase_add(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 32)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_purchase_edit(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 32)
+    edit = Q(edit = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, edit)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_purchase_delete(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 32)
+    delete = Q(delete = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
+    if allow_role:
+        return False
+    else:
+        return False
+
+
+def allow_purchase_return(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 32)
+    r_return = Q(r_return = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_return)
+    if allow_role:
+        return False
+    else:
+        return False
+
+
+
+def allow_purchase_return_display(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 33)
+    display = Q(display = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, display)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_purchase_return_add(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 33)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_purchase_return_edit(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 33)
+    edit = Q(edit = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, edit)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_purchase_return_delete(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 33)
+    delete = Q(delete = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
+    if allow_role:
+        return False
+    else:
+        return False
+
+
+
+def allow_sale_display(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 34)
+    display = Q(display = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, display)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_sale_add(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 34)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_sale_edit(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 34)
+    edit = Q(edit = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, edit)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_sale_delete(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 34)
+    delete = Q(delete = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
+    if allow_role:
+        return False
+    else:
+        return False
+
+def allow_sale_return(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 34)
+    r_return = Q(r_return = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_return)
+    if allow_role:
+        return False
+    else:
+        return False
+
+
+def allow_sale_return_display(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 35)
+    display = Q(display = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, display)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_sale_return_add(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 35)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_sale_return_edit(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 35)
+    edit = Q(edit = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, edit)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_sale_return_delete(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 35)
+    delete = Q(delete = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
+    if allow_role:
+        return False
+    else:
+        return False
+
+
+def chart_account_roles(user):
+    userid = str(user.id)
+    user_id = Q(user_id= userid)
+    child_form = Q(child_form= 31)
+    coa_roles = UserRoles.objects.filter(user_id,child_form).first()
+    return coa_roles
+
+def purchase_roles(user):
+    userid = str(user.id)
+    user_id = Q(user_id= userid)
+    child_form = Q(child_form= 32)
+    purchase_roles = UserRoles.objects.filter(user_id,child_form).first()
+    return purchase_roles
+
+def purchase_return_roles(user):
+    userid = str(user.id)
+    user_id = Q(user_id= userid)
+    child_form = Q(child_form= 33)
+    purchase_return_roles = UserRoles.objects.filter(user_id,child_form).first()
+    return purchase_return_roles
+
+def sale_roles(user):
+    userid = str(user.id)
+    user_id = Q(user_id= userid)
+    child_form = Q(child_form= 34)
+    sale_roles = UserRoles.objects.filter(user_id,child_form).first()
+    return sale_roles
+
+def sale_return_roles(user):
+    userid = str(user.id)
+    user_id = Q(user_id= userid)
+    child_form = Q(child_form= 35)
+    sale_return_roles = UserRoles.objects.filter(user_id,child_form).first()
+    return sale_return_roles
+
+
+@user_passes_test(allow_purchase_display)
 def purchase(request):
+    permission = purchase_roles(request.user)
     all_purchases = PurchaseHeader.objects.all()
-    return render(request, 'transaction/purchase.html',{'all_purchases': all_purchases})
+    return render(request, 'transaction/purchase.html',{'all_purchases': all_purchases,'permission':permission})
 
-
+@user_passes_test(allow_purchase_add)
 def new_purchase(request):
     amount = 0
     item_amount = 0
@@ -91,6 +365,7 @@ def new_purchase(request):
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/new_purchase.html',{'all_item_code':all_item_code,'get_last_purchase_no':get_last_purchase_no, 'all_accounts':all_accounts})
 
+@user_passes_test(allow_purchase_edit)
 def edit_purchase(request,pk):
     item_amount = 0
     total_amount = 0
@@ -179,7 +454,9 @@ def purchase_return_summary(request):
     return render(request, 'transaction/purchase_return_summary.html',{'all_purchase_return': all_purchase_return})
 
 
+@user_passes_test(allow_purchase_return_display)
 def new_purchase_return(request,pk):
+    permission = purchase_return_roles(request.user)
     total_amount = 0
     item_amount = 0
     get_last_purchase_no = PurchaseReturnHeader.objects.last()
@@ -231,8 +508,9 @@ def new_purchase_return(request,pk):
             tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = purchase_account, tran_type = "Purchase Return Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/purchase_return.html',{'purchase_header':purchase_header, 'purchase_detail': purchase_detail,'pk':pk,'get_last_purchase_no':get_last_purchase_no})
+    return render(request, 'transaction/purchase_return.html',{'purchase_header':purchase_header, 'purchase_detail': purchase_detail,'pk':pk,'get_last_purchase_no':get_last_purchase_no,'permission':permission})
 
+@user_passes_test(allow_purchase_return_edit)
 def edit_purchase_return(request,pk):
     amount = 0
     item_amount = 0
@@ -288,11 +566,14 @@ def edit_purchase_return(request,pk):
     return render(request, 'transaction/edit_purchase_return.html',{'purchase_header':purchase_header, 'purchase_detail': purchase_detail,'pk':pk,'all_accounts':all_accounts})
 
 
+@user_passes_test(allow_sale_display)
 def sale(request):
+    permission = sale_roles(request.user)
     all_sales = SaleHeader.objects.all()
-    return render(request, 'transaction/sale.html',{'all_sales': all_sales})
+    return render(request, 'transaction/sale.html',{'all_sales': all_sales,'permission':permission})
 
 
+@user_passes_test(allow_sale_add)
 def new_sale(request):
     item_amount = 0
     total_amount = 0
@@ -554,7 +835,7 @@ def direct_sale(request, pk):
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/direct_invoice.html',{'all_item_code':all_item_code,'get_last_sale_no':get_last_sale_no, 'all_accounts':all_accounts, 'dc_header':dc_header, 'dc_detail':dc_detail, 'pk':pk})
 
-
+@user_passes_test(allow_sale_edit)
 def edit_sale(request,pk):
     item_amount = 0
     total_amount = 0
@@ -702,7 +983,9 @@ def sale_return_summary(request):
     return render(request, 'transaction/sale_return_summary.html',{'all_sales_return': all_sales_return})
 
 
+@user_passes_test(allow_sale_return_display)
 def new_sale_return(request,pk):
+    permission = sale_return_roles(request.user)
     item_amount = 0
     total_amount = 0
     get_last_sale_no = SaleReturnHeader.objects.last()
@@ -755,9 +1038,9 @@ def new_sale_return(request,pk):
             tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_return_account, tran_type = "Sale Return Invoice On Credit", amount = total_amount, date = date, remarks = "")
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk,'get_last_sale_no':get_last_sale_no})
+    return render(request, 'transaction/sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk,'get_last_sale_no':get_last_sale_no,'permission':permission})
 
-
+@user_passes_test(allow_sale_return_edit)
 def edit_sale_return(request,pk):
     item_amount = 0
     total_amount = 0
@@ -814,8 +1097,9 @@ def edit_sale_return(request,pk):
     return render(request, 'transaction/edit_sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk,'all_accounts':all_accounts})
 
 
-
+@user_passes_test(allow_coa_display)
 def chart_of_account(request):
+    permission = chart_account_roles(request.user)
     all_accounts_null = ChartOfAccount.objects.filter(parent_id = 0).all()
     all_accounts = ChartOfAccount.objects.all()
     if request.method == 'POST':
@@ -843,7 +1127,7 @@ def chart_of_account(request):
             opening_balance = -abs(int(opening_balance))
         coa = ChartOfAccount(account_title = account_title, parent_id = account_type, opening_balance = opening_balance, phone_no = phone_no, email_address = email_address, ntn = ntn, stn = stn, cnic = cnic ,Address = address, remarks = remarks, credit_limit=credit_limits)
         coa.save()
-    return render(request, 'transaction/chart_of_account.html',{'all_accounts':all_accounts,'all_accounts_null':all_accounts_null})
+    return render(request, 'transaction/chart_of_account.html',{'all_accounts':all_accounts,'all_accounts_null':all_accounts_null,'permission':permission})
 
 
 def reports(request):

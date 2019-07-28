@@ -10,7 +10,12 @@
   <li class="list-group-item">
     <div class="input-group">
       <div class="col-md-12">
+        {% if permission.add == 1%}
         <a role="button" href="{% url 'new-rfq-supplier' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
+        {% else %}
+        <a role="button" href="#" style="float:right;" class="btn btn-outline-secondary disabled" name="button"><i class="fas fa-plus"></i> Add New</a>
+        {% endif %}
+
       </div>
     </div>
     <br>
@@ -38,7 +43,15 @@
                 <td> user1 </td>
                 <td>{{ row.attn }}</td>
                 <td>{{ row.follow_up }}</td>
-                <td><a class="edit_list" href="{% url 'edit-rfq-supplier' pk=row.id %}"><i class="material-icons">&#xE254;</i></a><a class="delete-rfq-supplier" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+                <td>
+                  {% if permission.edit == 1 %}
+                  <a class="edit_list" href="{% url 'edit-rfq-supplier' pk=row.id %}"><i class="material-icons">&#xE254;</i></a>
+                  {% endif %}
+
+                  {% if permission.delete == 1 %}
+                  <a class="delete-rfq-supplier" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                  {% endif %}
+                </td>
             </tr>
             {% endfor %}
           </tbody>
