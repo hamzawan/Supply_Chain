@@ -10,7 +10,7 @@
   <li class="list-group-item">
     <div class="input-group">
       <div class="col-md-12">
-        {% if allow_role.0.add == 1 %}
+        {% if permission.add == 1 %}
         <a role="button" href="{% url 'new-quotation-customer' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
         {% else %}
         <a role="button" href="#" style="float:right;" class="btn btn-outline-secondary disabled" name="button"><i class="fas fa-plus"></i> Add New</a>
@@ -43,17 +43,19 @@
                   <td> {{ value.currency }} </td>
                   <td> {{ value.exchange_rate }} </td>
                   <td>
-                    {% for v in allow_role %}
-                      {% if v.edit == 1 %}
+
+                      {% if permission.edit == 1 %}
                         <a class="edit_list" href="{% url 'edit-quotation-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
                       {% endif %}
-                      {% if v.print == 1 %}
+                      
+                      {% if permission.print == 1 %}
                         <a href="{% url 'print-quotation-customer' pk=value.id %}" target="_blank"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a>
                       {% endif %}
-                      {% if v.delete == 1 %}
+                      
+                      {% if permission.delete == 1 %}
                         <a class="delete-all"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
                       {% endif %}
-                    {% endfor %}
+
                   </td>
               </tr>
             {% endfor %}

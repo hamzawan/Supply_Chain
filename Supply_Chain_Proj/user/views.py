@@ -6,10 +6,12 @@ from .forms import RegistrationFrom
 from  supplier.models import Company_info
 from .models import UserRoles
 from django.db.models import Q
-from supplier.views import quotation_roles
+from supplier.views import customer_roles,supplier_roles,transaction_roles
 
 def register(request):
-    allow_quotation_roles = quotation_roles()
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -18,7 +20,7 @@ def register(request):
             return redirect('login')
     else:
         form = RegistrationFrom
-    return render(request, 'user/register.html', {'form': form,'quotation_roles':quotation_roles})
+    return render(request, 'user/register.html', {'form': form,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
 
 
 def forgot_password(request):
@@ -33,7 +35,9 @@ def select_company_fiscal(request):
 
 
 def user_roles(request,pk):
-    allow_quotation_roles = quotation_roles()
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
     user = User.objects.filter(id = pk)
     user_id = User.objects.get(id = pk)
     user_id = Q(user_id = pk)
@@ -46,6 +50,9 @@ def user_roles(request,pk):
 
     form_name_transaction = Q(form_name = "Transaction")
     allow_role_transaction = UserRoles.objects.filter(user_id, form_name_transaction).all()
+
+    form_name_inventory = Q(form_name = "Inventory")
+    allow_role_inventory = UserRoles.objects.filter(user_id, form_name_inventory).all()
 
     if request.method == "POST":
         form_id = request.POST.getlist('customer')
@@ -72,6 +79,61 @@ def user_roles(request,pk):
         t_delete = request.POST.getlist('t_delete[]')
         t_print = request.POST.getlist('t_print[]')
         t_return = request.POST.getlist('t_return[]')
+
+        i_display = request.POST.getlist('i_display[]')
+        i_add = request.POST.getlist('i_add[]')
+        i_edit = request.POST.getlist('i_edit[]')
+        i_delete = request.POST.getlist('i_delete[]')
+        i_shop = request.POST.getlist('i_shop[]')
+
+        form_id_i = request.POST.getlist('Inventory')
+        if form_id_i:
+            form_id_i = 4
+        else:
+            form_id_i = 0
+
+        for i,value in enumerate(allow_role_inventory):
+             if i == 0:
+                 i_matching_display = [c for c in i_display if "i_inventory_display" in c]
+                 i_matching_add = [c for c in i_add if "i_inventory_add" in c]
+                 i_matching_edit = [c for c in i_edit if "i_inventory_edit" in c]
+                 i_matching_delete = [c for c in i_delete if "i_inventory_delete" in c]
+                 i_matching_shop = [c for c in i_shop if "i_inventory_shop" in c]                 
+        
+                 if i_matching_display:
+                     value.display = 1
+                     value.save()
+                 else:
+                     value.display = 0
+                     value.save()
+                 if i_matching_add:
+                     value.add = 1
+                     value.save()
+                 else:
+                     value.add = 0
+                     value.save()
+                 if i_matching_edit:
+                     value.edit = 1
+                     value.save()
+                 else:
+                     value.edit = 0
+                     value.save()
+                 if i_matching_delete:                     
+                     value.delete = 1
+                     value.save()
+                 else:
+                     value.delete = 0
+                     value.save()
+                 if i_matching_shop:
+                     value.r_print = 1
+                     value.save()
+                 else:
+                     value.r_print = 0
+                     value.save()
+
+             value.form_id = form_id_i
+             value.save()
+
 
         for i,value in enumerate(allow_role):
             if i == 0:
@@ -867,9 +929,13 @@ def user_roles(request,pk):
              value.save()
 
 
-    return render(request, 'user/user_roles.html',{'user':user,'allow_role':allow_role,'allow_role_supplier':allow_role_supplier,'allow_quotation_roles':allow_quotation_roles,'allow_role_transaction':allow_role_transaction})
+    return render(request, 'user/user_roles.html',{'user':user,'allow_role':allow_role,'allow_role_supplier':allow_role_supplier,'allow_role_transaction':allow_role_transaction,
+    'allow_role_inventory':allow_role_inventory,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+
 
 def user_list(request):
-    allow_quotation_roles = quotation_roles()
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
     all_user = User.objects.all()
-    return render(request, 'user/users.html',{'all_user':all_user,'allow_quotation_roles':allow_quotation_roles})
+    return render(request, 'user/users.html',{'all_user':all_user,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})

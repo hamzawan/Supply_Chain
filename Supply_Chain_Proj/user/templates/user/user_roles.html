@@ -12,7 +12,92 @@
     <form class="" action="" method="post">
       {% csrf_token %}
       <!-- Table  -->
-        <table class="table table-bordered">
+
+      <table class="table table-bordered">
+        <!-- Table body -->
+        <tbody>
+          <tr>
+            <th scope="row" width="400px">
+              <!-- Default unchecked -->
+              <div class="custom-control custom-checkbox">
+                {% if allow_role_inventory.0.form_id == 4 %}
+                  <input type="checkbox" class="custom-control-input" name="Inventory" id="tableDefaultCheck4" checked>
+                {% else %}
+                  <input type="checkbox" class="custom-control-input" name="Inventory" id="tableDefaultCheck4" >
+                {% endif %}
+                <label class="custom-control-label" for="tableDefaultCheck4">Inventory</label>
+              </div>
+            </th>
+            <th style="text-align: center;" width="100px">Display</th>
+            <th style="text-align: center;" width="100px">Add</th>
+            <th style="text-align: center;" width="100px">Edit</th>
+            <th style="text-align: center;" width="100px">Delete</th>
+            <th style="text-align: center;" width="100px">Shop</th>
+          </tr>
+          <tr>
+            <th scope="row">
+              <span>&nbsp;&nbsp;&nbsp;</span>
+              Inventory 
+            </th>
+
+            <td style="text-align: center;">
+              <div class="custom-control custom-checkbox">
+                {% if allow_role_inventory.0.display == 1 %}
+                <input type="checkbox" class="custom-control-input" name="i_display[]" id="display41" checked value="i_inventory_display">
+                {% else %}
+                <input type="checkbox" class="custom-control-input" name="i_display[]" id="display41" value="i_inventory_display">
+                {% endif %}
+                <label class="custom-control-label" for="display41"></label>
+              </div>
+            </td>
+            
+
+            <td style="text-align: center;">
+              <div class="custom-control custom-checkbox">
+                {% if allow_role_inventory.0.add == 1 %}
+                <input type="checkbox" class="custom-control-input" name="i_add[]" id="add41" checked value="i_inventory_add">
+                {% else %}
+                <input type="checkbox" class="custom-control-input" name="i_add[]" id="add41" value="i_inventory_add">
+                {% endif %}
+                <label class="custom-control-label" for="add41"></label>
+              </div>
+            </td>
+            <td style="text-align: center;">
+              <div class="custom-control custom-checkbox">
+                {% if allow_role_inventory.0.edit == 1 %}
+                <input type="checkbox" class="custom-control-input" name="i_edit[]" id="edit41" checked value="i_inventory_edit">
+                {% else %}
+                <input type="checkbox" class="custom-control-input" name="i_edit[]" id="edit41" value="i_inventory_edit">
+                {% endif %}
+                <label class="custom-control-label" for="edit41"></label>
+              </div>
+            </td>
+            <td style="text-align: center;">
+              <div class="custom-control custom-checkbox">
+                {% if allow_role_inventory.0.delete == 1 %}
+                  <input type="checkbox" class="custom-control-input" name="i_delete[]" id="delete41" checked value="i_inventory_delete">
+                {% else %}
+                  <input type="checkbox" class="custom-control-input" name="i_delete[]" id="delete41" value="i_inventory_delete">
+                {% endif %}
+                <label class="custom-control-label" for="delete41"></label>
+              </div>
+            </td>
+            <td style="text-align: center;">
+              <div class="custom-control custom-checkbox">
+                {% if allow_role_inventory.0.r_print == 1 %}
+                  <input type="checkbox" class="custom-control-input" name="i_shop[]" id="shop41" checked value="i_inventory_shop">
+                {% else %}
+                  <input type="checkbox" class="custom-control-input" name="i_shop[]" id="shop41" value="i_inventory_shop">
+                {% endif %}
+                <label class="custom-control-label" for="shop41"></label>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+
+      <table class="table table-bordered">
           <!-- Table body -->
           <tbody>
             <tr>

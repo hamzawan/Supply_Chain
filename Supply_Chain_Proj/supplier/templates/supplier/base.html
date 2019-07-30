@@ -119,23 +119,42 @@
           <a class="dropdown-item" href="{% url 'add-product' %}">Add Item</a>
         </div>
       </li>
+      {% if allow_supplier_roles %}
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <i class="fas fa-industry"></i>
           <span>Supplier</span>
         </a>
         <div class="dropdown-menu" aria-labelledby="pagesDropdown">
+          {% for role in allow_supplier_roles %}
           <!-- <h6 class="dropdown-header">Login Screens:</h6> -->
+          
+          {% if role.display == 1 and role.child_form == 21 %}
           <a class="dropdown-item" href="{% url 'rfq-supplier' %}">RFQ</a>
+          {% endif %}
+          
+          {% if role.display == 1 and role.child_form == 22 %}
           <a class="dropdown-item" href="{% url 'quotation-supplier' %}">Quotation</a>
+          {% endif %}
+
+          {% if role.display == 1 and role.child_form == 23 %}
           <a class="dropdown-item" href="{% url 'purchase-order-supplier' %}">Purchase Order</a>
+          {% endif %}
           <!-- <div class="dropdown-divider"></div> -->
           <!-- <h6 class="dropdown-header">Other Pages:</h6> -->
+          {% if role.display == 1 and role.child_form == 24 %}
           <a class="dropdown-item" href="{% url 'delivery-challan-supplier' %}">Delivery Challan</a>
+          {% endif %}
+
+          {% if role.display == 1 and role.child_form == 25 %}
           <a class="dropdown-item" href="{% url 'mrn-supplier' %}">MRN</a>
+          {% endif %}
+          {% endfor %}
         </div>
       </li>
-  {% if allow_quotation_roles %}
+      {% endif %}
+
+  {% if allow_customer_roles.0.form_id == 1 %}
       <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fas fa-users"></i>
@@ -143,47 +162,86 @@
           </a>
           <h1>{{role.child_form}}</h1>
             <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-            {% for role in allow_quotation_roles %}
-              {% if role.child_form == 11 %}
+            {% for role in allow_customer_roles %}
+              {% if role.display == 1 and role.child_form == 11 %}
                 <a class="dropdown-item" href="{% url 'rfq-customer' %}">RFQ</a>
               {% endif %}
-              {% if role.child_form == 12 %}
+              {% if role.display == 1 and role.child_form == 12 %}
                 <a class="dropdown-item" href="{% url 'quotation-customer' %}">Quotation</a>
               {% endif %}
-              {% if role.child_form == 13 %}
+              {% if  role.display == 1 and role.child_form == 13 %}
                 <a class="dropdown-item" href="{% url 'purchase-order-customer' %}">Purchase Order</a>
               {% endif %}
-              {% if role.child_form == 14 %}
+              {% if role.display == 1 and role.child_form == 14 %}
                 <a class="dropdown-item" href="{% url 'delivery-challan-customer' %}">Delivery Challan</a>
               {% endif %}
-              {% if role.child_form == 15 %}
+              {% if role.display == 1 and role.child_form == 15 %}
                 <a class="dropdown-item" href="{% url 'mrn-customer' %}">MRN</a>
               {% endif %}
             {% endfor %}
             </div>
       </li>
   {% endif %}
+      
+      {% if allow_transaction_roles %}
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <i class="fa fa-money" aria-hidden="true"></i>
           <span>Transaction</span>
         </a>
         <div class="dropdown-menu" aria-labelledby="pagesDropdown">
+          {% for role in allow_transaction_roles %}
+          {% if role.display == 1 and role.child_form == 31 %}
           <a class="dropdown-item" href="{% url 'chart-of-account' %}">Chart Of Account</a>
+          {% endif %}
+
+          {% if role.display == 1 and role.child_form == 32 %}
           <a class="dropdown-item" href="{% url 'purchase' %}">Purchase</a>
+          {% endif %}
+
+          {% if role.display == 1 and role.child_form == 33 %}
           <a class="dropdown-item" href="{% url 'purchase-return-summary' %}">Purchase Return</a>
+          {% endif %}
+
+          {% if role.display == 1 and role.child_form == 34 %}
           <a class="dropdown-item" href="{% url 'sale' %}">Sale</a>
+          {% endif %}
+
+          {% if role.display == 1 and role.child_form == 35 %}
           <a class="dropdown-item" href="{% url 'sale-return-summary' %}">Sale Return</a>
+          {% endif %}
+
+          {% if role.display == 1 and role.child_form == 36 %}
           <h5 class="dropdown-header">Vouchers :</h5>
           <a class="dropdown-item" href="{% url 'journal-voucher-summary' %}">Journal Voucher</a>
+          {% endif %}
+          
+          {% if role.display == 1 and role.child_form == 37 or role.display == 1 and role.child_form == 38 %}
           <h6 class="dropdown-header">Receiving :</h6>
+          {% endif %}
+
+          {% if role.display == 1 and role.child_form == 37 %}
           <a class="dropdown-item" href="{% url 'bank-receiving-voucher' %}">Bank Receiving Voucher</a>
+          {% endif %}
+
+          {% if role.display == 1 and role.child_form == 38 %}
           <a class="dropdown-item" href="{% url 'cash-receiving-voucher' %}">Cash Receiving Voucher</a>
+          {% endif %}
+          
+          {% if role.display == 1 and role.child_form == 39 or role.display == 1 and role.child_form == 310 %}
           <h6 class="dropdown-header">Payment :</h6>
+          {% endif %}
+          {% if role.display == 1 and role.child_form == 39 %}
           <a class="dropdown-item" href="{% url 'bank-payment-voucher' %}">Bank Payment Voucher</a>
+          {% endif %}
+
+          {% if role.display == 1 and role.child_form == 310 %}
           <a class="dropdown-item" href="{% url 'cash-payment-voucher' %}">Cash Payment Voucher</a>
+          {% endif %}
+          {% endfor %}
         </div>
       </li>
+      {% endif %}
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="{% url 'report' %}" role="button"  aria-haspopup="true" aria-expanded="false">
           <i class="far fa-chart-bar"></i>
