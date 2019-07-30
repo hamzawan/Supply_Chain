@@ -7,88 +7,48 @@
   <h4>Bank Payment Voucher</h4>
 </div>
 <ul class="list-group list-group-flush">
-<form  action="" id="new-jv-form-bpv" autocomplete="off"  method="post">
-  {% csrf_token %}
   <li class="list-group-item">
-      <div class="form-row">
-        <div class="form-group col-md-2">
-          <label for="">Transaction ID</label>
-          <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_tran_id }}" id="tran_id">
-        </div>
-        <div class="col-md-2">
-          <label for="">Account Title</label>
-          <input type="text" class="form-control form-control-sm" list="account_title" id="account">
-          <datalist id="account_title">
-            {% for v in all_accounts %}
-            <option value="{{v.account_title}}">
-            {% endfor %}
-          </datalist>
-        </div>
-        <div class="col-md-2">
-          <label for="">Account Title</label>
-          <input type="text" class="form-control form-control-sm" list="invoice" id="text_invoice">
-          <datalist id="invoice">
-          </datalist>
-        </div>
-        <div class="form-group col-md-2">
-          <label for="">Invoice Date</label>
-          <input type="date"  class="form-control form-control-sm" required value="" id="doc_date">
-        </div>
-        <div class="form-group col-md-2">
-          <label for="">Cheque No</label>
-          <input type="text"  class="form-control form-control-sm" required value="" id="cheque_no">
-        </div>
-        <div class="form-group col-md-2">
-          <label for="">Cheque Date</label>
-          <input type="date"  class="form-control form-control-sm" required value="" id="cheque_date">
-        </div>
+
+    <div class="input-group">
+      <div class="col-md-12">
+        <a role="button" href="{% url 'new-bank-payment-voucher' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
       </div>
-      <div class="from-row">
-        <div class="form-group col-md-2">
-          <label for="">Description</label>
-          <textarea name="name" style="width:370px; height:30px;" id="description"></textarea>
-        </div>
-      </div>
-      </li>
-    <li class="list-group-item">
-    <div class="table-title">
-        <div class="row">
-          <div class="col-md-2">
-            <select class="form-control form-control-sm" id="account_title">
-              {% for value in all_accounts %}
-              <option value="{{value.id}}">{{value.account_title}}</option>
-              {% endfor %}
-            </select>
-          </div>
-            <div style="margin-left:20px;">
-                <button type="button" class="btn btn-info add-item-bpv"><i class="fa fa-plus"></i>Insert Account</button>
-            </div>
-        </div>
     </div>
-    <div class="table table-responsive">
-      <table class="table table-bordered" id="new-jv-table">
+    <br>
+    <ul style="list-style-type:none;" class="messages">
+      {% if messages %}
+        {% for msg in messages %}
+          <li>
+            <div class="alert {{msg.level_tag}}">
+              {{msg.message}}
+            </div>
+          </li>
+        {% endfor %}
+      {% endif %}
+    </ul>
+    <br>
+    <div class="table table-responsive content-loader">
+      <table class="table table-bordered sort" id="dataTable">
           <thead>
               <tr>
-                  <th width="100px" style="font-size:10px;">Account Id</th>
-                  <th width="300px">Account Title</th>
-                  <th width="100px">Debit</th>
-                  <th width="100px">Credit</th>
-                  <th>Action</th>
+                  <th>Voucher No.</th>
+                  <th>Date</th>
+                  <th width="600px">Action</th>
               </tr>
           </thead>
           <tbody>
+            {% for value in all_vouchers%}
+                <tr>
+                    <td>{{value.1}}</td>
+                    <td>{{value.2}}</td>
+                    <td><a class="edit_list" href="{% url 'view-bank-payment' pk=value.0%}" data-toggle=""><i class="fas fa-eye"></i></a><a href="" target="_blank" data-toggle=""><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a><a class="delete_purchase" href="{% url 'delete-bank-payment' pk=value.0 %}"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+                </tr>
+            {% endfor %}
           </tbody>
       </table>
     </div>
-    </li>
-      <br>
-    <div class="text-center">
-      <button type="submit" class="btn btn-outline-primary">Submit <small>(BR Voucher)</small></button>
-    </div>
-    <br>
-</form>
+  </li>
 </ul>
 </div>
-
 
 {% endblock body %}

@@ -143,19 +143,19 @@
           </a>
             <div class="dropdown-menu" aria-labelledby="pagesDropdown">
             {% for role in allow_quotation_roles %}
-              {% if role.child_form == 11 %}
+              {% if role.display == 1 and role.child_form == 11 %}
                 <a class="dropdown-item" href="{% url 'rfq-customer' %}">RFQ</a>
               {% endif %}
-              {% if role.child_form == 12 %}
+              {% if role.display == 1 and role.child_form == 12 %}
                 <a class="dropdown-item" href="{% url 'quotation-customer' %}">Quotation</a>
               {% endif %}
-              {% if role.child_form == 13 %}
+              {% if role.display == 1 and role.child_form == 13 %}
                 <a class="dropdown-item" href="{% url 'purchase-order-customer' %}">Purchase Order</a>
               {% endif %}
-              {% if role.child_form == 14 %}
+              {% if role.display == 1 and role.child_form == 14 %}
                 <a class="dropdown-item" href="{% url 'delivery-challan-customer' %}">Delivery Challan</a>
               {% endif %}
-              {% if role.child_form == 15 %}
+              {% if role.display == 1 and role.child_form == 15 %}
                 <a class="dropdown-item" href="{% url 'mrn-customer' %}">MRN</a>
               {% endif %}
             {% endfor %}
@@ -181,6 +181,7 @@
           <h6 class="dropdown-header">Payment :</h6>
           <a class="dropdown-item" href="{% url 'bank-payment-voucher' %}">Bank Payment Voucher</a>
           <a class="dropdown-item" href="{% url 'cash-payment-voucher' %}">Cash Payment Voucher</a>
+
         </div>
       </li>
       <li class="nav-item dropdown">

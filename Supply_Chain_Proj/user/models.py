@@ -12,3 +12,4 @@ class UserRoles(models.Model):
     edit = models.IntegerField()
     delete = models.IntegerField()
     r_print = models.IntegerField()
+    r_return = models.IntegerField(default='0')

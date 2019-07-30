@@ -20,6 +20,7 @@ from django.template.loader import get_template
 from django.db import connection
 from django.db.models import Q
 import xlwt
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from user.models import UserRoles
 
@@ -38,6 +39,287 @@ def po_roles():
     form_name = Q(form_name = "Supplier")
     allow_po_roles = UserRoles.objects.filter(user_id, form_id, form_name).all()
     return allow_po_roles
+
+
+def allow_rfq_display(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 21)
+    display = Q(display = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, display)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_rfq_add(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 21)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_rfq_edit(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 21)
+    edit = Q(edit = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, edit)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_rfq_delete(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 21)
+    delete = Q(delete = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_quotation_display(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 22)
+    display = Q(display = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, display)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_quotation_add(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 22)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_quotation_edit(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 22)
+    edit = Q(edit = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, edit)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_quotation_delete(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 22)
+    delete = Q(delete = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
+    if allow_role:
+        return False
+    else:
+        return False
+
+
+def allow_quotation_print(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 22)
+    r_print = Q(r_print = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
+    if allow_role:
+        return False
+    else:
+        return False
+
+
+
+def allow_purchase_order_display(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 23)
+    display = Q(display = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, display)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_purchase_order_add(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 23)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_purchase_order_edit(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 23)
+    edit = Q(edit = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, edit)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_purchase_order_delete(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 23)
+    delete = Q(delete = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
+    if allow_role:
+        return False
+    else:
+        return False
+
+def allow_purchase_order_print(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 23)
+    r_print = Q(r_print = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
+    if allow_role:
+        return False
+    else:
+        return False
+
+
+def allow_delivery_challan_display(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 24)
+    display = Q(display = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, display)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_delivery_challan_add(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 24)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_delivery_challan_edit(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 24)
+    edit = Q(edit = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, edit)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_delivery_challan_delete(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 24)
+    delete = Q(delete = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
+    if allow_role:
+        return False
+    else:
+        return False
+
+def allow_delivery_challan_print(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 24)
+    r_print = Q(r_print = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
+    if allow_role:
+        return False
+    else:
+        return False
+
+
+def allow_mrn_display(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 25)
+    display = Q(display = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, display)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_mrn_edit(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 2)
+    child_form = Q(child_form = 25)
+    edit = Q(edit = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, edit)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def rfq_roles(user):
+    userid = str(user.id)
+    user_id = Q(user_id= userid)
+    child_form = Q(child_form= 21)
+    rfq_roles = UserRoles.objects.filter(user_id,child_form).first()
+    return rfq_roles
+
+
+def quotation_roles2(user):
+    userid = str(user.id)
+    user_id = Q(user_id= userid)
+    child_form = Q(child_form= 22)
+    quotation_roles = UserRoles.objects.filter(user_id,child_form).first()
+    return quotation_roles
+
+
+def purchase_order_roles(user):
+    userid = str(user.id)
+    user_id = Q(user_id= userid)
+    child_form = Q(child_form= 23)
+    po_roles = UserRoles.objects.filter(user_id,child_form).first()
+    return po_roles
+
+def delivery_challan_roles(user):
+    userid = str(user.id)
+    user_id = Q(user_id= userid)
+    child_form = Q(child_form= 24)
+    dc_roles = UserRoles.objects.filter(user_id,child_form).first()
+    return dc_roles
+
+def mrn_roles(user):
+    userid = str(user.id)
+    user_id = Q(user_id= userid)
+    child_form = Q(child_form= 25)
+    mrn_roles = UserRoles.objects.filter(user_id,child_form).first()
+    return mrn_roles
+
 
 
 
@@ -84,11 +366,14 @@ def home(request):
     total_notification_supplier = len(supplier_row)
     return render(request,'supplier/base.html',{'total_notification':total_notification,'total_notification_supplier':total_notification_supplier ,'customer_row':customer_row, 'supplier_row':supplier_row, 'allow_quotation_roles':allow_quotation_roles})
 
+@user_passes_test(allow_rfq_display)
 def rfq_supplier(request):
-    allow_quotation_roles = quotation_roles()
+    #allow_quotation_roles = quotation_roles()
+    permission = rfq_roles(request.user)
     all_rfq = RfqSupplierHeader.objects.all()
-    return render(request, 'supplier/rfq_supplier.html',{'all_rfq':all_rfq, 'allow_quotation_roles':allow_quotation_roles})
+    return render(request, 'supplier/rfq_supplier.html',{'all_rfq':all_rfq, 'permission':permission})
 
+@user_passes_test(allow_rfq_add)
 def new_rfq_supplier(request):
     allow_quotation_roles = quotation_roles()
     allow_po_roles = po_roles()
@@ -136,6 +421,7 @@ def new_rfq_supplier(request):
     return render(request,'supplier/new_rfq_supplier.html',{'get_last_rfq_no':get_last_rfq_no, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles, 'allow_po_roles':allow_po_roles})
 
 
+@user_passes_test(allow_rfq_edit)
 def edit_rfq_supplier(request,pk):
     allow_quotation_roles = quotation_roles()
     rfq_header = RfqSupplierHeader.objects.filter(id = pk).first()
@@ -181,13 +467,14 @@ def edit_rfq_supplier(request,pk):
         print("Data Already Exist")
     return render(request,'supplier/edit_rfq_supplier.html',{'rfq_header':rfq_header,'pk':pk,'rfq_detail':rfq_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
-
+@user_passes_test(allow_quotation_display)
 def quotation_supplier(request):
-    allow_quotation_roles = quotation_roles()
+    #allow_quotation_roles = quotation_roles()
+    permission = quotation_roles2(request.user)
     all_quotation = QuotationHeaderSupplier.objects.all()
-    return render(request, 'supplier/quotation_supplier.html',{'all_quotation':all_quotation,'allow_quotation_roles':allow_quotation_roles})
+    return render(request, 'supplier/quotation_supplier.html',{'all_quotation':all_quotation,'permission':permission})
 
-
+@user_passes_test(allow_quotation_add)
 def new_quotation_supplier(request):
     allow_quotation_roles = quotation_roles()
     get_last_quotation_no = QuotationHeaderSupplier.objects.last()
@@ -243,6 +530,7 @@ def new_quotation_supplier(request):
     return render(request, 'supplier/new_quotation_supplier.html',{'all_item_code':all_item_code,'get_last_quotation_no':get_last_quotation_no,'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
 
+@user_passes_test(allow_quotation_edit)
 def edit_quotation_supplier(request,pk):
     allow_quotation_roles = quotation_roles()
     quotation_header = QuotationHeaderSupplier.objects.filter(id = pk).first()
@@ -300,7 +588,7 @@ def edit_quotation_supplier(request,pk):
         return JsonResponse({"result":"success"})
     return render(request,'supplier/edit_quotation_supplier.html',{'quotation_header':quotation_header,'pk':pk,'quotation_detail':quotation_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
-
+@user_passes_test(allow_quotation_print)
 def print_quotation_supplier(request,pk):
     lines = 0
     total_amount = 0
@@ -356,12 +644,14 @@ def quotation_export_supplier(request):
     wb.save(response)
     return response
 
+@user_passes_test(allow_purchase_order_display)
 def purchase_order_supplier(request):
-    allow_quotation_roles = quotation_roles()
+    #allow_quotation_roles = quotation_roles()
+    permission = purchase_order_roles(request.user)
     all_po = PoHeaderSupplier.objects.all()
-    return render(request, 'supplier/purchase_order_supplier.html',{'all_po':all_po,'allow_quotation_roles':allow_quotation_roles})
+    return render(request, 'supplier/purchase_order_supplier.html',{'all_po':all_po,'permission':permission})
 
-
+@user_passes_test(allow_purchase_order_add)
 def new_purchase_order_supplier(request):
     allow_quotation_roles = quotation_roles()
     get_last_po_no = PoHeaderSupplier.objects.last()
@@ -413,6 +703,7 @@ def new_purchase_order_supplier(request):
     return render(request, 'supplier/new_purchase_order_supplier.html',{'all_item_code':all_item_code,'get_last_po_no':get_last_po_no, 'all_accounts': all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
 
+@user_passes_test(allow_purchase_order_edit)
 def edit_purchase_order_supplier(request,pk):
     allow_quotation_roles = quotation_roles()
     po_header = PoHeaderSupplier.objects.filter(id = pk).first()
@@ -467,6 +758,7 @@ def edit_purchase_order_supplier(request,pk):
         return JsonResponse({"result":"success"})
     return render(request,'supplier/edit_purchase_order_supplier.html',{'po_header':po_header,'pk':pk,'po_detail':po_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
+@user_passes_test(allow_purchase_order_print)
 def print_po_supplier(request,pk):
     lines = 0
     total_amount = 0
@@ -492,13 +784,14 @@ def print_po_supplier(request,pk):
         return response
     return HttpResponse("Not found")
 
-
+@user_passes_test(allow_delivery_challan_display)
 def delivery_challan_supplier(request):
-    allow_quotation_roles = quotation_roles()
+    #allow_quotation_roles = quotation_roles()
+    permission = delivery_challan_roles(request.user)
     all_dc = DcHeaderSupplier.objects.all()
-    return render(request, 'supplier/delivery_challan_supplier.html',{'all_dc':all_dc,'allow_quotation_roles':allow_quotation_roles})
+    return render(request, 'supplier/delivery_challan_supplier.html',{'all_dc':all_dc,'permission':permission})
 
-
+@user_passes_test(allow_delivery_challan_add)
 def new_delivery_challan_supplier(request):
     allow_quotation_roles = quotation_roles()
     all_item_code = Add_products.objects.all()
@@ -540,7 +833,7 @@ def new_delivery_challan_supplier(request):
         return JsonResponse({'result':'success'})
     return render(request, 'supplier/new_delivery_challan_supplier.html',{'all_item_code':all_item_code,'get_last_dc_no':get_last_dc_no,'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
-
+@user_passes_test(allow_delivery_challan_edit)
 def edit_delivery_challan_supplier(request,pk):
     allow_quotation_roles = quotation_roles()
     dc_header = DcHeaderSupplier.objects.filter(id = pk).first()
@@ -577,7 +870,7 @@ def edit_delivery_challan_supplier(request,pk):
         return JsonResponse({"result":"success"})
     return render(request,'supplier/edit_delivery_challan_supplier.html',{'dc_header':dc_header,'pk':pk,'dc_detail':dc_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_quotation_roles':allow_quotation_roles})
 
-
+@user_passes_test(allow_delivery_challan_print)
 def print_dc_supplier(request,pk):
     lines = 0
     company_info = Company_info.objects.all()
@@ -598,13 +891,14 @@ def print_dc_supplier(request,pk):
     return HttpResponse("Not found")
 
 
-
+@user_passes_test(allow_mrn_display)
 def mrn_supplier(request):
-    allow_quotation_roles = quotation_roles()
+    #allow_quotation_roles = quotation_roles()
+    permission = mrn_roles(request.user)
     all_dc = DcHeaderSupplier.objects.all()
-    return render(request, 'supplier/mrn_supplier.html',{'all_dc':all_dc,'allow_quotation_roles':allow_quotation_roles})
+    return render(request, 'supplier/mrn_supplier.html',{'all_dc':all_dc,'permission':permission})
 
-
+@user_passes_test(allow_mrn_edit)
 def edit_mrn_supplier(request,pk):
     allow_quotation_roles = quotation_roles()
     dc_header = DcHeaderSupplier.objects.filter(id=pk).first()

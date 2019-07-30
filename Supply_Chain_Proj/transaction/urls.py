@@ -33,10 +33,28 @@ urlpatterns = [
     path('journal_voucher/edit/<pk>', views.edit_journal_voucher, name = 'edit-journal-voucher'),
 
 
-    path('bank_receiving_voucher/new', views.bank_receiving_voucher, name = 'bank-receiving-voucher'),
-    path('cash_receiving_voucher/new/', views.cash_receiving_voucher, name = 'cash-receiving-voucher'),
-    path('cash_payment_voucher/new', views.cash_payment_voucher, name = 'cash-payment-voucher'),
-    path('bank_payment_voucher/new', views.bank_payment_voucher, name = 'bank-payment-voucher'),
+    path('cash_receiving_voucher', views.cash_receiving_voucher, name='cash-receiving-voucher'),
+    path('cash_receiving_voucher/new/', views.new_cash_receiving_voucher, name='new-cash-receiving-voucher'),
+    path('cash_receiving_voucher/view/<pk>', views.view_cash_receiving, name='view-cash-receiving'),
+    path('cash_receiving_voucher/delete/<pk>', views.delete_cash_receiving, name='delete-cash-receiving'),
+    path('crv_pdf/<pk>', views.crv_pdf, name='crv'),
+
+    path('bank_receiving_voucher', views.bank_receiving_voucher, name='bank-receiving-voucher'),
+    path('bank_receiving_voucher/new/', views.new_bank_receiving_voucher, name='new-bank-receiving-voucher'),
+    path('bank_receiving_voucher/view/<pk>', views.view_bank_receiving, name='view-bank-receiving'),
+    path('bank_receiving_voucher/delete/<pk>', views.delete_bank_receiving, name='delete-bank-receiving'),
+
+
+    path('bank_payment_voucher', views.bank_payment_voucher, name='bank-payment-voucher'),
+    path('bank_payment_voucher/new/', views.new_bank_payment_voucher, name='new-bank-payment-voucher'),
+    path('bank_payment_voucher/view/<pk>', views.view_bank_payment, name='view-bank-payment'),
+    path('bank_payment_voucher/delete/<pk>', views.delete_bank_payment, name='delete-bank-payment'),
+
+
+    path('cash_payment_voucher', views.cash_payment_voucher, name='cash-payment-voucher'),
+    path('cash_payment_voucher/new/', views.new_cash_payment_voucher, name='new-cash-payment-voucher'),
+    path('cash_payment_voucher/view/<pk>', views.view_cash_payment, name='view-cash-payment'),
+    path('cash_payment_voucher/delete/<pk>', views.delete_cash_payment, name='delete-cash-payment'),
 
 
     path('trial_balance/pdf', views.trial_balance, name = 'trial-balance'),

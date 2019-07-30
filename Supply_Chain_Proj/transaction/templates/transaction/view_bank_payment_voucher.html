@@ -1,0 +1,61 @@
+{% extends 'supplier/base.html' %}
+{% load crispy_forms_tags %}
+{% load mathfilters %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+    <div class="card-header">
+      <h4>Bank Payment Voucher</h4>
+    </div>
+    <ul class="list-group list-group-flush">
+    <form  action="" id="edit-jv-form-crv" autocomplete="off"  method="post">
+      {% csrf_token %}
+      <li class="list-group-item">
+          <div class="form-row">
+            <div class="form-group col-md-2">
+              <label for="">Transaction ID</label>
+              <input type="text" readonly class="form-control form-control-sm" readonly  value="{{ voucher_header.voucher_no }}">
+            </div>
+            <div class="form-group col-md-2">
+              <label for="">Date</label>
+              <input type="date" readonly class="form-control form-control-sm" readonly  value="{{voucher_header.doc_date|date:"Y-m-d"}}">
+            </div>
+            <div class="form-group col-md-2">
+              <label for="">Description</label>
+              <textarea name="name" style="width:370px; height:30px;" id="description">{{ voucher_header.description }}</textarea>
+            </div>
+          </div>
+          </li>
+        <li class="list-group-item">
+        <div class="table table-responsive">
+          <table class="table table-bordered" id="view-crv-table">
+              <thead>
+                  <tr>
+                      <th width="100px" style="font-size:10px;">Account Id</th>
+                      <th width="300px">Account Title</th>
+                      <th width="100px">Debit</th>
+                      <th width="100px">Credit</th>
+                  </tr>
+              </thead>
+              <tbody>
+                {% for v in voucher_detail %}
+                  <tr>
+                    <td>{{v.account_id.id}}</td>
+                    <td>{{v.account_id.account_title}}</td>
+                    <td>{{v.debit}}</td>
+                    <td>{{v.credit|abs}}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+          </table>
+        </div>
+        </li>
+          <br>
+        <div class="text-center">
+          <a type="button" href="{% url 'bank-payment-voucher' %}" class="btn btn-outline-primary"">Go Back</a>
+        </div>
+        <br>
+    </form>
+    </ul>
+</div>
+{% endblock body %}

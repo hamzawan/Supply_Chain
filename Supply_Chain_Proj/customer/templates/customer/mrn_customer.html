@@ -27,7 +27,12 @@
                 <td>{{ value.dc_no }}</td>
                 <td>{{ value.account_id.account_title }}</td>
                 <td>{{ value.date }}</td>
-                <td><a class="edit_list" href="{% url 'edit-mrn-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a></td>
+                <td>
+                
+                    {% if permission.edit == 1 %}
+                  <a class="edit_list" href="{% url 'edit-mrn-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
+                  {% endif %}
+                </td>
             </tr>
             {% endfor %}
           </tbody>

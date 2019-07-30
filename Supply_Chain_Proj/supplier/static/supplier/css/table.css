@@ -2568,11 +2568,8 @@ line-height: 13px;
 margin-right: 4px;
 }
 
-.table-title .add-item-jv i {
-margin-right: 4px;
-}
 
-.table-title .add-item-cpv {
+.table-title .load-invoices-brv {
 float: right;
 height: 30px;
 font-weight: bold;
@@ -2582,9 +2579,42 @@ min-width: 100px;
 border-radius: 50px;
 line-height: 13px;
 }
-.table-title .add-item-cpv i {
+.table-title .load-invoices-brv i {
 margin-right: 4px;
 }
+
+.table-title .load-invoices-bpv {
+float: right;
+height: 30px;
+font-weight: bold;
+font-size: 12px;
+text-shadow: none;
+min-width: 100px;
+border-radius: 50px;
+line-height: 13px;
+}
+.table-title .load-invoices-bpv i {
+margin-right: 4px;
+}
+
+.table-title .load-invoices-cpv {
+float: right;
+height: 30px;
+font-weight: bold;
+font-size: 12px;
+text-shadow: none;
+min-width: 100px;
+border-radius: 50px;
+line-height: 13px;
+}
+.table-title .load-invoices-cpv i {
+margin-right: 4px;
+}
+
+.table-title .add-item-jv i {
+margin-right: 4px;
+}
+
 
 .table-title .add-item-jv i {
 margin-right: 4px;

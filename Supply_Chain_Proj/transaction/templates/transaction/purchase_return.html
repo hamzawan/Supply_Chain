@@ -65,7 +65,19 @@
               <td id="sales_tax">{{ value.sales_tax }}</td>
               <td id="sales_tax_amount">{{sales_tax_amount|floatformat:2}}</td>
               <td id="total">{{sales_tax_amount|add:goods_amount|floatformat:2}}</td>
-              <td><a class="add-purchase-return" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-purchase-return" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-purchase-return" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+              <td>
+                {% if permission.add == 1 %}
+                <a class="add-purchase-return" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a>
+                {% endif %}
+
+                {% if permission.edit == 1 %}
+                <a class="edit-purchase-return" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
+                {% endif %}
+
+                {% if permission.delete == 1 %}
+                <a class="delete-purchase-return" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                {% endif %}
+              </td>
             </tr>
             {% endwith %}
             {% endfor %}
