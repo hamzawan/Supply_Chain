@@ -11,7 +11,11 @@
 
     <div class="input-group">
       <div class="col-md-12">
+        {% if permission.add == 1 %}
         <a role="button" href="{% url 'new-cash-receiving-voucher' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
+        {% else %}
+        <a role="button" href="#" style="float:right;" class="btn btn-outline-secondary disabled" name="button"><i class="fas fa-plus"></i> Add New</a>
+        {% endif %}
       </div>
     </div>
     <br>
@@ -41,7 +45,20 @@
                 <tr>
                     <td>{{value.1}}</td>
                     <td>{{value.2}}</td>
-                    <td><a class="edit_list" href="{% url 'view-cash-receiving' pk=value.0%}" data-toggle=""><i class="fas fa-eye"></i></a><a href="{% url 'crv' pk=value.0%}" target="_blank" data-toggle=""><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a><a class="delete_purchase" href="{% url 'delete-cash-receiving' pk=value.0 %}"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+                    <td>
+                      {% if permission.display == 1 %}
+                      <a class="edit_list" href="{% url 'view-cash-receiving' pk=value.0%}" data-toggle=""><i class="fas fa-eye"></i></a>
+                      {% endif %}
+                      
+                      {% if permission.r_print == 1 %}
+                      <a href="{% url 'crv' pk=value.0%}" target="_blank" data-toggle=""><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a>
+                      {% endif %}
+                      
+                      {% if permission.delete == 1 %}
+                      <a class="delete_purchase" href="{% url 'delete-cash-receiving' pk=value.0 %}"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                      {% endif %}
+                    
+                    </td>
                 </tr>
             {% endfor %}
           </tbody>
