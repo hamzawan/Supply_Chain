@@ -1,7 +1,7 @@
 from django.db import models
 from transaction.models import ChartOfAccount
 import datetime
-# from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 from supplier.models import Company_info
 from inventory.models import Add_products
 
@@ -19,6 +19,7 @@ class RfqCustomerHeader(models.Model):
     footer_remarks = models.TextField()
     company_id = models.ForeignKey(Company_info, models.SET_NULL, blank = True, null = True)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL, blank=True, null=True)
+    user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
 
 class RfqCustomerDetail(models.Model):
     item_id = models.ForeignKey(Add_products, models.SET_NULL, blank = True, null = True)
@@ -43,7 +44,7 @@ class QuotationHeaderCustomer(models.Model):
     footer_remarks = models.TextField()
     company_id = models.ForeignKey(Company_info, models.SET_NULL, blank = True, null = True)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
-
+    user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
 
 class QuotationDetailCustomer(models.Model):
     item_id = models.ForeignKey(Add_products, models.SET_NULL, blank = True, null = True)
@@ -69,7 +70,7 @@ class PoHeaderCustomer(models.Model):
     show_notification = models.BooleanField(default = True)
     footer_remarks = models.TextField()
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
-
+    user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
 
 class PoDetailCustomer(models.Model):
     item_id = models.ForeignKey(Add_products, models.SET_NULL, blank = True, null = True)
@@ -89,6 +90,8 @@ class DcHeaderCustomer(models.Model):
     cartage_amount = models.DecimalField(max_digits = 8, decimal_places = 2)
     comments = models.CharField(max_length = 100)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True)
+    user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
+    
 
 class DcDetailCustomer(models.Model):
     item_id = models.ForeignKey(Add_products, models.SET_NULL, blank = True, null = True)

@@ -38,8 +38,8 @@
           <br>
           <label for="">Fiscal Year</label>
           <select class="form-control" name="sel_fiscal">
-            {% for v in company %}
-            <option value="{{v.id}}">{{v.company_name}}</option>
+            {% for v in fiscal_year %}
+            <option value="{{v.id}}">{{v.fiscal_year}}</option>
             {% endfor %}
           </select>
           <br>

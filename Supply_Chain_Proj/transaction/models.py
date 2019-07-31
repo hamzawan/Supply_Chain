@@ -1,6 +1,7 @@
 from django.db import models
 from inventory.models import Add_products
 import datetime
+from django.contrib.auth.models import User
 
 
 class ChartOfAccount(models.Model):
@@ -16,6 +17,7 @@ class ChartOfAccount(models.Model):
     Address = models.CharField(max_length = 200)
     remarks = models.CharField(max_length = 100)
     credit_limit = models.DecimalField(max_digits = 8, decimal_places = 2)
+    user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
 
 
 class PurchaseHeader(models.Model):
@@ -29,6 +31,8 @@ class PurchaseHeader(models.Model):
     withholding_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
     follow_up = models.DateField(blank = True)
+    user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
+
 
 class PurchaseDetail(models.Model):
     item_id = models.ForeignKey(Add_products, models.SET_NULL, blank = True, null = True)
@@ -49,6 +53,8 @@ class PurchaseReturnHeader(models.Model):
     additional_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
     withholding_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
+    user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
+
 
 class PurchaseReturnDetail(models.Model):
     item_id = models.ForeignKey(Add_products, models.SET_NULL, blank = True, null = True)
@@ -70,7 +76,7 @@ class SaleHeader(models.Model):
     withholding_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
     follow_up = models.DateField(blank = True)
-
+    user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
 
 class SaleDetail(models.Model):
     item_id = models.ForeignKey(Add_products, models.SET_NULL, blank = True, null = True)
@@ -93,6 +99,8 @@ class SaleReturnHeader(models.Model):
     additional_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
     withholding_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True)
+    user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
+
 
 class SaleReturnDetail(models.Model):
     item_id = models.ForeignKey(Add_products, models.SET_NULL, blank = True, null = True)
@@ -104,6 +112,8 @@ class SaleReturnDetail(models.Model):
     hs_code = models.CharField(max_length = 100)
     sale_return_id = models.ForeignKey(SaleReturnHeader, on_delete = models.CASCADE)
 
+
+
 class VoucherHeader(models.Model):
     voucher_no = models.CharField(max_length = 100)
     date = models.DateField(default = datetime.date.today)
@@ -112,6 +122,8 @@ class VoucherHeader(models.Model):
     cheque_no = models.CharField(max_length = 100)
     cheque_date = models.DateField(max_length = datetime.date.today)
     description = models.TextField()
+    user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
+
 
 
 class VoucherDetail(models.Model):
@@ -133,3 +145,4 @@ class Transactions(models.Model):
     ref_inv_tran_type = models.CharField(max_length = 100)
     remarks = models.CharField(max_length = 100)
     voucher_id = models.CharField(max_length = 100)
+    user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)

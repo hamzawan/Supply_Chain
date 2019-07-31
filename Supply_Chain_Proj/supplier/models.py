@@ -1,6 +1,7 @@
 from django.db import models
 from transaction.models import ChartOfAccount
 import datetime
+from django.contrib.auth.models import User
 
 class RfqSupplierHeader(models.Model):
     rfq_no = models.CharField(max_length = 100)
@@ -10,6 +11,8 @@ class RfqSupplierHeader(models.Model):
     show_notification = models.BooleanField(default = True)
     footer_remarks = models.TextField()
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
+    user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
+
 
 class RfqSupplierDetail(models.Model):
     item_code = models.CharField(max_length = 100)
@@ -35,6 +38,8 @@ class QuotationHeaderSupplier(models.Model):
     show_notification = models.BooleanField(default = True)
     footer_remarks = models.TextField()
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
+    user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
+
 
 class QuotationDetailSupplier(models.Model):
     item_code = models.CharField(max_length = 100)
@@ -63,6 +68,8 @@ class PoHeaderSupplier(models.Model):
     show_notification = models.BooleanField(default = True)
     footer_remarks = models.TextField()
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
+    user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
+
 
 
 class PoDetailSupplier(models.Model):
@@ -85,6 +92,8 @@ class DcHeaderSupplier(models.Model):
     show_notification = models.BooleanField(default = True)
     follow_up = models.DateField(blank = True)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
+    user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
+
 
 class DcDetailSupplier(models.Model):
     item_code = models.CharField(max_length = 100)
@@ -111,3 +120,4 @@ class Company_info(models.Model):
     ntn = models.CharField(max_length = 100)
     stn = models.CharField(max_length = 100)
     cnic = models.CharField(max_length = 100)
+    user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
