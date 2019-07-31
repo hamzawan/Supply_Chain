@@ -9,10 +9,7 @@ from django.contrib import messages
 from supplier.views import customer_roles,supplier_roles,transaction_roles,inventory_roles
 from django.db.models import Q
 from django.contrib.auth.decorators import user_passes_test
-<<<<<<< HEAD
 from django.db.models import Q
-=======
->>>>>>> cf0357b00e1076a42c33affaa68e1201868db7fb
 from user.models import UserRoles
 
 def inventory_form_roles(user):
@@ -189,12 +186,9 @@ def edit_item(request,pk):
 def item_avaliable(pk):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
-<<<<<<< HEAD
     allow_transaction_roles = transaction_roles(request.user)
-=======
-    allow_transaction_roles = transaction_roles(request.user)    
+    allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
->>>>>>> cf0357b00e1076a42c33affaa68e1201868db7fb
     cusror = connection.cursor()
     row = cusror.execute('''select case
                              when exists (select id from customer_rfqcustomerdetail  where item_id_id = %s)
