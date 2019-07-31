@@ -33,4 +33,5 @@ urlpatterns = [
 
     path('show_notification_supplier/', views.show_notification_supplier, name = 'show-notification-supplier'),
     path('update_notification_supplier/', views.update_notification_supplier, name = 'update-notification-supplier'),
+
 ]

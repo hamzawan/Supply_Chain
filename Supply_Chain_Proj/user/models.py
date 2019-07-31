@@ -13,3 +13,9 @@ class UserRoles(models.Model):
     delete = models.IntegerField()
     r_print = models.IntegerField()
     r_return = models.IntegerField(default='0')
+
+
+class FiscalYear(models.Model):
+    fiscal_year = models.CharField(max_length = 100)
+    database_name = models.CharField(max_length = 100)
+    is_current_year = models.IntegerField()

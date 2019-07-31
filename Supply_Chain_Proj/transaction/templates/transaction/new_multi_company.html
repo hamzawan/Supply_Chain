@@ -1,0 +1,104 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Create Company</h4>
+</div>
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">
+    <form class="" action="{% url 'new-multi-companies' %}" method="post" autocomplete="off">
+      {% csrf_token %}
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body">
+          <div class="float-right">
+            <form>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Company Name:</label>
+                <div class="col-sm-8">
+                  <input type="select" class="form-control form-control-sm" required name="company_name" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Company Address:</label>
+                <div class="col-sm-8">
+                  <input type="select" class="form-control form-control-sm"  name="company_address" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label" >Company Logo:</label>
+                <div class="col-sm-8">
+                  <input type="file" class="form-control form-control-sm" name="opening_balance" placeholder="">
+                </div>
+                <div class="col-md-4">
+                  <label></label>&nbsp;&nbsp;&nbsp;&nbsp;
+                  <label></label>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Phone No:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="phone_no" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Mobile No:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="mobile_no" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Email Address:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="email_address" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">Web Site:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="web_site" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">NTN:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="ntn" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">STN:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="stn" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label">CNIC:</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control form-control-sm" name="cnic" placeholder="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="" class="col-sm-4 form-control-sm col-form-label"></label>
+                <div class="col-sm-8">
+                  <input type="submit" class="btn btn-outline-primary form-control" placeholder="" value="Create">
+                </div>
+              </div>
+            </form>
+              </div>
+              </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+    </div>
+    </form>
+  </li>
+  </ul>
+</div>
+{% endblock body %}

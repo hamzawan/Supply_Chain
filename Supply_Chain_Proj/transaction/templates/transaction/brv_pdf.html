@@ -41,7 +41,7 @@
          {% for value in company_info %}
          <h1 style="text-align:center; font-size:250%; font-family: "Times New Roman", Times, serif; " color="#0a012c" ><b>{{value.company_name}}</b></h1>
          {% endfor %}
-         <p style="text-align:center; padding-top:-30px ;font-size:200%; font-family: "Times New Roman", Times, serif; " color="#0a012c"  ><u>CASH RECEIPT VOUCHER</u></p>
+         <p style="text-align:center; padding-top:-30px ;font-size:200%; font-family: "Times New Roman", Times, serif; " color="#0a012c"  ><u>BANK RECEIPT VOUCHER</u></p>
      </div>
     </div>
 
@@ -74,7 +74,7 @@
          <font size="5">DATE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</font><font size="5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{header.date}}</font>
          <br>
          <br>
-         <font size="5">CASH ACCOUNT&nbsp;&nbsp;&nbsp;&nbsp;:</font><font size="5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CASH IN HAND</font>
+         <font size="5">BANK ACCOUNT&nbsp;&nbsp;&nbsp;&nbsp;:</font><font size="5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{bank.account_id.account_title}}</font>
       <br>
     </div>
       <table cellpadding="3" id="item_table" repeat="1">

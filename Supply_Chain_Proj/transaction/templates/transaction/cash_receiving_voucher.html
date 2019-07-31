@@ -39,9 +39,9 @@
           <tbody>
             {% for value in all_vouchers%}
                 <tr>
-                    <td>{{value.voucher_no}}</td>
-                    <td>{{value.doc_date}}</td>
-                    <td><a class="edit_list" href="{% url 'view-cash-receiving' pk=value.id%}" data-toggle=""><i class="fas fa-eye"></i></a><a href="{% url 'crv' pk=value.id%}" target="_blank" data-toggle=""><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a><a class="delete_purchase" href="{% url 'delete-cash-receiving' pk=value.id %}"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+                    <td>{{value.1}}</td>
+                    <td>{{value.2}}</td>
+                    <td><a class="edit_list" href="{% url 'view-cash-receiving' pk=value.0%}" data-toggle=""><i class="fas fa-eye"></i></a><a href="{% url 'crv' pk=value.0%}" target="_blank" data-toggle=""><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a><a class="delete_purchase" href="{% url 'delete-cash-receiving' pk=value.0 %}"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
                 </tr>
             {% endfor %}
           </tbody>

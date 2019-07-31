@@ -1,0 +1,56 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Multi Companies</h4>
+</div>
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">
+    <!-- <div class="form-row">
+      <input type="text" name=""class="form-control col-md-2" value="">
+    </div> -->
+    <div class="input-group">
+      <div class="col-md-12">
+        <a role="button" href="{% url 'new-multi-companies' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
+      </div>
+    </div>
+    <br>
+    <div class="table table-responsive content-loader">
+      <table class="table table-bordered sort" id="dataTable">
+          <thead>
+              <tr>
+                  <th width="140px">S. No</th>
+                  <th >Company Name</th>
+                  <th >Created Date</th>
+                  <th >Created By</th>
+                  <th >Email</th>
+                  <th >Website</th>
+                  <th width="400px">Action</th>
+              </tr>
+          </thead>
+          <tbody>
+            {% for value in all_companies %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+                <td>{{ value.company_name }}</td>
+                <td>{{ value.date }}</td>
+                <td>Admin</td>
+                <td>{{ value.email }}</td>
+                <td>{{ value.website }}</td>
+                <td>
+                  <a class="edit_list" href="{% url 'edit-purchase' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
+                  <a class="delete_purchase"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+    </div>
+  </li>
+</ul>
+</div>
+
+
+{% endblock body %}

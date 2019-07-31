@@ -17,6 +17,7 @@ from user.models import UserRoles
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from num2words import num2words
+from supplier.models import Company_info
 
 def allow_coa_display(user):
     user_id = Q(user_id = user.id)
@@ -1248,12 +1249,15 @@ def view_cash_receiving(request, pk):
     header_id = VoucherHeader.objects.get(id=pk)
     voucher_header = VoucherHeader.objects.filter(id=pk).first()
     voucher_detail = VoucherDetail.objects.filter(header_id=header_id.id).all()
+    print(voucher_detail)
     return render(request, 'transaction/view_cash_receiving_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail})
 
 
 def cash_receiving_voucher(request):
     cursor = connection.cursor()
-    all_vouchers = VoucherHeader.objects.all()
+    all_vouchers = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%CRV%'
+                                        order by voucher_no''')
+    all_vouchers = all_vouchers.fetchall()
     return render(request, 'transaction/cash_receiving_voucher.html', {'all_vouchers': all_vouchers})
 
 
@@ -1779,16 +1783,92 @@ def delete_cash_payment(request,pk):
 def crv_pdf(request, pk):
     company_info = Company_info.objects.all()
     header = VoucherHeader.objects.filter(id = pk).first()
+    details = VoucherDetail.objects.filter(debit = 0,header_id = pk).first()
     cursor = connection.cursor()
+    print(details.account_id.id)
     detail = cursor.execute('''select sum(VD.credit) as Amount,COA.account_title, COA.account_id
                             from transaction_voucherdetail VD
                             inner join transaction_voucherheader VH on VH.id = VD.header_id_id
                             inner join transaction_chartofaccount COA on VD.account_id_id = COA.id
-                            where VD.header_id_id = '16' AND VD.account_id_id = '14'
-                            ''')
+                            where VD.header_id_id = %s AND VD.account_id_id = %s
+                            ''',[header.id,details.account_id.id])
     detail = detail.fetchall()
+    print(detail)
     amount_in_words =  num2words(abs(detail[0][0]))
     pdf = render_to_pdf('transaction/crv_pdf.html', {'company_info':company_info, 'header':header, 'detail':detail, 'amount_in_words':amount_in_words})
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "CashReceivingVoucher.pdf"
+        content = "inline; filename='%s'" %(filename)
+        response['Content-Disposition'] = content
+        return response
+    return HttpResponse("Not found")
+
+
+def cpv_pdf(request, pk):
+    company_info = Company_info.objects.all()
+    header = VoucherHeader.objects.filter(id = pk).first()
+    details = VoucherDetail.objects.filter(credit = 0,header_id = pk).first()
+    cursor = connection.cursor()
+    detail = cursor.execute('''select sum(VD.debit) as Amount,COA.account_title, COA.account_id
+                            from transaction_voucherdetail VD
+                            inner join transaction_voucherheader VH on VH.id = VD.header_id_id
+                            inner join transaction_chartofaccount COA on VD.account_id_id = COA.id
+                            where VD.header_id_id = %s AND VD.account_id_id = %s
+                            ''',[header.id,details.account_id.id])
+    detail = detail.fetchall()
+    amount_in_words =  num2words(abs(detail[0][0]))
+    pdf = render_to_pdf('transaction/cpv_pdf.html', {'company_info':company_info, 'header':header, 'detail':detail, 'amount_in_words':amount_in_words})
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "CashReceivingVoucher.pdf"
+        content = "inline; filename='%s'" %(filename)
+        response['Content-Disposition'] = content
+        return response
+    return HttpResponse("Not found")
+
+
+def bpv_pdf(request, pk):
+    company_info = Company_info.objects.all()
+    header = VoucherHeader.objects.filter(id = pk).first()
+    details = VoucherDetail.objects.filter(credit = 0,header_id = pk).first()
+    cursor = connection.cursor()
+    detail = cursor.execute('''select sum(VD.debit) as Amount,COA.account_title, COA.account_id
+                            from transaction_voucherdetail VD
+                            inner join transaction_voucherheader VH on VH.id = VD.header_id_id
+                            inner join transaction_chartofaccount COA on VD.account_id_id = COA.id
+                            where VD.header_id_id = %s AND VD.account_id_id = %s
+                            ''',[header.id,details.account_id.id])
+    detail = detail.fetchall()
+    amount_in_words =  num2words(abs(detail[0][0]))
+    bank = VoucherDetail.objects.filter(debit = 0, header_id = pk).first()
+    pdf = render_to_pdf('transaction/bpv_pdf.html', {'company_info':company_info, 'header':header, 'detail':detail, 'amount_in_words':amount_in_words,'bank':bank})
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "CashReceivingVoucher.pdf"
+        content = "inline; filename='%s'" %(filename)
+        response['Content-Disposition'] = content
+        return response
+    return HttpResponse("Not found")
+
+
+def brv_pdf(request, pk):
+    company_info = Company_info.objects.all()
+    header = VoucherHeader.objects.filter(id = pk).first()
+    details = VoucherDetail.objects.filter(debit = 0,header_id = pk).first()
+    cursor = connection.cursor()
+    print(details.account_id.id)
+    detail = cursor.execute('''select sum(VD.credit) as Amount,COA.account_title, COA.account_id
+                            from transaction_voucherdetail VD
+                            inner join transaction_voucherheader VH on VH.id = VD.header_id_id
+                            inner join transaction_chartofaccount COA on VD.account_id_id = COA.id
+                            where VD.header_id_id = %s AND VD.account_id_id = %s
+                            ''',[header.id,details.account_id.id])
+    detail = detail.fetchall()
+    print(detail)
+    amount_in_words =  num2words(abs(detail[0][0]))
+    bank = VoucherDetail.objects.filter(credit = 0, header_id = pk).first()
+    pdf = render_to_pdf('transaction/brv_pdf.html', {'company_info':company_info, 'header':header, 'detail':detail, 'amount_in_words':amount_in_words,'bank':bank})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "CashReceivingVoucher.pdf"
@@ -2075,3 +2155,24 @@ def commercial_invoice(request,pk):
         response['Content-Disposition'] = content
         return response
     return HttpResponse("Not found")
+
+
+def multi_companies(request):
+    all_companies = Company_info.objects.all()
+    return render(request,'transaction/multi_companies.html',{'all_companies':all_companies})
+
+
+def new_multi_companies(request):
+    if request.method == 'POST':
+        company_name = request.POST.get('company_name')
+        company_address = request.POST.get('company_address')
+        phone_no = request.POST.get('phone_no')
+        mobile_no = request.POST.get('mobile_no')
+        email_address = request.POST.get('email_address')
+        web_site = request.POST.get('web_site')
+        ntn = request.POST.get('ntn')
+        stn = request.POST.get('stn')
+        cnic = request.POST.get('cnic')
+        new_companies = Company_info(company_name = company_name, company_address = company_address, phone_no = phone_no, email = email_address,  website = web_site, ntn = ntn, stn = stn, cnic = cnic)
+        new_companies.save()
+    return render(request,'transaction/new_multi_company.html')
