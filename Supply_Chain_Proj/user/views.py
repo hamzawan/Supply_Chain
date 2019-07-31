@@ -6,12 +6,14 @@ from .forms import RegistrationFrom
 from  supplier.models import Company_info
 from .models import UserRoles, FiscalYear
 from django.db.models import Q
-from supplier.views import customer_roles,supplier_roles,transaction_roles
+from supplier.views import customer_roles,supplier_roles,transaction_roles,inventory_roles
+
 
 def register(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -20,7 +22,7 @@ def register(request):
             return redirect('login')
     else:
         form = RegistrationFrom
-    return render(request, 'user/register.html', {'form': form,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request, 'user/register.html', {'form': form,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 def forgot_password(request):
@@ -39,6 +41,7 @@ def user_roles(request,pk):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     user = User.objects.filter(id = pk)
     user_id = User.objects.get(id = pk)
     user_id = Q(user_id = pk)
@@ -933,12 +936,13 @@ def user_roles(request,pk):
 
 
     return render(request, 'user/user_roles.html',{'user':user,'allow_role':allow_role,'allow_role_supplier':allow_role_supplier,'allow_role_transaction':allow_role_transaction,
-    'allow_role_inventory':allow_role_inventory,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    'allow_role_inventory':allow_role_inventory,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 def user_list(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     all_user = User.objects.all()
-    return render(request, 'user/users.html',{'all_user':all_user,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request, 'user/users.html',{'all_user':all_user,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})

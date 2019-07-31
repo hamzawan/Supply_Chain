@@ -19,7 +19,8 @@ from django.core import mail
 from django.core.mail import EmailMessage
 from user.models import UserRoles
 from django.contrib.auth.decorators import user_passes_test
-from supplier.views import customer_roles,supplier_roles,transaction_roles
+from supplier.views import customer_roles,supplier_roles,transaction_roles,inventory_roles
+
 
 def allow_rfq_display(user):
     user_id = Q(user_id = user.id)
@@ -329,17 +330,20 @@ def rfq_customer(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     permission = rfq_roles(request.user)
     company = Q(company_id = company)
     all_rfq = RfqCustomerHeader.objects.filter(company).all()
     return render(request, 'customer/rfq_customer.html',{'all_rfq':all_rfq,
-    'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+
 
 @user_passes_test(bool_allow_rfq_add)
 def new_rfq_customer(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     get_last_rfq_no = RfqCustomerHeader.objects.last()
     all_item_code = Add_products.objects.all()
     all_accounts = ChartOfAccount.objects.all()
@@ -378,7 +382,7 @@ def new_rfq_customer(request):
             rfq_detail = RfqCustomerDetail(item_id = item_id, quantity = value["quantity"],rfq_id = header_id)
             rfq_detail.save()
         return JsonResponse({"result": "success"})
-    return render(request,'customer/new_rfq_customer.html',{'get_last_rfq_no':get_last_rfq_no,'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request,'customer/new_rfq_customer.html',{'get_last_rfq_no':get_last_rfq_no,'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 @user_passes_test(allow_rfq_edit)
@@ -386,6 +390,7 @@ def edit_rfq_customer(request,pk):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     rfq_header = RfqCustomerHeader.objects.filter(id = pk).first()
     rfq_detail = RfqCustomerDetail.objects.filter(rfq_id = pk).all()
     all_accounts = ChartOfAccount.objects.all()
@@ -428,7 +433,7 @@ def edit_rfq_customer(request,pk):
             return JsonResponse({"result":"success"})
     except IntegrityError:
         print("Data Already Exist")
-    return render(request,'customer/edit_rfq_customer.html',{'rfq_header':rfq_header,'pk':pk,'rfq_detail':rfq_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request,'customer/edit_rfq_customer.html',{'rfq_header':rfq_header,'pk':pk,'rfq_detail':rfq_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 @user_passes_test(allow_quotation_display)
@@ -441,7 +446,10 @@ def quotation_customer(request):
     company = Q(company_id = company)
     permission = quotation_roles(request.user)
     all_quotation = QuotationHeaderCustomer.objects.filter(company).all()
-    return render(request, 'customer/quotation_customer.html',{'all_quotation':all_quotation,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'permission':permission})
+    allow_inventory_roles = inventory_roles(request.user)
+    permission = quotation_roles(request.user)
+    all_quotation = QuotationHeaderCustomer.objects.all()
+    return render(request, 'customer/quotation_customer.html',{'all_quotation':all_quotation,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'permission':permission,'allow_inventory_roles':allow_inventory_roles})
 
 
 @user_passes_test(bool_allow_quotation_add)
@@ -449,6 +457,7 @@ def new_quotation_customer(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     all_item_code = Add_products.objects.all()
     get_last_quotation_no = QuotationHeaderCustomer.objects.last()
     all_accounts = ChartOfAccount.objects.all()
@@ -497,13 +506,14 @@ def new_quotation_customer(request):
         last_id = QuotationHeaderCustomer.objects.last()
         last_id = last_id.id
         return JsonResponse({'result':'success',"last_id":last_id})
-    return render(request, 'customer/new_quotation_customer.html',{'all_item_code':all_item_code,'get_last_quotation_no':get_last_quotation_no,'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request, 'customer/new_quotation_customer.html',{'all_item_code':all_item_code,'get_last_quotation_no':get_last_quotation_no,'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 def send_email(request, pk,id):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     account_id = ChartOfAccount.objects.get(id = id)
     msg = EmailMessage('Quotation', 'This is Quotation for Valve','ah.awan33@gmail.com',[account_id.email_address])
     msg.attach_file('/Downloads/Quotation_Customer_QU_CU_150.pdf')
@@ -515,6 +525,7 @@ def edit_quotation_customer(request,pk):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     quotation_header = QuotationHeaderCustomer.objects.filter(id = pk).first()
     quotation_detail = QuotationDetailCustomer.objects.filter(quotation_id = pk).all()
     all_item_code = list(Add_products.objects.values('product_code'))
@@ -573,7 +584,7 @@ def edit_quotation_customer(request,pk):
             quotation_detail_update = QuotationDetailCustomer(item_id = item_id, quantity = value["quantity"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_id = header_id)
             quotation_detail_update.save()
         return JsonResponse({"result":"success"})
-    return render(request,'customer/edit_quotation_customer.html',{'quotation_header':quotation_header,'pk':pk,'quotation_detail':quotation_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request,'customer/edit_quotation_customer.html',{'quotation_header':quotation_header,'pk':pk,'quotation_detail':quotation_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 @user_passes_test(allow_quotation_print)
@@ -581,6 +592,7 @@ def print_quotation_customer(request,pk):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     lines = 0
     total_amount = 0
     company_info = Company_info.objects.filter(id = 1)
@@ -590,7 +602,7 @@ def print_quotation_customer(request,pk):
     for value in detail:
         amount = float(value.unit_price * value.quantity)
         total_amount = total_amount + amount
-    pdf = render_to_pdf('customer/quotation_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    pdf = render_to_pdf('customer/quotation_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "Quotation_Customer_%s.pdf" %(header.quotation_no)
@@ -606,9 +618,11 @@ def purchase_order_customer(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     permission = purchase_order_roles(request.user)
     all_po = PoHeaderCustomer.objects.all()
-    return render(request, 'customer/purchase_order_customer.html',{'all_po':all_po,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request, 'customer/purchase_order_customer.html',{'all_po':all_po,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 @user_passes_test(allow_purchase_order_add)
@@ -616,6 +630,7 @@ def new_purchase_order_customer(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     get_last_po_no = PoHeaderCustomer.objects.last()
     all_item_code = Add_products.objects.all()
     all_accounts = ChartOfAccount.objects.all()
@@ -663,7 +678,7 @@ def new_purchase_order_customer(request):
             po_detail = PoDetailCustomer(item_id = item_id, quantity = value["quantity"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_no = "to be define" ,po_id = header_id)
             po_detail.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'customer/new_purchase_order_customer.html',{'get_last_po_no':get_last_po_no,'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request, 'customer/new_purchase_order_customer.html',{'get_last_po_no':get_last_po_no,'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 @user_passes_test(allow_purchase_order_edit)
@@ -671,6 +686,7 @@ def edit_purchase_order_customer(request,pk):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     po_header = PoHeaderCustomer.objects.filter(id = pk).first()
     po_detail = PoDetailCustomer.objects.filter(po_id = pk).all()
     all_item_code = list(Add_products.objects.values('product_code'))
@@ -731,7 +747,7 @@ def edit_purchase_order_customer(request,pk):
             po_detail_update = PoDetailCustomer(item_id = item_id, quantity = value["quantity"],unit_price = value["unit_price"], remarks = value["remarks"], po_id = header_id)
             po_detail_update.save()
         return JsonResponse({"result":"success"})
-    return render(request,'customer/edit_purchase_order_customer.html',{'po_header':po_header,'pk':pk,'po_detail':po_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request,'customer/edit_purchase_order_customer.html',{'po_header':po_header,'pk':pk,'po_detail':po_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 @user_passes_test(allow_purchase_order_print)
@@ -739,6 +755,7 @@ def print_po_customer(request,pk):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     lines = 0
     total_amount = 0
     company_info = Company_info.objects.filter(id = 1)
@@ -748,7 +765,7 @@ def print_po_customer(request,pk):
     for value in detail:
         amount = float(value.unit_price * value.quantity)
         total_amount = total_amount + amount
-    pdf = render_to_pdf('customer/po_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    pdf = render_to_pdf('customer/po_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "Quotation_Supplier_%s.pdf" %("123")
@@ -763,6 +780,7 @@ def delivery_challan_customer(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     permission = delivery_challan_roles(request.user)
     all_dc = DcHeaderCustomer.objects.all()
     cursor = connection.cursor()
@@ -780,7 +798,7 @@ def delivery_challan_customer(request):
                             Inner Join customer_dcheadercustomer  HD on  HD.id = tblData.dc_id_id
                             Where RemainingQuantity > 0''')
     is_dc = is_dc.fetchall()
-    return render(request, 'customer/delivery_challan_customer.html',{'all_dc':all_dc,'is_dc':is_dc,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request, 'customer/delivery_challan_customer.html',{'all_dc':all_dc,'is_dc':is_dc,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 @user_passes_test(allow_delivery_challan_add)
@@ -788,6 +806,7 @@ def new_delivery_challan_customer(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     row = []
     cursor = connection.cursor()
     all_item_code = Add_products.objects.all()
@@ -871,7 +890,7 @@ def new_delivery_challan_customer(request):
             dc_detail = DcDetailCustomer(item_id = item_id, quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, po_no = value["po_no"] ,dc_id = header_id)
             dc_detail.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'customer/new_delivery_challan_customer.html',{'all_item_code':all_item_code,'get_last_dc_no':get_last_dc_no,'all_accounts':all_accounts,'all_po_code':all_po_code,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request, 'customer/new_delivery_challan_customer.html',{'all_item_code':all_item_code,'get_last_dc_no':get_last_dc_no,'all_accounts':all_accounts,'all_po_code':all_po_code,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 @user_passes_test(allow_delivery_challan_edit)
@@ -879,6 +898,7 @@ def edit_delivery_challan_customer(request,pk):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     data = ''
     row = []
     cursor = connection.cursor()
@@ -931,7 +951,7 @@ def edit_delivery_challan_customer(request,pk):
             dc_detail_update = DcDetailCustomer(item_id = item_id, quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, po_no = value["po_no"] ,dc_id = header_id)
             dc_detail_update.save()
         return JsonResponse({"result":"success"})
-    return render(request,'customer/edit_delivery_challan_customer.html',{'dc_header':dc_header,'pk':pk,'dc_detail':dc_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'all_po_code':all_po_code,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request,'customer/edit_delivery_challan_customer.html',{'dc_header':dc_header,'pk':pk,'dc_detail':dc_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'all_po_code':all_po_code,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 @user_passes_test(allow_delivery_challan_print)
@@ -939,6 +959,7 @@ def print_dc_customer(request,pk):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     lines = 0
     total_amount = 0
     company_info = Company_info.objects.all()
@@ -952,7 +973,7 @@ def print_dc_customer(request,pk):
     print(total_amount)
     lines = lines + len(detail) + len(detail)
     total_lines = 36 - lines
-    pdf = render_to_pdf('customer/dc_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    pdf = render_to_pdf('customer/dc_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "DC_Customer_%s.pdf" %(header.dc_no)
@@ -968,9 +989,10 @@ def mrn_customer(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     permission = mrn_roles(request.user)
     all_dc = DcHeaderCustomer.objects.all()
-    return render(request, 'customer/mrn_customer.html',{'all_dc':all_dc,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request, 'customer/mrn_customer.html',{'all_dc':all_dc,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 @user_passes_test(allow_mrn_edit)
@@ -978,6 +1000,7 @@ def edit_mrn_customer(request,pk):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     dc_header = DcHeaderCustomer.objects.filter(id=pk).first()
     dc_detail = DcDetailCustomer.objects.filter(dc_id=pk).all()
     if request.method == 'POST':
@@ -989,4 +1012,4 @@ def edit_mrn_customer(request,pk):
             value.accepted_quantity = items[i]["accepted_quantity"]
             value.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'customer/edit_mrn_customer.html',{'dc_header':dc_header,'dc_detail':dc_detail,'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request, 'customer/edit_mrn_customer.html',{'dc_header':dc_header,'dc_detail':dc_detail,'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
