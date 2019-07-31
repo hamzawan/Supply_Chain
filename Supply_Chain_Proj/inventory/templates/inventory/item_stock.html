@@ -45,7 +45,19 @@
               <td><pre>{{ value.4 }}</pre></td>
               <td>{{ value.7 }}</td>
               <td>{{ value.5 }}</td>
-  			      <td><a class="cart" href=""><i class="fas fa-shopping-cart"></i></a><a class="edit_list" href="{% url 'edit-item' pk=value.0 %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a class="delete_item_row" href="{% url 'delete-item' pk=value.0 %}" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+  			      <td>
+                {% if permission.r_print == 1 %}  
+                <a class="cart" href=""><i class="fas fa-shopping-cart"></i></a>
+                {% endif %}
+                
+                {% if permission.edit == 1 %}
+                <a class="edit_list" href="{% url 'edit-item' pk=value.0 %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
+                {% endif %}
+
+                {% if permission.delete == 1 %}
+                <a class="delete_item_row" href="{% url 'delete-item' pk=value.0 %}" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                {% endif %}
+              </td>
           </tr>
           {% endfor %}
         </tbody>

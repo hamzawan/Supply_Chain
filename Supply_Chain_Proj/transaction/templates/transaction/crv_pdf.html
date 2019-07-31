@@ -1,0 +1,118 @@
+{% load mathfilters %}
+<html>
+<head>
+  <title>{{header.dc_no}}</title>
+<style>
+    @page {
+        size: a4 portrait;
+        @frame header_frame {           /* Static Frame */
+            -pdf-frame-content: header_content;
+            left: 30pt; width: 512pt; top: 20pt; height: 390pt;
+        }
+        @frame content_frame {          /* Content Frame */
+            left: 30pt; width: 535pt; top: 10pt; height: 780pt;
+        }
+        @frame footer_frame {           /* Another static Frame */
+            -pdf-frame-content: footer_content;
+            left: 30pt; width: 535pt; top: 755pt; height: 120pt;
+        }
+    }
+    table > thead > tr > th {
+      text-align: center;
+      font-family: "Times New Roman", Times, serif;
+        }
+        table > thead > tr > td {
+          text-align: center;
+          font-family: "Times New Roman", Times, serif;
+        }
+        .no-bottom-border{
+            border-bottom:none;
+        }
+        .heading_row{
+          border:1px solid black;
+        }
+</style>
+</head>
+
+<body>
+    <!-- Content for Static Frame 'header_frame' -->
+    <div id="header_content">
+      <div>
+         {% for value in company_info %}
+         <h1 style="text-align:center; font-size:250%; font-family: "Times New Roman", Times, serif; " color="#0a012c" ><b>{{value.company_name}}</b></h1>
+         {% endfor %}
+         <p style="text-align:center; padding-top:-30px ;font-size:200%; font-family: "Times New Roman", Times, serif; " color="#0a012c"  ><u>CASH RECEIPT VOUCHER</u></p>
+     </div>
+    </div>
+
+    <!-- Content for Static Frame 'footer_frame' -->
+    <div id="footer_content">
+      <div class="footer">
+         </div>
+      page <pdf:pagenumber> of <pdf:pagecount>
+      <p style="text-align:center;">Software Developed By TechFurq, 92 322 2832789, info@techfurq.com, www.techfurq.com</p>
+    </div>
+
+        <!-- HTML Content -->
+
+      <br>
+      <br>
+      <div class="body">
+         <br>
+         <br>
+         <br>
+         <header>
+           <table style="border-radius: 55px; border-bottom:1px solid black; border-spacing: 40px 10px;" cellpadding="3" bgcolor="#f7f7f7">
+           </table>
+         </header>
+         <br>
+         <br>
+         <font size="5">VOUCHER NO.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</font><font size="5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{header.voucher_no}}</font>
+         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+         <font size="5">DATE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</font><font size="5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;19/02/2019</font>
+         <br>
+         <br>
+         <font size="5">CASH ACCOUNT&nbsp;&nbsp;&nbsp;&nbsp;:</font><font size="5">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CASH IN HAND</font>
+      <br>
+    </div>
+      <table cellpadding="3" id="item_table" repeat="1">
+          <thead>
+            <tr class="heading_row">
+              <th align="center" style="width: 200px;"><font size="13px">ACCOUNT CODE</font></th>
+              <th style="width:700px;"><font size="13px">D  E  S  C  R  I  P  T  I  O  N</font></th>
+              <th style="width:200px;"><font size="13px">AMOUNT</font></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for value in detail %}
+          <tr>
+              <td style="border-left:1px solid black; border-right:1px solid black;"><font size="14px">{{value.2}}</font></td>
+              <td style="border-left:1px solid black; border-right:1px solid black;"><font size="14px"><b>{{value.1}}</b></font>
+                <br>
+                <pre>{{header.description}}</pre>
+              </td>
+              <td style="border-left:1px solid black; text-align: right; border-right:1px solid black;"><font size="14px">{{value.0|floatformat:2|abs}}</font></td>
+          </tr>
+            {% endfor %}
+          <tr class="heading_row">
+            <td style="width: 200px;"></td>
+            <td style="width:900px; text-align: right;"><font size="13px"> T O T A L </font></td>
+            <td  style="text-align:center; width:200px; text-align: right" ><font size="14px">{{detail.0.0|floatformat:2|abs}}</font></td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      <br>
+      <font size="4">Amount (in words) : {{amount_in_words}} only</font>
+      <br>
+      <br>
+      <br>
+      <br>
+      <font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>________________________</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>________________________</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>________________________</b></font>
+      <br>
+      <font size="4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Prepared By&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;Approved By&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Receiver's Signature</font>
+   <br>
+</body>
+</html>

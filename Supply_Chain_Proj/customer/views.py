@@ -87,12 +87,11 @@ def allow_quotation_display(user):
     else:
         return False
 
-def allow_quotation_add(user):
-    user_id = Q(user_id = user.id)
+def allow_quotation_add(request):
+    user_id = Q(user_id = request.user.id)
     form_id = Q(form_id = 1)
     child_form = Q(child_form = 12)
-    add = Q(add = 1)
-    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form)
     if allow_role:
         return allow_role
     else:

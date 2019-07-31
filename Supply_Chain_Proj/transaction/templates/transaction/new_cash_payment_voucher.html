@@ -1,0 +1,89 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Cash Payment Voucher</h4>
+</div>
+<ul class="list-group list-group-flush">
+<form  action="" id="new-jv-form-cpv" autocomplete="off"  method="post">
+  {% csrf_token %}
+  <li class="list-group-item">
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label for="">Transaction ID</label>
+          <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_tran_id }}" id="tran_id">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Date</label>
+          <input type="date"  class="form-control form-control-sm" required value="" id="date">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Doc Date</label>
+          <input type="date"  class="form-control form-control-sm" required value="" id="doc_date">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Description</label>
+          <textarea name="name" style="width:370px; height:30px;" id="description"></textarea>
+        </div>
+      </div>
+      <div class="table-title">
+          <div class="row">
+            <div class="col-md-2">
+              <label for="">Customers</label>
+              <select class="form-control form-control-sm" id="account_title">
+                {% for value in all_accounts %}
+                <option value="{{value.id}}">{{value.account_title}}</option>
+                {% endfor %}
+              </select>
+            </div>
+              <div class="form-group col-md-2">
+                <input type="checkbox" name="check" id="box" class="check" >
+                <label for="">Invoice #</label>
+                <input type="text" list="inv_no" id="invoice_no" class="form-control form-control-sm" disabled/>
+                <datalist class="" id="inv_no">
+                  {% for v in all_invoices %}
+                    <option value="{{v.purchase_no}}">{{v.purchase_no}}</option>
+                  {% endfor %}
+                </datalist>
+              </div>
+              <div class="form-group col-md-2">
+                <label for="">Amount</label>
+                <input type="text" id="amount" class="form-control form-control-sm"/>
+              </div>
+              <div class="form-group col-md-2">
+                <button type="button" style="margin-top:30px;" class="btn btn-info load-invoices-cpv"><i class="fa fa-plus"></i>Load Invoices</button>
+              </div>
+          </div>
+      </div>
+      </li>
+    <li class="list-group-item">
+    <div class="table table-responsive">
+      <table class="table table-bordered" id="new-cpv-table">
+          <thead>
+              <tr>
+                  <th width="100px" style="font-size:10px;">Account Id</th>
+                  <th width="300px">Account Title</th>
+                  <th width="100px">Invoice No</th>
+                  <th width="100px">Debit</th>
+                  <th width="100px">Credit</th>
+                  <th width="100px">Balance</th>
+              </tr>
+          </thead>
+          <tbody>
+          </tbody>
+      </table>
+    </div>
+    </li>
+      <br>
+    <div class="text-center">
+      <button type="submit" class="btn btn-outline-primary">Submit <small>(CP Voucher)</small></button>
+    </div>
+    <br>
+</form>
+</ul>
+</div>
+
+
+{% endblock body %}

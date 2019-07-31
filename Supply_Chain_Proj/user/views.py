@@ -41,7 +41,7 @@ def user_roles(request,pk):
     user = User.objects.filter(id = pk)
     user_id = User.objects.get(id = pk)
     user_id = Q(user_id = pk)
-    
+
     form_name = Q(form_name = "Customer")
     allow_role = UserRoles.objects.filter(user_id, form_name).all()
 
@@ -60,7 +60,7 @@ def user_roles(request,pk):
             form_id = 1
         else:
             form_id = 0
-        
+
         display = request.POST.getlist('display[]')
         add = request.POST.getlist('add[]')
         edit = request.POST.getlist('edit[]')
@@ -136,13 +136,15 @@ def user_roles(request,pk):
 
 
         for i,value in enumerate(allow_role):
+            value.form_id = form_id
+            value.save()
             if i == 0:
                 matching_display = [c for c in display if "c_rfq_display" in c]
                 matching_add = [c for c in add if "c_rfq_add" in c]
                 matching_edit = [c for c in edit if "c_rfq_edit" in c]
                 matching_delete = [c for c in delete if "c_rfq_delete" in c]
                 matching_print = [c for c in c_print if "c_rfq_print" in c]
-                
+
                 if matching_display:
                     value.display = 1
                     value.save()
@@ -284,7 +286,7 @@ def user_roles(request,pk):
                 else:
                     value.r_print = 0
                     value.save()
-            
+
             elif i == 4:
                 matching_display = [c for c in display if "c_mrn_display" in c]
                 matching_add = [c for c in add if "c_mrn_add" in c]
@@ -322,7 +324,7 @@ def user_roles(request,pk):
 
             value.form_id = form_id
             value.save()
-        
+
         form_id_s = request.POST.getlist('Supplier')
         if form_id_s:
             form_id_s = 2
@@ -335,8 +337,8 @@ def user_roles(request,pk):
                  s_matching_add = [c for c in s_add if "s_rfq_add" in c]
                  s_matching_edit = [c for c in s_edit if "s_rfq_edit" in c]
                  s_matching_delete = [c for c in s_delete if "s_rfq_delete" in c]
-                 s_matching_print = [c for c in s_print if "s_rfq_print" in c]                 
-        
+                 s_matching_print = [c for c in s_print if "s_rfq_print" in c]
+
                  if s_matching_display:
                      value.display = 1
                      value.save()
@@ -355,7 +357,7 @@ def user_roles(request,pk):
                  else:
                      value.edit = 0
                      value.save()
-                 if s_matching_delete:                     
+                 if s_matching_delete:
                      value.delete = 1
                      value.save()
                  else:
@@ -410,7 +412,7 @@ def user_roles(request,pk):
                  s_matching_add = [c for c in s_add if "s_po_add" in c]
                  s_matching_edit = [c for c in s_edit if "s_po_edit" in c]
                  s_matching_delete = [c for c in s_delete if "s_po_delete" in c]
-                 s_matching_print = [c for c in s_print if "s_po_print" in c]                 
+                 s_matching_print = [c for c in s_print if "s_po_print" in c]
 
                  if s_matching_display:
                      value.display = 1
@@ -433,7 +435,7 @@ def user_roles(request,pk):
                      value.save()
                  if s_matching_delete:
                      value.delete = 1
-                     value.save()                     
+                     value.save()
                  else:
                      value.delete = 0
                      value.save()
@@ -532,8 +534,8 @@ def user_roles(request,pk):
                  t_matching_add = [c for c in t_add if "t_coa_add" in c]
                  t_matching_edit = [c for c in t_edit if "t_coa_edit" in c]
                  t_matching_delete = [c for c in t_delete if "t_coa_delete" in c]
-                 t_matching_print = [c for c in t_print if "t_coa_print" in c]                 
-                 
+                 t_matching_print = [c for c in t_print if "t_coa_print" in c]
+
 
                  if t_matching_display:
                      value.display = 1
@@ -553,7 +555,7 @@ def user_roles(request,pk):
                  else:
                      value.edit = 0
                      value.save()
-                 if t_matching_delete:                     
+                 if t_matching_delete:
                      value.delete = 1
                      value.save()
                  else:
@@ -617,7 +619,7 @@ def user_roles(request,pk):
                  t_matching_add = [c for c in t_add if "t_pr_add" in c]
                  t_matching_edit = [c for c in t_edit if "t_pr_edit" in c]
                  t_matching_delete = [c for c in t_delete if "t_pr_delete" in c]
-                 t_matching_print = [c for c in t_print if "t_pr_print" in c]                 
+                 t_matching_print = [c for c in t_print if "t_pr_print" in c]
 
                  if t_matching_display:
                      value.display = 1
@@ -640,7 +642,7 @@ def user_roles(request,pk):
                      value.save()
                  if t_matching_delete:
                      value.delete = 1
-                     value.save()                     
+                     value.save()
                  else:
                      value.delete = 0
                      value.save()
@@ -740,14 +742,14 @@ def user_roles(request,pk):
                  t_matching_add = [c for c in t_add if "t_jv_add" in c]
                  t_matching_edit = [c for c in t_edit if "t_jv_edit" in c]
                  t_matching_delete = [c for c in t_delete if "t_jv_delete" in c]
-                 t_matching_print = [c for c in t_print if "t_jv_print" in c]                 
+                 t_matching_print = [c for c in t_print if "t_jv_print" in c]
 
                  if t_matching_display:
                      value.display = 1
                      value.save()
                  else:
                      value.display = 0
-                     value.save()        
+                     value.save()
                  if t_matching_add:
                      value.add = 1
                      value.save()
@@ -760,7 +762,7 @@ def user_roles(request,pk):
                  else:
                      value.edit = 0
                      value.save()
-                 if t_matching_delete:                     
+                 if t_matching_delete:
                      value.delete = 1
                      value.save()
                  else:
@@ -815,7 +817,7 @@ def user_roles(request,pk):
                  t_matching_add = [c for c in t_add if "t_crv_add" in c]
                  t_matching_edit = [c for c in t_edit if "t_crv_edit" in c]
                  t_matching_delete = [c for c in t_delete if "t_crv_delete" in c]
-                 t_matching_print = [c for c in t_print if "t_crv_print" in c]                 
+                 t_matching_print = [c for c in t_print if "t_crv_print" in c]
 
                  if t_matching_display:
                      value.display = 1
@@ -837,7 +839,7 @@ def user_roles(request,pk):
                      value.save()
                  if t_matching_delete:
                      value.delete = 1
-                     value.save()                     
+                     value.save()
                  else:
                      value.delete = 0
                      value.save()

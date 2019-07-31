@@ -4,6 +4,7 @@ import datetime
 
 
 class ChartOfAccount(models.Model):
+    account_id = models.CharField(max_length = 100)
     account_title = models.CharField(max_length = 100, unique = True)
     parent_id = models.IntegerField()
     opening_balance = models.DecimalField(max_digits = 8, decimal_places = 2)
@@ -117,7 +118,7 @@ class VoucherDetail(models.Model):
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True)
     debit = models.DecimalField(max_digits = 8, decimal_places = 2)
     credit = models.DecimalField(max_digits = 8, decimal_places = 2)
-    invoice_id = models.ForeignKey(SaleHeader, models.SET_NULL, blank=True,null=True)
+    invoice_id = models.IntegerField()
     header_id = models.ForeignKey(VoucherHeader, on_delete = models.CASCADE)
 
 
@@ -131,3 +132,4 @@ class Transactions(models.Model):
     ref_inv_tran_id = models.IntegerField()
     ref_inv_tran_type = models.CharField(max_length = 100)
     remarks = models.CharField(max_length = 100)
+    voucher_id = models.CharField(max_length = 100)

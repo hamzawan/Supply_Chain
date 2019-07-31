@@ -4,7 +4,7 @@
 
 <div class="card" style="width: 100%;">
 <div class="card-header">
-  <h4>Sales</h4>
+  <h4>Journal Voucher</h4>
 </div>
 <ul class="list-group list-group-flush">
   <li class="list-group-item">
@@ -23,7 +23,7 @@
               <tr>
                   <th width="140px">Voucher No</th>
                   <th >Date</th>
-                  <th >Invoice No</th>
+                  <th >Document No</th>
                   <th >From</th>
                   <th >Action</th>
               </tr>
@@ -31,9 +31,9 @@
           <tbody>
             {% for value in all_voucher %}
             <tr>
-                <td>{{ value.6 }}</td>
-                <td>{{ value.7 }}</td>
                 <td>{{ value.1 }}</td>
+                <td>{{ value.2 }}</td>
+                <td>{{ value.3 }}</td>
                 <td>user1</td>
                 <td><a class="edit_list" href="{% url 'edit-journal-voucher' pk=value.0 %}" data-toggle=""><i class="material-icons">&#xE254;</i></a><a data-toggle="modal" href="#"  class="has_id" id="{{value.id}}"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a><a class="delete"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
             </tr>
