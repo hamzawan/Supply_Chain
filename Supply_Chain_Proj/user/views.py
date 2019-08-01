@@ -7,6 +7,11 @@ from  supplier.models import Company_info
 from .models import UserRoles, FiscalYear
 from django.db.models import Q
 from supplier.views import customer_roles,supplier_roles,transaction_roles,inventory_roles
+from django.contrib.auth.decorators import user_passes_test
+
+
+def Is_superuser(user):
+    return True if user.is_superuser else False
 
 
 def register(request):
@@ -22,7 +27,7 @@ def register(request):
             return redirect('login')
     else:
         form = RegistrationFrom
-    return render(request, 'user/register.html', {'form': form,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'user/register.html', {'form': form,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 def forgot_password(request):
@@ -37,6 +42,8 @@ def select_company_fiscal(request):
     return render(request, 'user/select_company_fiscal.html',{'company':company,'fiscal_year':fiscal_year})
 
 
+
+@user_passes_test(Is_superuser)
 def user_roles(request,pk):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
@@ -936,13 +943,14 @@ def user_roles(request,pk):
 
 
     return render(request, 'user/user_roles.html',{'user':user,'allow_role':allow_role,'allow_role_supplier':allow_role_supplier,'allow_role_transaction':allow_role_transaction,
-    'allow_role_inventory':allow_role_inventory,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    'allow_role_inventory':allow_role_inventory,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(Is_superuser)
 def user_list(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     all_user = User.objects.all()
-    return render(request, 'user/users.html',{'all_user':all_user,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'user/users.html',{'all_user':all_user,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})

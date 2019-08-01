@@ -6,6 +6,7 @@ urlpatterns = [
     path('rfq/', views.rfq_customer, name = 'rfq-customer'),
     path('rfq/new/', views.new_rfq_customer, name = 'new-rfq-customer'),
     path('rfq/edit/<pk>', views.edit_rfq_customer, name = 'edit-rfq-customer'),
+    path('rfq/delete/<pk>', views.delete_rfq_customer, name = 'delete-rfq-customer'),
 
     path('quotation/', views.quotation_customer, name = 'quotation-customer'),
     path('quotation/new', views.new_quotation_customer, name = 'new-quotation-customer'),
