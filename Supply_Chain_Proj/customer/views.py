@@ -20,6 +20,7 @@ from django.core.mail import EmailMessage
 from user.models import UserRoles
 from django.contrib.auth.decorators import user_passes_test
 from supplier.views import customer_roles,supplier_roles,transaction_roles,inventory_roles
+from django.contrib import messages
 
 
 def allow_rfq_display(user):
@@ -127,7 +128,7 @@ def allow_quotation_delete(user):
     delete = Q(delete = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -139,7 +140,7 @@ def allow_quotation_print(user):
     r_print = Q(r_print = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -186,7 +187,7 @@ def allow_purchase_order_delete(user):
     delete = Q(delete = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -197,7 +198,7 @@ def allow_purchase_order_print(user):
     r_print = Q(r_print = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -243,7 +244,7 @@ def allow_delivery_challan_delete(user):
     delete = Q(delete = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -254,7 +255,7 @@ def allow_delivery_challan_print(user):
     r_print = Q(r_print = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -438,7 +439,7 @@ def edit_rfq_customer(request,pk):
 
 @user_passes_test(allow_rfq_delete)
 def delete_rfq_customer(request,pk):
-    RfqCustomerDetail.objects.filter(header_id = pk).all().delete()
+    RfqCustomerDetail.objects.filter(rfq_id_id = pk).all().delete()
     RfqCustomerHeader.objects.filter(id = pk).delete()
     messages.add_message(request, messages.SUCCESS, " Customer RFQ Deleted")
     return redirect('rfq-customer')
@@ -622,6 +623,14 @@ def print_quotation_customer(request,pk):
     return HttpResponse("Not found")
 
 
+@user_passes_test(allow_quotation_delete)
+def delete_quotation_customer(request,pk):
+    QuotationDetailCustomer.objects.filter(quotation_id_id = pk).all().delete()
+    QuotationHeaderCustomer.objects.filter(id = pk).delete()
+    messages.add_message(request, messages.SUCCESS, " Customer Quotation Deleted")
+    return redirect('quotation-customer')
+
+
 
 @user_passes_test(allow_purchase_order_display)
 def purchase_order_customer(request):
@@ -783,6 +792,14 @@ def print_po_customer(request,pk):
         response['Content-Disposition'] = content
         return response
     return HttpResponse("Not found")
+
+
+@user_passes_test(allow_purchase_order_delete)
+def delete_po_customer(request,pk):
+    PoDetailCustomer.objects.filter(po_id_id = pk).all().delete()
+    PoHeaderCustomer.objects.filter(id = pk).delete()
+    messages.add_message(request, messages.SUCCESS, " Customer Purchase Order Deleted")
+    return redirect('purchase-order-customer')
 
 
 @user_passes_test(allow_delivery_challan_display)

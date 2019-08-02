@@ -7,11 +7,11 @@ class UserRoles(models.Model):
     form_id = models.IntegerField()
     form_name = models.CharField(max_length = 100)
     child_form = models.IntegerField()
-    display = models.IntegerField()
-    add = models.IntegerField()
-    edit = models.IntegerField()
-    delete = models.IntegerField()
-    r_print = models.IntegerField()
+    display = models.IntegerField(default='0')
+    add = models.IntegerField(default='0')
+    edit = models.IntegerField(default='0')
+    delete = models.IntegerField(default='0')
+    r_print = models.IntegerField(default='0')
     r_return = models.IntegerField(default='0')
 
 

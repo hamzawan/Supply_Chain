@@ -8,17 +8,22 @@ urlpatterns = [
     path('rfq/', views.rfq_supplier, name = 'rfq-supplier'),
     path('rfq/new/', views.new_rfq_supplier, name = 'new-rfq-supplier'),
     path('rfq/edit/<pk>', views.edit_rfq_supplier, name = 'edit-rfq-supplier'),
+    path('rfq/delete/<pk>', views.delete_rfq_supplier, name = 'delete-rfq-supplier'),    
 
     path('quotation/', views.quotation_supplier, name = 'quotation-supplier'),
     path('quotation/new', views.new_quotation_supplier, name = 'new-quotation-supplier'),
     path('quotation/edit/<pk>', views.edit_quotation_supplier, name = 'edit-quotation-supplier'),
     path('print_quotation_supplier/<pk>',views.print_quotation_supplier, name = 'print-quotation-supplier'),
     path('quotation/export', views.quotation_export_supplier, name = 'export-supplier-quotation'),
+    path('quotation/delete/<pk>', views.delete_quotation_supplier, name = 'delete-quotation-supplier'),
+
 
     path('purchase_order/', views.purchase_order_supplier, name = 'purchase-order-supplier'),
     path('purchase_order/new', views.new_purchase_order_supplier, name = 'new-purchase-order-supplier'),
     path('purchase_order/edit/<pk>', views.edit_purchase_order_supplier, name = 'edit-purchase-order-supplier'),
     path('print_po_supplier/<pk>',views.print_po_supplier, name = 'print-po-supplier'),
+    path('purchase_order/delete/<pk>', views.delete_purchase_order_supplier, name = 'delete-purchase-order-supplier'),
+
 
     path('delivery_challan/', views.delivery_challan_supplier, name = 'delivery-challan-supplier'),
     path('delivery_challan/new', views.new_delivery_challan_supplier, name = 'new-delivery-challan-supplier'),

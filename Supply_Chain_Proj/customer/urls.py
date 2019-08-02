@@ -13,11 +13,15 @@ urlpatterns = [
     path('quotation/edit/<pk>', views.edit_quotation_customer, name = 'edit-quotation-customer'),
     path('print_quotation_customer/<pk>', views.print_quotation_customer, name = 'print-quotation-customer'),
     path('send_email/<pk>/<id>', views.send_email, name = 'send-email'),
+    path('quotation/delete/<pk>', views.delete_quotation_customer, name = 'delete-quotation-customer'),
+
 
     path('purchase_order/', views.purchase_order_customer, name = 'purchase-order-customer'),
     path('purchase_order/new', views.new_purchase_order_customer, name = 'new-purchase-order-customer'),
     path('purchase_order/edit/<pk>', views.edit_purchase_order_customer, name = 'edit-purchase-order-customer'),
     path('print_po_customer/<pk>', views.print_po_customer, name = 'print-po-customer'),
+    path('purchase_order/delete/<pk>', views.delete_po_customer, name = 'delete-purchase-order-customer'),
+
 
     path('delivery_challan/', views.delivery_challan_customer, name = 'delivery-challan-customer'),
     path('delivery_challan/new', views.new_delivery_challan_customer, name = 'new-delivery-challan-customer'),

@@ -23,6 +23,27 @@ def register(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
+            username = request.POST.getlist('username')[0]
+            user = User.objects.get(username = username)
+            for i in range(11,16):
+                roles = UserRoles.objects.create(user_id=user,form_name="Customer",form_id=1,child_form=i)
+                roles.save()
+
+            for i in range(21,26):
+                roles = UserRoles.objects.create(user_id=user,form_name="Supplier",form_id=2,child_form=i)
+                roles.save()    
+
+            for i in range(31,41):
+                if i == 40:
+                    roles = UserRoles.objects.create(user_id=user,form_name="Transaction",form_id=3,child_form=310)
+                    roles.save()
+                else:    
+                    roles = UserRoles.objects.create(user_id=user,form_name="Transaction",form_id=3,child_form=i)
+                    roles.save()
+
+            roles = UserRoles.objects.create(user_id=user,form_name="Inventory",form_id=4,child_form=41)
+            roles.save()
+            
             messages.success(request, f'Your account has been created! You are now able to log in')
             return redirect('login')
     else:
