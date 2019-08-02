@@ -44,12 +44,12 @@
             {% for value in dc_detail %}
             <tr>
               <td>{{forloop.counter}}</td>
-              <td>{{value.item_code}}</td>
-              <td>{{value.item_name}}</td>
-              <td><pre>{{value.item_description}}</pre></td>
+              <td>{{value.item_id.product_code}}</td>
+              <td>{{value.item_id.product_name}}</td>
+              <td><pre>{{value.item_id.product_desc}}</pre></td>
               <td>{{value.quantity}}</td>
               <td>{{value.accepted_quantity}}</td>
-              <td>{{value.unit}}</td>
+              <td>{{value.item_id.unit}}</td>
               <td><a class="add-mrn" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-mrn" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a></td>
             </tr>
             {% endfor %}

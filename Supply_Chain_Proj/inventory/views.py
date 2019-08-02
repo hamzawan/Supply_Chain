@@ -65,15 +65,19 @@ def allow_inventory_delete(user):
         return False
 
 def allow_inventory_shop(user):
-    user_id = Q(user_id = user.id)
+    print("Hamza")
+    print(user.id)
+    user_id = Q(user_id = 2)
     form_id = Q(form_id = 4)
     child_form = Q(child_form = 41)
     r_print = Q(r_print = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
+    print(allow_role)
     if allow_role:
-        return False
+        return True
     else:
         return False
+
 
 @user_passes_test(allow_inventory_display)
 def item_stock(request):

@@ -65,7 +65,6 @@
                 <th>Description</th>
                 <th width="90px">Quantity</th>
                 <th width="90px">Unit</th>
-                <th width="120px">Price</th>
                 <th width="90px">Remarks</th>
                 <th>Action</th>
             </tr>
@@ -74,12 +73,12 @@
             {% for value in dc_detail %}
             <tr>
               <td>{{ forloop.counter }}</td>
-              <td>{{ value.item_code }}</td>
-              <td>{{ value.item_name }}</td>
-              <td>{{ value.item_description }}</td>
+              <td style="display:none;">{{ value.item_id.id }}</td>
+              <td>{{ value.item_id.product_code }}</td>
+              <td>{{ value.item_id.product_name }}</td>
+              <td>{{ value.item_id.product_desc }}</td>
               <td>{{ value.quantity }}</td>
-              <td>{{ value.unit }}</td>
-              <td>{{ value.unit_price }}</td>
+              <td>{{ value.item_id.unit }}</td>
               <td>{{ value.remarks }}</td>
               <td><a class="add-dc-edit" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-dc-edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-dc-edit" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
             </tr>

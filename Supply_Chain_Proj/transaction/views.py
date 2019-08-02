@@ -292,18 +292,24 @@ def sale_return_roles(user):
 
 @user_passes_test(allow_purchase_display)
 def purchase(request):
+    company =  request.session['company']
+    print(company)
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     permission = purchase_roles(request.user)
-    all_purchases = PurchaseHeader.objects.all()
+    all_purchases = PurchaseHeader.objects.filter(company).all()
     return render(request, 'transaction/purchase.html',{'all_purchases': all_purchases,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 @user_passes_test(allow_purchase_add)
 def new_purchase(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -344,7 +350,7 @@ def new_purchase(request):
             follow_up = follow_up
         else:
             follow_up = '2010-06-10'
-        purchase_header = PurchaseHeader(purchase_no = purchase_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = withholding_tax, account_id = account_id, follow_up = follow_up, credit_days = credit_days)
+        purchase_header = PurchaseHeader(purchase_no = purchase_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = withholding_tax, account_id = account_id, follow_up = follow_up, credit_days = credit_days, company_id = company, user_id = request.user)
 
         items = json.loads(request.POST.get('items'))
         purchase_header.save()
@@ -366,15 +372,15 @@ def new_purchase(request):
 
         cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
         if payment_method == 'Cash':
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Invoice", amount = total_amount, date = date, remarks = "Amount Debit",ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
             tran2.save()
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Purchase Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Purchase Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit",ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
             tran1.save()
         else:
             purchase_account = ChartOfAccount.objects.get(account_title = 'Purchases')
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Invoice On Credit", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran1 = Transactions(refrence_id = 0, refrence_date = date, account_id = account_id, tran_type = "", amount = -abs(total_amount), date = date, remarks = "Amount Debit",ref_inv_tran_id = header_id, ref_inv_tran_type = "Purchase Invoice", company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = purchase_account, tran_type = "Purchase Invoice On Credit", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = purchase_account, tran_type = "", amount = total_amount, date = date, remarks = "Amount Debit",ref_inv_tran_id = header_id, ref_inv_tran_type = "Purchase Invoice", company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/new_purchase.html',{'all_item_code':all_item_code,'get_last_purchase_no':get_last_purchase_no, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
@@ -382,6 +388,9 @@ def new_purchase(request):
 
 @user_passes_test(allow_purchase_edit)
 def edit_purchase(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -389,8 +398,8 @@ def edit_purchase(request,pk):
     item_amount = 0
     total_amount = 0
     all_item_code = Add_products.objects.all()
-    purchase_header = PurchaseHeader.objects.filter(id = pk).first()
-    purchase_detail = PurchaseDetail.objects.filter(purchase_id = pk).all()
+    purchase_header = PurchaseHeader.objects.filter(company, id = pk).first()
+    purchase_detail = PurchaseDetail.objects.filter(purchase_id = purchase_header.id).all()
     all_accounts = ChartOfAccount.objects.all()
     item_code = request.POST.get('item_code_purchase',False)
     if item_code:
@@ -449,9 +458,11 @@ def edit_purchase(request,pk):
             tran_type = Q(tran_type = "Purchase Invoice")
             delete = Transactions.objects.filter(refrence_id, tran_type)
             delete.delete()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            company =  request.session['company']
+            company = Company_info.objects.get(id = company)
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Invoice", amount = total_amount, date = date, remarks = "Amount Debit", company_id = company , user_id = request.user)
             tran2.save()
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Purchase Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Purchase Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit", company_id = company , user_id = request.user)
             tran1.save()
         else:
             refrence_id = Q(refrence_id = header_id)
@@ -459,9 +470,9 @@ def edit_purchase(request,pk):
             delete = Transactions.objects.filter(refrence_id, tran_type)
             delete.delete()
             purchase_account = ChartOfAccount.objects.get(account_title = 'Purchases')
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit", company_id = company , user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = purchase_account, tran_type = "Purchase Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = purchase_account, tran_type = "Purchase Invoice", amount = total_amount, date = date, remarks = "Amount Debit", company_id = company , user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/edit_purchase.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'purchase_header':purchase_header, 'purchase_detail':purchase_detail, 'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
@@ -469,18 +480,24 @@ def edit_purchase(request,pk):
 
 
 def purchase_return_summary(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
-    all_purchase_return = PurchaseReturnHeader.objects.all()
+    all_purchase_return = PurchaseReturnHeader.objects.filter(company).all()
     return render(request, 'transaction/purchase_return_summary.html',{'all_purchase_return': all_purchase_return,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 
 @user_passes_test(allow_purchase_return_display)
 def new_purchase_return(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -498,9 +515,11 @@ def new_purchase_return(request,pk):
         get_last_purchase_no = 'PUR/RET/' + str(num)
     else:
         get_last_purchase_no = 'PUR/RET/101'
-    purchase_header = PurchaseHeader.objects.filter(id = pk).first()
-    purchase_detail = PurchaseDetail.objects.filter(purchase_id = pk).all()
+    purchase_header = PurchaseHeader.objects.filter(company, id = pk).first()
+    purchase_detail = PurchaseDetail.objects.filter(purchase_id = purchase_header.id).all()
     if request.method == 'POST':
+        company =  request.session['company']
+        company = Company_info.objects.get(id = company)
         supplier = request.POST.get('supplier',False)
         credit_days = purchase_header.credit_days
         payment_method = purchase_header.payment_method
@@ -509,7 +528,7 @@ def new_purchase_return(request,pk):
         description = request.POST.get('description',False)
         date = datetime.date.today()
         account_id = ChartOfAccount.objects.get(account_title = supplier)
-        purchase_return_header = PurchaseReturnHeader(purchase_no = get_last_purchase_no, date = date, footer_description = description, payment_method = payment_method, credit_days = credit_days ,cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = 0, account_id = account_id )
+        purchase_return_header = PurchaseReturnHeader(purchase_no = get_last_purchase_no, date = date, footer_description = description, payment_method = payment_method, credit_days = credit_days ,cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = 0, account_id = account_id, company_id = company, user_id = request.user )
         purchase_return_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = PurchaseReturnHeader.objects.get(purchase_no = get_last_purchase_no)
@@ -527,15 +546,19 @@ def new_purchase_return(request,pk):
         header_id = header_id.id
         cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
         if purchase_header.payment_method == 'Cash':
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Return Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            company =  request.session['company']
+            company = Company_info.objects.get(id = company)
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Return Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit", copmany_id = company, user_id = request.user)
             tran2.save()
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Purchase Return Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Purchase Return Invoice", amount = total_amount, date = date, remarks = "Amount Debit", copmany_id = company, user_id = request.user)
             tran1.save()
         else:
+            company =  request.session['company']
+            company = Company_info.objects.get(id = company)
             purchase_account = ChartOfAccount.objects.get(account_title = 'Purchase Returns')
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Return Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran1 = Transactions(refrence_id = 0, refrence_date = date, account_id = account_id, tran_type = "", amount = total_amount, date = date, remarks = "Amount Debit",ref_inv_tran_id = header_id ,ref_inv_tran_type = "Purchase Return Invoice", user_id = request.user, copmany_id = company)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = purchase_account, tran_type = "Purchase Return Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = purchase_account, tran_type = "", amount = -abs(total_amount), date = date, remarks = "Amount Debit", ref_inv_tran_id = header_id ,ref_inv_tran_type = "Purchase Return Invoice", user_id = request.user, copmany_id = company)
             tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/purchase_return.html',{'purchase_header':purchase_header, 'purchase_detail': purchase_detail,'pk':pk,'get_last_purchase_no':get_last_purchase_no,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
@@ -544,6 +567,9 @@ def new_purchase_return(request,pk):
 
 @user_passes_test(allow_purchase_return_edit)
 def edit_purchase_return(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -551,8 +577,8 @@ def edit_purchase_return(request,pk):
     amount = 0
     item_amount = 0
     total_amount = 0
-    purchase_header = PurchaseReturnHeader.objects.filter(id = pk).first()
-    purchase_detail = PurchaseReturnDetail.objects.filter(purchase_return_id = pk).all()
+    purchase_header = PurchaseReturnHeader.objects.filter(company, id = pk).first()
+    purchase_detail = PurchaseReturnDetail.objects.filter(purchase_return_id = purchase_header.id).all()
     all_accounts = ChartOfAccount.objects.all()
     if request.method == 'POST':
         purchase_detail.delete()
@@ -588,15 +614,17 @@ def edit_purchase_return(request,pk):
         delete.delete()
         purchase_account = ChartOfAccount.objects.get(account_title = 'Purchase Returns')
         if purchase_header.payment_method == 'Cash':
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Return Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Credit")
+            company =  request.session['company']
+            company = Company_info.objects.get(id = company)
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Return Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Credit", company = company_id, user_id = request.user)
             tran2.save()
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Purchase Return Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Purchase Return Invoice", amount = total_amount, date = date, remarks = "Amount Debit", company = company_id, user_id = request.user)
             tran1.save()
         else:
             purchase_account = ChartOfAccount.objects.get(account_title = 'Purchase Returns')
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Return Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Purchase Return Invoice", amount = total_amount, date = date, remarks = "Amount Debit", company = company_id, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = purchase_account, tran_type = "Purchase Return Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = purchase_account, tran_type = "Purchase Return Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit", company = company_id, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/edit_purchase_return.html',{'purchase_header':purchase_header, 'purchase_detail': purchase_detail,'pk':pk,'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
@@ -604,17 +632,22 @@ def edit_purchase_return(request,pk):
 
 @user_passes_test(allow_sale_display)
 def sale(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     permission = sale_roles(request.user)
-    all_sales = SaleHeader.objects.all()
+    all_sales = SaleHeader.objects.filter(company).all()
     return render(request, 'transaction/sale.html',{'all_sales': all_sales,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 @user_passes_test(allow_sale_add)
 def new_sale(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -763,7 +796,7 @@ def new_sale(request):
         else:
             follow_up = '2010-06-10'
 
-        sale_header = SaleHeader(sale_no = sale_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = withholding_tax, account_id = account_id, follow_up = follow_up, credit_days = credit_days)
+        sale_header = SaleHeader(sale_no = sale_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = withholding_tax, account_id = account_id, follow_up = follow_up, credit_days = credit_days, company_id = company, user_id = request.user)
 
         items = json.loads(request.POST.get('items'))
         sale_header.save()
@@ -784,21 +817,23 @@ def new_sale(request):
         header_id = header_id.id
         cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
         if payment_method == 'Cash':
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit",  ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit",   ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
             tran2.save()
         else:
             sale_account = ChartOfAccount.objects.get(account_title = 'Sales')
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice On Credit", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran1 = Transactions(refrence_id = 0, refrence_date = date, account_id = account_id, tran_type = "", amount = total_amount, date = date, remarks = "Amount Debit",  ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice" ,company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_account, tran_type = "Sale Invoice On Credit", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = sale_account, tran_type = "", amount = -abs(total_amount), date = date, remarks = "Amount Debit",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice", company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/new_sales.html',{'get_last_sale_no':get_last_sale_no, 'all_accounts':all_accounts, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 def direct_sale(request, pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -845,11 +880,10 @@ def direct_sale(request, pk):
         cartage_amount = request.POST.get('cartage_amount',False)
         additional_tax = request.POST.get('additional_tax',False)
         withholding_tax = request.POST.get('withholding_tax',False)
-        print(payment_method)
         account_id = ChartOfAccount.objects.get(account_title = customer)
         date = datetime.date.today()
 
-        sale_header = SaleHeader(sale_no = sale_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = withholding_tax, account_id = account_id, follow_up = '2010-06-10' )
+        sale_header = SaleHeader(sale_no = sale_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = withholding_tax, account_id = account_id, follow_up = '2010-06-10', company_id = company, user_id = request.user)
 
         items = json.loads(request.POST.get('items'))
         print(items)
@@ -870,15 +904,15 @@ def direct_sale(request, pk):
         header_id = header_id.id
         cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
         if payment_method == 'Cash':
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit",ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit",ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
             tran2.save()
         else:
             sale_account = ChartOfAccount.objects.get(account_title = 'Sales')
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice On Credit", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran1 = Transactions(refrence_id = 0, refrence_date = date, account_id = account_id, tran_type = "", amount = total_amount, date = date, remarks = "Amount Debit",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice", company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_account, tran_type = "Sale Invoice On Credit", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = sale_account, tran_type = "", amount = -abs(total_amount), date = date, remarks = "Amount Debit",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice", company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/direct_invoice.html',{'all_item_code':all_item_code,'get_last_sale_no':get_last_sale_no, 'all_accounts':all_accounts, 'dc_header':dc_header, 'dc_detail':dc_detail, 'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
@@ -887,6 +921,9 @@ def direct_sale(request, pk):
 
 @user_passes_test(allow_sale_edit)
 def edit_sale(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -895,8 +932,8 @@ def edit_sale(request,pk):
     total_amount = 0
     cursor = connection.cursor()
     all_item_code = Add_products.objects.all()
-    sale_header = SaleHeader.objects.filter(id = pk).first()
-    sale_detail = SaleDetail.objects.filter(sale_id = pk).all()
+    sale_header = SaleHeader.objects.filter(company, id = pk).first()
+    sale_detail = SaleDetail.objects.filter(sale_id = sale_header.id).all()
     all_accounts = ChartOfAccount.objects.all()
     customer_name_sale = request.POST.get('customer_name_sale')
     if customer_name_sale:
@@ -996,6 +1033,8 @@ def edit_sale(request,pk):
         sale_header.save()
         header_id = SaleHeader.objects.get(sale_no = sale_id)
         for value in items:
+            company =  request.session['company']
+            company = Company_info.objects.get(id = company)
             item_id = Add_products.objects.get(id = value["id"])
             sale_detail = SaleDetail(item_id = item_id, quantity = value["quantity"], cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], sale_id = header_id, dc_ref = value["dc_no"], hs_code = value["hs_code"])
             sale_detail.save()
@@ -1014,9 +1053,9 @@ def edit_sale(request,pk):
             tran_type = Q(tran_type = "Sale Invoice")
             delete = Transactions.objects.filter(refrence_id, tran_type)
             delete.delete()
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, ref_inv_tran_id = 0, ref_inv_tran_type = "" ,remarks = "Amount Debit", company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit",  ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
             tran2.save()
         else:
             refrence_id = Q(refrence_id = header_id)
@@ -1024,26 +1063,32 @@ def edit_sale(request,pk):
             delete = Transactions.objects.filter(refrence_id, tran_type)
             delete.delete()
             sale_account = ChartOfAccount.objects.get(account_title = 'Sales')
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit")
+            tran1 = Transactions(refrence_id = 0, refrence_date = date, account_id = account_id, tran_type = "", amount = total_amount, date = date, remarks = "Amount Debit", ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice" ,company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_account, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit")
+            tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = sale_account, tran_type = "", amount = -abs(total_amount), date = date, remarks = "Amount Debit", ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice" ,company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/edit_sale.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'sale_header':sale_header, 'sale_detail':sale_detail, 'pk':pk, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 def sale_return_summary(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
-    all_sales_return = SaleReturnHeader.objects.all()
+    all_sales_return = SaleReturnHeader.filter(company).objects.all()
     return render(request, 'transaction/sale_return_summary.html',{'all_sales_return': all_sales_return,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
 
 
 @user_passes_test(allow_sale_return_display)
 def new_sale_return(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -1061,9 +1106,11 @@ def new_sale_return(request,pk):
         get_last_sale_no = 'SAL/RET/' + str(num)
     else:
         get_last_sale_no = 'SAL/RET/101'
-    sale_header = SaleHeader.objects.filter(id = pk).first()
-    sale_detail = SaleDetail.objects.filter(sale_id = pk).all()
+    sale_header = SaleHeader.objects.filter(company, id = pk).first()
+    sale_detail = SaleDetail.objects.filter(sale_id = sale_header.id).all()
     if request.method == 'POST':
+        company =  request.session['company']
+        company = Company_info.objects.get(id = company)
         customer = request.POST.get('customer',False)
         payment_method = request.POST.get('payment_method',False)
         description = request.POST.get('description',False)
@@ -1071,7 +1118,7 @@ def new_sale_return(request,pk):
         additional_tax = request.POST.get('additional_tax',False)
         date = datetime.date.today()
         account_id = ChartOfAccount.objects.get(account_title = customer)
-        sale_return_header = SaleReturnHeader(sale_no = get_last_sale_no, date = date, footer_description = description, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = 0, account_id = account_id )
+        sale_return_header = SaleReturnHeader(sale_no = get_last_sale_no, date = date, footer_description = description, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = 0, account_id = account_id, company_id = company, user_id = request.user)
         sale_return_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = SaleReturnHeader.objects.get(sale_no = get_last_sale_no)
@@ -1091,15 +1138,15 @@ def new_sale_return(request,pk):
         total_amount = total_amount
         cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
         if sale_header.payment_method == 'Cash':
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Return Invoice", amount = -abs(total_amount), date = date, remarks = "")
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Return Invoice", amount = -abs(total_amount), date = date, remarks = "",ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Return Invoice", amount = total_amount, date = date, remarks = "")
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Return Invoice", amount = total_amount, date = date, remarks = "", ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
             tran2.save()
         else:
             sale_return_account = ChartOfAccount.objects.get(account_title = 'Sales Returns')
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Return Invoice On Credit", amount = -abs(total_amount), date = date, remarks = "")
+            tran1 = Transactions(refrence_id = 0, refrence_date = date, account_id = account_id, tran_type = "", amount = -abs(total_amount), date = date, remarks = "",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice Return" ,company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_return_account, tran_type = "Sale Return Invoice On Credit", amount = total_amount, date = date, remarks = "")
+            tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = sale_return_account, tran_type = "", amount = total_amount, date = date, remarks = "",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice Return" ,company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk,'get_last_sale_no':get_last_sale_no,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
@@ -1108,16 +1155,21 @@ def new_sale_return(request,pk):
 
 @user_passes_test(allow_sale_return_edit)
 def edit_sale_return(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     item_amount = 0
     total_amount = 0
-    sale_header = SaleReturnHeader.objects.filter(id = pk).first()
-    sale_detail = SaleReturnDetail.objects.filter(sale_return_id = pk).all()
+    sale_header = SaleReturnHeader.objects.filter(company, id = pk).first()
+    sale_detail = SaleReturnDetail.objects.filter(sale_return_id = sale_header.id).all()
     all_accounts = ChartOfAccount.objects.all()
     if request.method == 'POST':
+        company =  request.session['company']
+        company = Company_info.objects.get(id = company)
         sale_detail.delete()
         sale_id = request.POST.get('sale_id',False)
         customer = request.POST.get('customer',False)
@@ -1153,15 +1205,15 @@ def edit_sale_return(request,pk):
         delete.delete()
         purchase_account = ChartOfAccount.objects.get(account_title = 'Sales Returns')
         if sale_header.payment_method == 'Cash':
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Return Invoice", amount = -abs(total_amount), date = date, remarks = "")
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Return Invoice", amount = -abs(total_amount), date = date, remarks = "", company_id = company , user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Return Invoice", amount = total_amount, date = date, remarks = "")
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Return Invoice", amount = total_amount, date = date, remarks = "", company_id = company , user_id = request.user)
             tran2.save()
         else:
             sale_return_account = ChartOfAccount.objects.get(account_title = 'Sales Returns')
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Return Invoice", amount = -abs(total_amount), date = date, remarks = "")
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Return Invoice", amount = -abs(total_amount), date = date, remarks = "", company_id = company , user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_return_account, tran_type = "Sale Return Invoice", amount = total_amount, date = date, remarks = "")
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_return_account, tran_type = "Sale Return Invoice", amount = total_amount, date = date, remarks = "", company_id = company , user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/edit_sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk,'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
@@ -1227,6 +1279,8 @@ def journal_voucher_summary(request):
 
 
 def journal_voucher(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -1267,17 +1321,17 @@ def journal_voucher(request):
             account_id = ChartOfAccount.objects.get(account_title = value["account_title"])
             if value["debit"] > "0" and value["debit"] > "0.00":
                 tran1 = Transactions(refrence_id = 0, refrence_date = doc_date, tran_type = '', amount = abs(float(value["debit"])),
-                                    date = datetime.date.today(), remarks = description, account_id = account_id, ref_inv_tran_id = doc_no, ref_inv_tran_type = 'JV', voucher_id = voucher_id.id)
+                                    date = datetime.date.today(), remarks = description, account_id = account_id, ref_inv_tran_id = doc_no, ref_inv_tran_type = 'JV', voucher_id = voucher_id.id, company_id = company, user_id = request.user)
                 tran1.save()
-                jv_detail1 = VoucherDetail(account_id = account_id, debit = abs(float(value["debit"])), credit = 0.00, header_id = voucher_id)
+                jv_detail1 = VoucherDetail(account_id = account_id, debit = abs(float(value["debit"])), credit = 0.00, header_id = voucher_id, invoice_id = 0)
                 jv_detail1.save()
             if value["credit"] > "0" and value["credit"] > "0.00":
                 print("run")
                 print(value["credit"])
                 tran2 = Transactions(refrence_id = 0, refrence_date = doc_date, tran_type = '', amount = -abs(float(value["credit"])),
-                                    date = datetime.date.today(), remarks = description, account_id = account_id, ref_inv_tran_id = doc_no, ref_inv_tran_type = 'JV', voucher_id = voucher_id.id)
+                                    date = datetime.date.today(), remarks = description, account_id = account_id, ref_inv_tran_id = doc_no, ref_inv_tran_type = 'JV', voucher_id = voucher_id.id, company_id = company, user_id = request.user)
                 tran2.save()
-                jv_detail2 = VoucherDetail(account_id = account_id,  debit = 0.00, credit = -abs(float(value["credit"])), header_id = voucher_id)
+                jv_detail2 = VoucherDetail(account_id = account_id,  debit = 0.00, credit = -abs(float(value["credit"])), header_id = voucher_id, invoice_id = 0)
                 jv_detail2.save()
         return JsonResponse({"result":"success"})
     return render(request, 'transaction/journal_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
@@ -1285,12 +1339,15 @@ def journal_voucher(request):
 
 
 def edit_journal_voucher(request, pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
-    jv_header = VoucherHeader.objects.filter(id = pk).first()
-    jv_detail = VoucherDetail.objects.filter(header_id = pk).all()
+    jv_header = VoucherHeader.objects.filter(company, id = pk).first()
+    jv_detail = VoucherDetail.objects.filter(header_id = jv_header).all()
     account_id = request.POST.get('account_title',False)
     all_accounts = ChartOfAccount.objects.all()
     if account_id:
@@ -1299,10 +1356,13 @@ def edit_journal_voucher(request, pk):
         account_id = account_info.id
         return JsonResponse({'account_title':account_title, 'account_id':account_id})
     if request.method == "POST":
+        company =  request.session['company']
+        company = Company_info.objects.get(id = company)
+        company = Q(company_id = company)
         jv_detail.delete()
         ref_inv_tran_type = Q(ref_inv_tran_type = "JV")
         voucher_id = Q(voucher_id = pk)
-        Transactions.objects.filter(ref_inv_tran_type, voucher_id).all().delete()
+        Transactions.objects.filter(company, ref_inv_tran_type, voucher_id).all().delete()
         tran_id = request.POST.get('tran_id', False)
         doc_no = request.POST.get('doc_no', False)
         doc_date = request.POST.get('doc_date', False)
@@ -1316,12 +1376,14 @@ def edit_journal_voucher(request, pk):
 
         jv_header.save()
         voucher_id = VoucherHeader.objects.get(voucher_no = tran_id)
+        company =  request.session['company']
+        company = Company_info.objects.get(id = company)
         for value in items:
             header_id = VoucherHeader.objects.get(id = pk)
             account_id = ChartOfAccount.objects.get(account_title = value["account_title"])
             if value["debit"] > "0" and value["debit"] > "0.00":
                 tran1 = Transactions(refrence_id = doc_no, refrence_date = doc_date, tran_type = 'JV', amount = abs(float(value["debit"])),
-                                    date = datetime.date.today(), remarks = description, account_id = account_id, ref_inv_tran_id = doc_no, ref_inv_tran_type = 'JV', voucher_id = voucher_id.id)
+                                    date = datetime.date.today(), remarks = description, account_id = account_id, ref_inv_tran_id = doc_no, ref_inv_tran_type = 'JV', voucher_id = voucher_id.id, company_id = company, user_id = request.user)
                 tran1.save()
                 jv_detail1 = VoucherDetail(account_id = account_id, debit = abs(float(value["debit"])), credit = 0.00, header_id = header_id)
                 jv_detail1.save()
@@ -1329,7 +1391,7 @@ def edit_journal_voucher(request, pk):
                 print("run")
                 print(value["credit"])
                 tran2 = Transactions(refrence_id = doc_no, refrence_date = doc_date, tran_type = 'JV', amount = -abs(float(value["credit"])),
-                                    date = datetime.date.today(), remarks = description, account_id = account_id, ref_inv_tran_id = doc_no, ref_inv_tran_type = 'JV', voucher_id = voucher_id.id)
+                                    date = datetime.date.today(), remarks = description, account_id = account_id, ref_inv_tran_id = doc_no, ref_inv_tran_type = 'JV', voucher_id = voucher_id.id, company_id = company, user_id = request.user)
                 tran2.save()
                 jv_detail2 = VoucherDetail(account_id = account_id,  debit = 0.00, credit = -abs(float(value["credit"])), header_id = header_id)
                 jv_detail2.save()
@@ -1338,13 +1400,19 @@ def edit_journal_voucher(request, pk):
 
 
 def view_cash_receiving(request, pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     header_id = VoucherHeader.objects.get(id=pk)
-    voucher_header = VoucherHeader.objects.filter(id=pk).first()
+    voucher_header = VoucherHeader.objects.filter(company, id=pk).first()
     voucher_detail = VoucherDetail.objects.filter(header_id=header_id.id).all()
     return render(request, 'transaction/view_cash_receiving_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail})
 
 
 def cash_receiving_voucher(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -1356,6 +1424,11 @@ def cash_receiving_voucher(request):
 
 
 def new_cash_receiving_voucher(request):
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
     cursor = connection.cursor()
     get_last_tran_id = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%CRV%'
                                         order by voucher_no DESC LIMIT 1''')
@@ -1435,7 +1508,7 @@ def new_cash_receiving_voucher(request):
         customer = request.POST.get('customer', False)
         date = request.POST.get('date', False)
         items = json.loads(request.POST.get('items', False))
-        jv_header = VoucherHeader(voucher_no = get_last_tran_id, doc_no = invoice_no, doc_date = doc_date, cheque_no = "-",cheque_date = doc_date, description = description)
+        jv_header = VoucherHeader(voucher_no = get_last_tran_id, doc_no = invoice_no, doc_date = doc_date, cheque_no = "-",cheque_date = doc_date, description = description, company_id = company, user_id = request.user)
         jv_header.save()
         voucher_id = VoucherHeader.objects.get(voucher_no = get_last_tran_id)
         for value in items:
@@ -1446,10 +1519,10 @@ def new_cash_receiving_voucher(request):
             amount = float(value["debit"]) - float(value['balance'])
 
             tran1 = Transactions(refrence_id = 0, refrence_date = doc_date, tran_type = '', amount = amount,
-                                date = date, remarks = description, account_id = cash_account,ref_inv_tran_id = invoice_no.id,ref_inv_tran_type = "Sale CRV", voucher_id = voucher_id.id )
+                                date = date, remarks = description, account_id = cash_account,ref_inv_tran_id = invoice_no.id,ref_inv_tran_type = "Sale CRV", voucher_id = voucher_id.id, company_id = company,  user_id = request.user)
             tran1.save()
             tran2 = Transactions(refrence_id = 0, refrence_date = doc_date, tran_type = '', amount = -abs(amount),
-                                date = date, remarks = description, account_id = account_id,ref_inv_tran_id = invoice_no.id,ref_inv_tran_type = "Sale CRV", voucher_id = voucher_id.id )
+                                date = date, remarks = description, account_id = account_id,ref_inv_tran_id = invoice_no.id,ref_inv_tran_type = "Sale CRV", voucher_id = voucher_id.id, company_id = company,  user_id = request.user)
             tran2.save()
             header_id = VoucherHeader.objects.get(voucher_no = get_last_tran_id)
             jv_detail1 = VoucherDetail(account_id = cash_account, debit = amount, credit = 0.00, header_id = header_id, invoice_id = invoice_no)
@@ -1457,13 +1530,16 @@ def new_cash_receiving_voucher(request):
             jv_detail2 = VoucherDetail(account_id = account_id,  debit = 0.00, credit = -abs(amount),header_id = header_id, invoice_id = invoice_no)
             jv_detail2.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'transaction/bank_receiving_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request, 'transaction/new_cash_receiving_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
 
 
 def delete_cash_receiving(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     ref_inv_tran_type = Q(ref_inv_tran_type = "Sale CRV")
     voucher_id = Q(voucher_id = pk)
-    Transactions.objects.filter(ref_inv_tran_type, voucher_id).all().delete()
+    Transactions.objects.filter(company, ref_inv_tran_type, voucher_id).all().delete()
     VoucherDetail.objects.filter(header_id = pk).all().delete()
     VoucherHeader.objects.filter(id = pk).delete()
     messages.add_message(request, messages.SUCCESS, "Cash Receiving Voucher Deleted")
@@ -1471,8 +1547,11 @@ def delete_cash_receiving(request,pk):
 
 
 def view_bank_receiving(request, pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     header_id = VoucherHeader.objects.get(id=pk)
-    voucher_header = VoucherHeader.objects.filter(id=pk).first()
+    voucher_header = VoucherHeader.objects.filter(company, id=pk).first()
     voucher_detail = VoucherDetail.objects.filter(header_id=header_id.id).all()
     return render(request, 'transaction/view_bank_receiving_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail})
 
@@ -1486,6 +1565,12 @@ def bank_receiving_voucher(request):
 
 
 def new_bank_receiving_voucher(request):
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     cursor = connection.cursor()
     get_last_tran_id = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%BRV%'
                                         order by voucher_no DESC LIMIT 1''')
@@ -1510,7 +1595,7 @@ def new_bank_receiving_voucher(request):
     all_accounts = ChartOfAccount.objects.filter(customers|suppliers).all()
     banks = Q(parent_id = 16)
     all_bank = ChartOfAccount.objects.filter(banks).all()
-    all_invoices = SaleHeader.objects.all()
+    all_invoices = SaleHeader.objects.filter(company).all()
     user = request.user
     if account_name:
         if check == "1":
@@ -1564,6 +1649,8 @@ def new_bank_receiving_voucher(request):
             pi = pi.fetchall()
             return JsonResponse({'pi':pi,'bank_account':bank_account,'account_id':account_id.account_id})
     if request.method == "POST":
+        company =  request.session['company']
+        company = Company_info.objects.get(id = company)
         invoice_no = request.POST.get('invoice_no', False)
         doc_date = request.POST.get('doc_date', False)
         cheque_no = request.POST.get('cheque_no', False)
@@ -1573,11 +1660,10 @@ def new_bank_receiving_voucher(request):
         bank = request.POST.get('bank', False)
         date = request.POST.get('date', False)
         items = json.loads(request.POST.get('items', False))
-        jv_header = VoucherHeader(voucher_no = get_last_tran_id, doc_no = invoice_no, doc_date = doc_date, cheque_no = cheque_no,cheque_date = cheque_date, description = description)
+        jv_header = VoucherHeader(voucher_no = get_last_tran_id, doc_no = invoice_no, doc_date = doc_date, cheque_no = cheque_no,cheque_date = cheque_date, description = description, company_id = company, user_id = request.user)
         jv_header.save()
         voucher_id = VoucherHeader.objects.get(voucher_no = get_last_tran_id)
         for value in items:
-            print(items)
             invoice_no = SaleHeader.objects.get(sale_no = value["invoice_no"])
 
             account_id = ChartOfAccount.objects.get(account_title = customer)
@@ -1585,10 +1671,10 @@ def new_bank_receiving_voucher(request):
             amount = float(value["debit"]) - float(value['balance'])
 
             tran1 = Transactions(refrence_id = 0, refrence_date = doc_date, tran_type = '', amount = amount,
-                                date = date, remarks = description, account_id = bank_account,ref_inv_tran_id = invoice_no.id,ref_inv_tran_type = "Sale BRV", voucher_id = voucher_id.id )
+                                date = date, remarks = description, account_id = bank_account,ref_inv_tran_id = invoice_no.id,ref_inv_tran_type = "Sale BRV", voucher_id = voucher_id.id, company_id = company, user_id = request.user )
             tran1.save()
             tran2 = Transactions(refrence_id = 0, refrence_date = doc_date, tran_type = '', amount = -abs(amount),
-                                date = date, remarks = description, account_id = account_id,ref_inv_tran_id = invoice_no.id,ref_inv_tran_type = "Sale BRV", voucher_id = voucher_id.id )
+                                date = date, remarks = description, account_id = account_id,ref_inv_tran_id = invoice_no.id,ref_inv_tran_type = "Sale BRV", voucher_id = voucher_id.id, company_id = company, user_id = request.user)
             tran2.save()
             header_id = VoucherHeader.objects.get(voucher_no = get_last_tran_id)
             jv_detail1 = VoucherDetail(account_id = bank_account, debit = amount, credit = 0.00, header_id = header_id, invoice_id = invoice_no)
@@ -1596,21 +1682,27 @@ def new_bank_receiving_voucher(request):
             jv_detail2 = VoucherDetail(account_id = account_id,  debit = 0.00, credit = -abs(amount),header_id = header_id, invoice_id = invoice_no)
             jv_detail2.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'transaction/cash_receiving_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request, 'transaction/new_bank_receiving_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
 
 
 def delete_bank_receiving(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     ref_inv_tran_type = Q(ref_inv_tran_type = "Sale BRV")
     voucher_id = Q(voucher_id = pk)
-    Transactions.objects.filter(ref_inv_tran_type, voucher_id).all().delete()
+    Transactions.objects.filter(company,ref_inv_tran_type, voucher_id).all().delete()
     VoucherDetail.objects.filter(header_id = pk).all().delete()
     VoucherHeader.objects.filter(id = pk).delete()
     messages.add_message(request, messages.SUCCESS, "Cash Receiving Voucher Deleted")
     return redirect('bank-receiving-voucher')
 
 def view_bank_payment(request, pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     header_id = VoucherHeader.objects.get(id=pk)
-    voucher_header = VoucherHeader.objects.filter(id=pk).first()
+    voucher_header = VoucherHeader.objects.filter(company,id=pk).first()
     voucher_detail = VoucherDetail.objects.filter(header_id=header_id.id).all()
     return render(request, 'transaction/view_bank_payment_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail})
 
@@ -1627,6 +1719,12 @@ def bank_payment_voucher(request):
 
 
 def new_bank_payment_voucher(request):
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     cursor = connection.cursor()
     get_last_tran_id = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%BPV%'
                                         order by voucher_no DESC LIMIT 1''')
@@ -1651,7 +1749,7 @@ def new_bank_payment_voucher(request):
     all_accounts = ChartOfAccount.objects.filter(customers|suppliers).all()
     banks = Q(parent_id = 16)
     all_bank = ChartOfAccount.objects.filter(banks).all()
-    all_invoices = PurchaseHeader.objects.all()
+    all_invoices = PurchaseHeader.objects.filter(company).all()
     user = request.user
     if account_name:
         if check == "1":
@@ -1705,6 +1803,8 @@ def new_bank_payment_voucher(request):
             pi = pi.fetchall()
             return JsonResponse({'pi':pi,'bank_account':bank_account,'account_id':account_id.account_id})
     if request.method == "POST":
+        company =  request.session['company']
+        company = Company_info.objects.get(id = company)
         invoice_no = request.POST.get('invoice_no', False)
         doc_date = request.POST.get('doc_date', False)
         cheque_no = request.POST.get('cheque_no', False)
@@ -1714,7 +1814,7 @@ def new_bank_payment_voucher(request):
         bank = request.POST.get('bank', False)
         date = request.POST.get('date', False)
         items = json.loads(request.POST.get('items', False))
-        jv_header = VoucherHeader(voucher_no = get_last_tran_id, doc_no = invoice_no, doc_date = doc_date, cheque_no = cheque_no,cheque_date = cheque_date, description = description)
+        jv_header = VoucherHeader(voucher_no = get_last_tran_id, doc_no = invoice_no, doc_date = doc_date, cheque_no = cheque_no,cheque_date = cheque_date, description = description, company_id = company, user_id = request.user)
         jv_header.save()
         voucher_id = VoucherHeader.objects.get(voucher_no = get_last_tran_id)
         for value in items:
@@ -1725,10 +1825,10 @@ def new_bank_payment_voucher(request):
             amount = float(value["credit"]) - float(value['balance'])
 
             tran1 = Transactions(refrence_id = 0, refrence_date = doc_date, tran_type = '', amount = -abs(amount),
-                                date = date, remarks = description, account_id = bank_account,ref_inv_tran_id = invoice_no.id,ref_inv_tran_type = "Purchase BPV", voucher_id = voucher_id.id )
+                                date = date, remarks = description, account_id = bank_account,ref_inv_tran_id = invoice_no.id,ref_inv_tran_type = "Purchase BPV", voucher_id = voucher_id.id , company_id = company, user_id = request.user )
             tran1.save()
             tran2 = Transactions(refrence_id = 0, refrence_date = doc_date, tran_type = '', amount = amount,
-                                date = date, remarks = description, account_id = account_id,ref_inv_tran_id = invoice_no.id,ref_inv_tran_type = "Purchase BPV", voucher_id = voucher_id.id )
+                                date = date, remarks = description, account_id = account_id,ref_inv_tran_id = invoice_no.id,ref_inv_tran_type = "Purchase BPV", voucher_id = voucher_id.id , company_id = company, user_id = request.user)
             tran2.save()
             header_id = VoucherHeader.objects.get(voucher_no = get_last_tran_id)
             jv_detail1 = VoucherDetail(account_id = bank_account, debit = 0.00, credit = -abs(amount), header_id = header_id, invoice_id = invoice_no.id)
@@ -1740,18 +1840,24 @@ def new_bank_payment_voucher(request):
 
 
 def delete_bank_payment(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     ref_inv_tran_type = Q(ref_inv_tran_type = "Purchase BPV")
     voucher_id = Q(voucher_id = pk)
-    Transactions.objects.filter(ref_inv_tran_type, voucher_id).all().delete()
+    Transactions.objects.filter(company, ref_inv_tran_type, voucher_id).all().delete()
     VoucherDetail.objects.filter(header_id = pk).all().delete()
-    VoucherHeader.objects.filter(id = pk).delete()
+    VoucherHeader.objects.filter(company, id = pk).delete()
     messages.add_message(request, messages.SUCCESS, "Bank Payment Voucher Deleted")
     return redirect('bank-payment-voucher')
 
 
 def view_cash_payment(request, pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     header_id = VoucherHeader.objects.get(id=pk)
-    voucher_header = VoucherHeader.objects.filter(id=pk).first()
+    voucher_header = VoucherHeader.objects.filter(company, id=pk).first()
     voucher_detail = VoucherDetail.objects.filter(header_id=header_id.id).all()
     return render(request, 'transaction/view_cash_receiving_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail})
 
@@ -1768,6 +1874,9 @@ def cash_payment_voucher(request):
 
 
 def new_cash_payment_voucher(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     cursor = connection.cursor()
     get_last_tran_id = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%CPV%'
                                         order by voucher_no DESC LIMIT 1''')
@@ -1787,7 +1896,7 @@ def new_cash_payment_voucher(request):
     check = request.POST.get('check', False)
     invoice_no = request.POST.get('invoice_no', False)
     all_accounts = ChartOfAccount.objects.all()
-    all_invoices = PurchaseHeader.objects.all()
+    all_invoices = PurchaseHeader.objects.filter(company).all()
     user = request.user
     if account_name:
         if check == "1":
@@ -1845,7 +1954,7 @@ def new_cash_payment_voucher(request):
         customer = request.POST.get('customer', False)
         date = request.POST.get('date', False)
         items = json.loads(request.POST.get('items', False))
-        jv_header = VoucherHeader(voucher_no = get_last_tran_id, doc_no = invoice_no, doc_date = doc_date, cheque_no = "-",cheque_date = doc_date, description = description)
+        jv_header = VoucherHeader(voucher_no = get_last_tran_id, doc_no = invoice_no, doc_date = doc_date, cheque_no = "-",cheque_date = doc_date, description = description , company_id = company, user_id = request.user)
         jv_header.save()
         voucher_id = VoucherHeader.objects.get(voucher_no = get_last_tran_id)
         for value in items:
@@ -1872,21 +1981,26 @@ def new_cash_payment_voucher(request):
 
 
 def delete_cash_payment(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     ref_inv_tran_type = Q(ref_inv_tran_type = "Purchase CPV")
     voucher_id = Q(voucher_id = pk)
-    Transactions.objects.filter(ref_inv_tran_type, voucher_id).all().delete()
+    Transactions.objects.filter(company, ref_inv_tran_type, voucher_id).all().delete()
     VoucherDetail.objects.filter(header_id = pk).all().delete()
-    VoucherHeader.objects.filter(id = pk).delete()
+    VoucherHeader.objects.filter(company,id = pk).delete()
     messages.add_message(request, messages.SUCCESS, "Cash Payment Voucher Deleted")
     return redirect('cash-payment-voucher')
 
 
 def crv_pdf(request, pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     company_info = Company_info.objects.all()
-    header = VoucherHeader.objects.filter(id = pk).first()
-    details = VoucherDetail.objects.filter(debit = 0,header_id = pk).first()
+    header = VoucherHeader.objects.filter(company, id = pk).first()
+    details = VoucherDetail.objects.filter(debit = 0,header_id = header.id).first()
     cursor = connection.cursor()
-    print(details.account_id.id)
     detail = cursor.execute('''select sum(VD.credit) as Amount,COA.account_title, COA.account_id
                             from transaction_voucherdetail VD
                             inner join transaction_voucherheader VH on VH.id = VD.header_id_id
@@ -1907,9 +2021,12 @@ def crv_pdf(request, pk):
 
 
 def cpv_pdf(request, pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     company_info = Company_info.objects.all()
-    header = VoucherHeader.objects.filter(id = pk).first()
-    details = VoucherDetail.objects.filter(credit = 0,header_id = pk).first()
+    header = VoucherHeader.objects.filter(company, id = pk).first()
+    details = VoucherDetail.objects.filter(credit = 0,header_id = header.id).first()
     cursor = connection.cursor()
     detail = cursor.execute('''select sum(VD.debit) as Amount,COA.account_title, COA.account_id
                             from transaction_voucherdetail VD
@@ -1930,9 +2047,12 @@ def cpv_pdf(request, pk):
 
 
 def bpv_pdf(request, pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     company_info = Company_info.objects.all()
-    header = VoucherHeader.objects.filter(id = pk).first()
-    details = VoucherDetail.objects.filter(credit = 0,header_id = pk).first()
+    header = VoucherHeader.objects.filter(company, id = pk).first()
+    details = VoucherDetail.objects.filter(credit = 0,header_id = header.id).first()
     cursor = connection.cursor()
     detail = cursor.execute('''select sum(VD.debit) as Amount,COA.account_title, COA.account_id
                             from transaction_voucherdetail VD
@@ -1954,9 +2074,12 @@ def bpv_pdf(request, pk):
 
 
 def brv_pdf(request, pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     company_info = Company_info.objects.all()
-    header = VoucherHeader.objects.filter(id = pk).first()
-    details = VoucherDetail.objects.filter(debit = 0,header_id = pk).first()
+    header = VoucherHeader.objects.filter(company,id = pk).first()
+    details = VoucherDetail.objects.filter(debit = 0,header_id = header.id).first()
     cursor = connection.cursor()
     print(details.account_id.id)
     detail = cursor.execute('''select sum(VD.credit) as Amount,COA.account_title, COA.account_id
@@ -1980,6 +2103,9 @@ def brv_pdf(request, pk):
 
 
 def account_ledger(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -2061,6 +2187,9 @@ def trial_balance(request):
 
 
 def sale_detail(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -2287,11 +2416,20 @@ def commercial_invoice(request,pk):
 
 
 def multi_companies(request):
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     all_companies = Company_info.objects.all()
-    return render(request,'transaction/multi_companies.html',{'all_companies':all_companies})
+    return render(request,'transaction/multi_companies.html',{'all_companies':all_companies,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_inventory_roles':allow_inventory_roles,'allow_transaction_roles':allow_transaction_roles})
 
 
 def new_multi_companies(request):
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
+    all_companies = Company_info.objects.all()
     if request.method == 'POST':
         company_name = request.POST.get('company_name')
         company_address = request.POST.get('company_address')
@@ -2304,4 +2442,4 @@ def new_multi_companies(request):
         cnic = request.POST.get('cnic')
         new_companies = Company_info(company_name = company_name, company_address = company_address, phone_no = phone_no, email = email_address,  website = web_site, ntn = ntn, stn = stn, cnic = cnic)
         new_companies.save()
-    return render(request,'transaction/new_multi_company.html')
+    return render(request,'transaction/new_multi_company.html',{'all_companies':all_companies,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_inventory_roles':allow_inventory_roles,'allow_transaction_roles':allow_transaction_roles})

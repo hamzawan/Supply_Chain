@@ -108,9 +108,10 @@
           {% for value in quotation_detail %}
             <tr>
               <td>{{ forloop.counter }}</td>
-              <td> {{value.item_code}} </td>
-              <td> {{value.item_name}} </td>
-              <td><pre>{{value.item_description}}</pre></td>
+              <td style="display:none;">{{ value.item_id.id }}</td>
+              <td> {{value.item_id.product_code}} </td>
+              <td> {{value.item_id.product_name}} </td>
+              <td><pre>{{value.item_id.product_desc}}</pre></td>
               <td> {{value.quantity}} </td>
               <td> {{value.unit}} </td>
               <td> {{value.unit_price}} </td>

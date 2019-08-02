@@ -70,9 +70,10 @@
               {% for value in rfq_detail  %}
               <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ value.item_code }}</td>
-                <td>{{ value.item_name }}</td>
-                <td>{{ value.item_description }}</td>
+                <td style="display:none;">{{ value.item_id.id }}</td>
+                <td>{{ value.item_id.product_code }}</td>
+                <td>{{ value.item_id.product_name }}</td>
+                <td>{{ value.item_id.product_desc }}</td>
                 <td>{{ value.unit }}</td>
                 <td>{{ value.quantity }}</td>
                 <td><a class="add-rfq-edit" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-rfq-edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-rfq-edit" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>

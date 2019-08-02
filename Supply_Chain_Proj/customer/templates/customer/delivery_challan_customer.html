@@ -13,7 +13,7 @@
       <div class="col-md-12">
         {% if permission.add == 1%}
         <a role="button" href="{% url 'new-delivery-challan-customer' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
-        
+
         {% else %}
         <a role="button" href="#" style="float:right;" class="btn btn-outline-secondary disabled" name="button"><i class="fas fa-plus"></i> Add New</a>
         {% endif %}
@@ -40,7 +40,7 @@
                 <td>{{ value.dc_no }}</td>
                 <td>{{value.account_id.account_title}}</td>
                 <td>{{ value.date }}</td>
-                <td>user1</td>
+                <td>{{ value.user_id.username }}</td>
                 <td>
                     {% if permission.edit == 1 %}
                   <a class="edit_list" href="{% url 'edit-delivery-challan-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
@@ -57,7 +57,7 @@
                   {% else %}
                   <a href="#" style="color:gray;"><i class="fas fa-file-invoice"></i></a>
                   {% endif %}
-                  
+
                   {% if permission.r_print == 1 %}
                   <a href="{% url 'print-dc-customer' pk=value.id %}" target="_blank"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a>
                   {% endif %}
@@ -65,7 +65,7 @@
                   {% if permission.delete == 1 %}
                   <a class="delete-po-supplier"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
                   {% endif %}
-                  
+
                   {% endwith %}
                 </td>
             </tr>
