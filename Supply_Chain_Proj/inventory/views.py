@@ -107,7 +107,7 @@ def item_stock(request):
                     ''')
     row = cursor.fetchall()
     return render(request, 'inventory/item_stock.html',{'row':row,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,
-    'permission':permission,'allow_inventory_roles':allow_inventory_roles})
+    'permission':permission,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_inventory_add)
@@ -116,7 +116,7 @@ def new_item_stock(request):
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
-    return render(request, 'inventory/new_item_stock.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'inventory/new_item_stock.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 
@@ -158,7 +158,7 @@ def add_product(request):
             new_products.save()
             serial_no = serial_no + 1
         return JsonResponse({"result":"success"})
-    return render(request, 'inventory/add_product.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'inventory/add_product.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_inventory_edit)
@@ -184,7 +184,7 @@ def edit_item(request,pk):
         all_detail.opening_stock = opening_stock
         all_detail.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'inventory/edit_item.html', {'all_detail':all_detail,'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'inventory/edit_item.html', {'all_detail':all_detail,'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 def item_avaliable(pk):

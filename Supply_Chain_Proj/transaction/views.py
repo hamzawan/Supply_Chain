@@ -254,6 +254,301 @@ def allow_sale_return_delete(user):
         return False
 
 
+
+def allow_jv_display(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 36)
+    display = Q(display = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, display)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_jv_add(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 36)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_jv_print(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 36)
+    r_print = Q(r_print = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_jv_delete(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 36)
+    delete = Q(delete = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_jv_edit(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 36)
+    edit = Q(edit = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, edit)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_brv_display(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 37)
+    display = Q(display = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, display)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_brv_add(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 37)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_brv_edit(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 37)
+    edit = Q(edit = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, edit)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_brv_delete(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 37)
+    delete = Q(delete = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
+    if allow_role:
+        return False
+    else:
+        return False
+
+
+def allow_brv_print(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 37)
+    r_print = Q(r_print = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
+    if allow_role:
+        return False
+    else:
+        return False
+
+
+
+def allow_crv_display(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 38)
+    display = Q(display = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, display)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_crv_add(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 38)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_crv_edit(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 38)
+    edit = Q(edit = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, edit)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_crv_delete(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 38)
+    delete = Q(delete = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
+    if allow_role:
+        return False
+    else:
+        return False
+
+
+def allow_crv_print(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 38)
+    r_print = Q(r_print = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
+    if allow_role:
+        return False
+    else:
+        return False
+
+
+def allow_bpv_display(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 39)
+    display = Q(display = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, display)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_bpv_add(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 39)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_bpv_edit(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 39)
+    edit = Q(edit = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, edit)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_bpv_delete(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 39)
+    delete = Q(delete = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
+    if allow_role:
+        return False
+    else:
+        return False
+
+
+def allow_bpv_print(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 39)
+    r_print = Q(r_print = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
+    if allow_role:
+        return False
+    else:
+        return False
+
+
+
+def allow_cpv_display(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 310)
+    display = Q(display = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, display)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_cpv_add(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 310)
+    add = Q(add = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+
+def allow_cpv_edit(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 310)
+    edit = Q(edit = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, edit)
+    if allow_role:
+        return True
+    else:
+        return False
+
+
+def allow_cpv_delete(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 310)
+    delete = Q(delete = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
+    if allow_role:
+        return False
+    else:
+        return False
+
+def allow_cpv_print(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 310)
+    r_print = Q(r_print = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
+    if allow_role:
+        return False
+    else:
+        return False
+
+
 def chart_account_roles(user):
     userid = str(user.id)
     user_id = Q(user_id= userid)
@@ -290,6 +585,44 @@ def sale_return_roles(user):
     return sale_return_roles
 
 
+def journal_voucher_roles(user):
+    userid = str(user.id)
+    user_id = Q(user_id= userid)
+    child_form = Q(child_form= 36)
+    journal_voucher_roles = UserRoles.objects.filter(user_id,child_form).first()
+    return journal_voucher_roles
+
+def brv_roles(user):
+    userid = str(user.id)
+    user_id = Q(user_id= userid)
+    child_form = Q(child_form= 37)
+    brv_roles = UserRoles.objects.filter(user_id,child_form).first()
+    return brv_roles
+
+def crv_roles(user):
+    userid = str(user.id)
+    user_id = Q(user_id= userid)
+    child_form = Q(child_form= 38)
+    crv_roles = UserRoles.objects.filter(user_id,child_form).first()
+    return crv_roles
+
+
+def bpv_roles(user):
+    userid = str(user.id)
+    user_id = Q(user_id= userid)
+    child_form = Q(child_form= 39)
+    bpv_roles = UserRoles.objects.filter(user_id,child_form).first()
+    return bpv_roles
+
+
+def cpv_roles(user):
+    userid = str(user.id)
+    user_id = Q(user_id= userid)
+    child_form = Q(child_form= 310)
+    cpv_roles = UserRoles.objects.filter(user_id,child_form).first()
+    return cpv_roles
+
+
 @user_passes_test(allow_purchase_display)
 def purchase(request):
     company =  request.session['company']
@@ -303,7 +636,8 @@ def purchase(request):
     allow_inventory_roles = inventory_roles(request.user)
     permission = purchase_roles(request.user)
     all_purchases = PurchaseHeader.objects.filter(company).all()
-    return render(request, 'transaction/purchase.html',{'all_purchases': all_purchases,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'transaction/purchase.html',{'all_purchases': all_purchases,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+
 
 
 @user_passes_test(allow_purchase_add)
@@ -383,7 +717,7 @@ def new_purchase(request):
             tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = purchase_account, tran_type = "", amount = total_amount, date = date, remarks = "Amount Debit",ref_inv_tran_id = header_id, ref_inv_tran_type = "Purchase Invoice", company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/new_purchase.html',{'all_item_code':all_item_code,'get_last_purchase_no':get_last_purchase_no, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'transaction/new_purchase.html',{'all_item_code':all_item_code,'get_last_purchase_no':get_last_purchase_no, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_purchase_edit)
@@ -475,7 +809,7 @@ def edit_purchase(request,pk):
             tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = purchase_account, tran_type = "Purchase Invoice", amount = total_amount, date = date, remarks = "Amount Debit", company_id = company , user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/edit_purchase.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'purchase_header':purchase_header, 'purchase_detail':purchase_detail, 'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'transaction/edit_purchase.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'purchase_header':purchase_header, 'purchase_detail':purchase_detail, 'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 
@@ -489,7 +823,7 @@ def purchase_return_summary(request):
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     all_purchase_return = PurchaseReturnHeader.objects.filter(company).all()
-    return render(request, 'transaction/purchase_return_summary.html',{'all_purchase_return': all_purchase_return,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'transaction/purchase_return_summary.html',{'all_purchase_return': all_purchase_return,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 
@@ -561,7 +895,7 @@ def new_purchase_return(request,pk):
             tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = purchase_account, tran_type = "", amount = -abs(total_amount), date = date, remarks = "Amount Debit", ref_inv_tran_id = header_id ,ref_inv_tran_type = "Purchase Return Invoice", user_id = request.user, copmany_id = company)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/purchase_return.html',{'purchase_header':purchase_header, 'purchase_detail': purchase_detail,'pk':pk,'get_last_purchase_no':get_last_purchase_no,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'transaction/purchase_return.html',{'purchase_header':purchase_header, 'purchase_detail': purchase_detail,'pk':pk,'get_last_purchase_no':get_last_purchase_no,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 
@@ -627,7 +961,7 @@ def edit_purchase_return(request,pk):
             tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = purchase_account, tran_type = "Purchase Return Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit", company = company_id, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/edit_purchase_return.html',{'purchase_header':purchase_header, 'purchase_detail': purchase_detail,'pk':pk,'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'transaction/edit_purchase_return.html',{'purchase_header':purchase_header, 'purchase_detail': purchase_detail,'pk':pk,'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_sale_display)
@@ -641,7 +975,8 @@ def sale(request):
     allow_inventory_roles = inventory_roles(request.user)
     permission = sale_roles(request.user)
     all_sales = SaleHeader.objects.filter(company).all()
-    return render(request, 'transaction/sale.html',{'all_sales': all_sales,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'transaction/sale.html',{'all_sales': all_sales,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+
 
 
 @user_passes_test(allow_sale_add)
@@ -828,7 +1163,7 @@ def new_sale(request):
             tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = sale_account, tran_type = "", amount = -abs(total_amount), date = date, remarks = "Amount Debit",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice", company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/new_sales.html',{'get_last_sale_no':get_last_sale_no, 'all_accounts':all_accounts, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'transaction/new_sales.html',{'get_last_sale_no':get_last_sale_no, 'all_accounts':all_accounts, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 def direct_sale(request, pk):
@@ -915,7 +1250,7 @@ def direct_sale(request, pk):
             tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = sale_account, tran_type = "", amount = -abs(total_amount), date = date, remarks = "Amount Debit",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice", company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/direct_invoice.html',{'all_item_code':all_item_code,'get_last_sale_no':get_last_sale_no, 'all_accounts':all_accounts, 'dc_header':dc_header, 'dc_detail':dc_detail, 'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'transaction/direct_invoice.html',{'all_item_code':all_item_code,'get_last_sale_no':get_last_sale_no, 'all_accounts':all_accounts, 'dc_header':dc_header, 'dc_detail':dc_detail, 'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 
@@ -1068,7 +1403,7 @@ def edit_sale(request,pk):
             tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = sale_account, tran_type = "", amount = -abs(total_amount), date = date, remarks = "Amount Debit", ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice" ,company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/edit_sale.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'sale_header':sale_header, 'sale_detail':sale_detail, 'pk':pk, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'transaction/edit_sale.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'sale_header':sale_header, 'sale_detail':sale_detail, 'pk':pk, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 def sale_return_summary(request):
@@ -1081,7 +1416,8 @@ def sale_return_summary(request):
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     all_sales_return = SaleReturnHeader.filter(company).objects.all()
-    return render(request, 'transaction/sale_return_summary.html',{'all_sales_return': all_sales_return,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'transaction/sale_return_summary.html',{'all_sales_return': all_sales_return,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+
 
 
 @user_passes_test(allow_sale_return_display)
@@ -1149,7 +1485,7 @@ def new_sale_return(request,pk):
             tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = sale_return_account, tran_type = "", amount = total_amount, date = date, remarks = "",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice Return" ,company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk,'get_last_sale_no':get_last_sale_no,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'transaction/sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk,'get_last_sale_no':get_last_sale_no,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 
@@ -1216,7 +1552,7 @@ def edit_sale_return(request,pk):
             tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_return_account, tran_type = "Sale Return Invoice", amount = total_amount, date = date, remarks = "", company_id = company , user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/edit_sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk,'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'transaction/edit_sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk,'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 
@@ -1254,17 +1590,16 @@ def chart_of_account(request):
             opening_balance = -abs(int(opening_balance))
         coa = ChartOfAccount(account_title = account_title, parent_id = account_type, opening_balance = opening_balance, phone_no = phone_no, email_address = email_address, ntn = ntn, stn = stn, cnic = cnic ,Address = address, remarks = remarks, credit_limit=credit_limits)
         coa.save()
-    return render(request, 'transaction/chart_of_account.html',{'all_accounts':all_accounts,'all_accounts_null':all_accounts_null,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'transaction/chart_of_account.html',{'all_accounts':all_accounts,'all_accounts_null':all_accounts_null,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 def reports(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
-    allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     all_accounts = ChartOfAccount.objects.all()
-    return render(request,'transaction/reports.html',{'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request,'transaction/reports.html',{'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 def journal_voucher_summary(request):
@@ -1272,12 +1607,14 @@ def journal_voucher_summary(request):
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
+    permission = journal_voucher_roles(request.user)
     cursor = connection.cursor()
     all_voucher = cursor.execute(''' select * from transaction_voucherheader where voucher_no LIKE '%JV%' ''')
     all_voucher = all_voucher.fetchall()
-    return render(request, 'transaction/journal_voucher_summary.html',{'all_voucher':all_voucher,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'transaction/journal_voucher_summary.html',{'all_voucher':all_voucher,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'permission':permission,'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(allow_jv_display)
 def journal_voucher(request):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
@@ -1285,6 +1622,7 @@ def journal_voucher(request):
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
+    permission = journal_voucher_roles(request.user)
     cursor = connection.cursor()
     get_last_tran_id = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%JV%'
                                     order by voucher_no DESC LIMIT 1 ''')
@@ -1334,10 +1672,11 @@ def journal_voucher(request):
                 jv_detail2 = VoucherDetail(account_id = account_id,  debit = 0.00, credit = -abs(float(value["credit"])), header_id = voucher_id, invoice_id = 0)
                 jv_detail2.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'transaction/journal_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'transaction/journal_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,
+    'permission':permission,'is_superuser':request.user.is_superuser})
 
 
-
+@user_passes_test(allow_jv_edit)
 def edit_journal_voucher(request, pk):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
@@ -1396,19 +1735,25 @@ def edit_journal_voucher(request, pk):
                 jv_detail2 = VoucherDetail(account_id = account_id,  debit = 0.00, credit = -abs(float(value["credit"])), header_id = header_id)
                 jv_detail2.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'transaction/edit_journal_voucher.html',{"all_accounts":all_accounts,'jv_header':jv_header, 'jv_detail':jv_detail,'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    return render(request, 'transaction/edit_journal_voucher.html',{"all_accounts":all_accounts,'jv_header':jv_header, 'jv_detail':jv_detail,'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(allow_crv_display)
 def view_cash_receiving(request, pk):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
     company = Q(company_id = company)
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     header_id = VoucherHeader.objects.get(id=pk)
     voucher_header = VoucherHeader.objects.filter(company, id=pk).first()
     voucher_detail = VoucherDetail.objects.filter(header_id=header_id.id).all()
-    return render(request, 'transaction/view_cash_receiving_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail})
+    return render(request, 'transaction/view_cash_receiving_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(allow_crv_display)
 def cash_receiving_voucher(request):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
@@ -1416,19 +1761,23 @@ def cash_receiving_voucher(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
+    permission = crv_roles(request.user)
     cursor = connection.cursor()
     all_vouchers = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%CRV%'
                                         order by voucher_no''')
     all_vouchers = all_vouchers.fetchall()
-    return render(request, 'transaction/cash_receiving_voucher.html', {'all_vouchers': all_vouchers})
+    return render(request, 'transaction/cash_receiving_voucher.html', {'all_vouchers': all_vouchers,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(allow_crv_add)
 def new_cash_receiving_voucher(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
+    allow_inventory_roles = inventory_roles(request.user)
     cursor = connection.cursor()
     get_last_tran_id = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%CRV%'
                                         order by voucher_no DESC LIMIT 1''')
@@ -1530,13 +1879,19 @@ def new_cash_receiving_voucher(request):
             jv_detail2 = VoucherDetail(account_id = account_id,  debit = 0.00, credit = -abs(amount),header_id = header_id, invoice_id = invoice_no)
             jv_detail2.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'transaction/new_cash_receiving_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request, 'transaction/bank_receiving_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
+
+@user_passes_test(allow_crv_delete)
 def delete_cash_receiving(request,pk):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
     company = Q(company_id = company)
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     ref_inv_tran_type = Q(ref_inv_tran_type = "Sale CRV")
     voucher_id = Q(voucher_id = pk)
     Transactions.objects.filter(company, ref_inv_tran_type, voucher_id).all().delete()
@@ -1546,24 +1901,36 @@ def delete_cash_receiving(request,pk):
     return redirect('cash-receiving-voucher')
 
 
+@user_passes_test(allow_brv_display)
 def view_bank_receiving(request, pk):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
     company = Q(company_id = company)
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     header_id = VoucherHeader.objects.get(id=pk)
     voucher_header = VoucherHeader.objects.filter(company, id=pk).first()
     voucher_detail = VoucherDetail.objects.filter(header_id=header_id.id).all()
-    return render(request, 'transaction/view_bank_receiving_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail})
+    return render(request, 'transaction/view_bank_receiving_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(allow_brv_display)
 def bank_receiving_voucher(request):
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     cursor = connection.cursor()
+    permission = brv_roles(request.user)
     all_vouchers = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%BRV%'
                                         order by voucher_no''')
     all_vouchers = all_vouchers.fetchall()
-    return render(request, 'transaction/bank_receiving_voucher.html', {'all_vouchers': all_vouchers})
+    return render(request, 'transaction/bank_receiving_voucher.html', {'all_vouchers': all_vouchers,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(allow_brv_add)
 def new_bank_receiving_voucher(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
@@ -1571,6 +1938,7 @@ def new_bank_receiving_voucher(request):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
     company = Q(company_id = company)
+    allow_inventory_roles = inventory_roles(request.user)
     cursor = connection.cursor()
     get_last_tran_id = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%BRV%'
                                         order by voucher_no DESC LIMIT 1''')
@@ -1682,13 +2050,18 @@ def new_bank_receiving_voucher(request):
             jv_detail2 = VoucherDetail(account_id = account_id,  debit = 0.00, credit = -abs(amount),header_id = header_id, invoice_id = invoice_no)
             jv_detail2.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'transaction/new_bank_receiving_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request, 'transaction/cash_receiving_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(allow_brv_delete)
 def delete_bank_receiving(request,pk):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
     company = Q(company_id = company)
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     ref_inv_tran_type = Q(ref_inv_tran_type = "Sale BRV")
     voucher_id = Q(voucher_id = pk)
     Transactions.objects.filter(company,ref_inv_tran_type, voucher_id).all().delete()
@@ -1697,27 +2070,37 @@ def delete_bank_receiving(request,pk):
     messages.add_message(request, messages.SUCCESS, "Cash Receiving Voucher Deleted")
     return redirect('bank-receiving-voucher')
 
+
+@user_passes_test(allow_bpv_display)
 def view_bank_payment(request, pk):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
     company = Q(company_id = company)
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     header_id = VoucherHeader.objects.get(id=pk)
     voucher_header = VoucherHeader.objects.filter(company,id=pk).first()
     voucher_detail = VoucherDetail.objects.filter(header_id=header_id.id).all()
-    return render(request, 'transaction/view_bank_payment_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail})
+    return render(request, 'transaction/view_bank_payment_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(allow_bpv_display)
 def bank_payment_voucher(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
+    permission = bpv_roles(request.user)
     cursor = connection.cursor()
     all_vouchers = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%BPV%'
                                         order by voucher_no''')
     all_vouchers = all_vouchers.fetchall()
-    return render(request, 'transaction/bank_payment_voucher.html', {'all_vouchers': all_vouchers})
+    return render(request, 'transaction/bank_payment_voucher.html', {'all_vouchers': all_vouchers,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(allow_bpv_add)
 def new_bank_payment_voucher(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
@@ -1725,6 +2108,7 @@ def new_bank_payment_voucher(request):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
     company = Q(company_id = company)
+    allow_inventory_roles = inventory_roles(request.user)
     cursor = connection.cursor()
     get_last_tran_id = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%BPV%'
                                         order by voucher_no DESC LIMIT 1''')
@@ -1836,13 +2220,19 @@ def new_bank_payment_voucher(request):
             jv_detail2 = VoucherDetail(account_id = account_id,  debit = amount, credit = 0.00,header_id = header_id, invoice_id = invoice_no.id)
             jv_detail2.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'transaction/new_bank_payment_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request, 'transaction/new_bank_payment_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
+
+@user_passes_test(allow_bpv_delete)
 def delete_bank_payment(request,pk):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
     company = Q(company_id = company)
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     ref_inv_tran_type = Q(ref_inv_tran_type = "Purchase BPV")
     voucher_id = Q(voucher_id = pk)
     Transactions.objects.filter(company, ref_inv_tran_type, voucher_id).all().delete()
@@ -1852,31 +2242,44 @@ def delete_bank_payment(request,pk):
     return redirect('bank-payment-voucher')
 
 
+@user_passes_test(allow_cpv_display)
 def view_cash_payment(request, pk):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
     company = Q(company_id = company)
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     header_id = VoucherHeader.objects.get(id=pk)
     voucher_header = VoucherHeader.objects.filter(company, id=pk).first()
     voucher_detail = VoucherDetail.objects.filter(header_id=header_id.id).all()
-    return render(request, 'transaction/view_cash_receiving_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail})
+    return render(request, 'transaction/view_cash_receiving_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(allow_cpv_display)
 def cash_payment_voucher(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
+    permission = cpv_roles(request.user)
     cursor = connection.cursor()
     all_vouchers = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%CPV%'
                                         order by voucher_no''')
     all_vouchers = all_vouchers.fetchall()
-    return render(request, 'transaction/cash_payment_voucher.html', {'all_vouchers': all_vouchers})
+    return render(request, 'transaction/cash_payment_voucher.html', {'all_vouchers': all_vouchers,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(allow_cpv_add)
 def new_cash_payment_voucher(request):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
     company = Q(company_id = company)
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     cursor = connection.cursor()
     get_last_tran_id = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%CPV%'
                                         order by voucher_no DESC LIMIT 1''')
@@ -1976,10 +2379,11 @@ def new_cash_payment_voucher(request):
             jv_detail2 = VoucherDetail(account_id = account_id,  debit = amount, credit = 0.00,header_id = header_id, invoice_id = invoice_no.id)
             jv_detail2.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'transaction/new_cash_payment_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'all_invoices':all_invoices})
+    return render(request, 'transaction/new_cash_payment_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'all_invoices':all_invoices,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 
+@user_passes_test(allow_cpv_delete)
 def delete_cash_payment(request,pk):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
@@ -1993,6 +2397,7 @@ def delete_cash_payment(request,pk):
     return redirect('cash-payment-voucher')
 
 
+@user_passes_test(allow_crv_print)
 def crv_pdf(request, pk):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
@@ -2020,6 +2425,7 @@ def crv_pdf(request, pk):
     return HttpResponse("Not found")
 
 
+@user_passes_test(allow_cpv_print)
 def cpv_pdf(request, pk):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
@@ -2046,6 +2452,7 @@ def cpv_pdf(request, pk):
     return HttpResponse("Not found")
 
 
+@user_passes_test(allow_bpv_print)
 def bpv_pdf(request, pk):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
@@ -2073,6 +2480,7 @@ def bpv_pdf(request, pk):
     return HttpResponse("Not found")
 
 
+@user_passes_test(allow_brv_print)
 def brv_pdf(request, pk):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
@@ -2138,7 +2546,7 @@ def account_ledger(request):
                     credit_amount = credit_amount + v[5]
         account_id = ChartOfAccount.objects.filter(id = pk).first()
         account_title = account_id.account_title
-        pdf = render_to_pdf('transaction/account_ledger_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount, 'account_title':account_title, 'from_date':from_date,'to_date':to_date,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+        pdf = render_to_pdf('transaction/account_ledger_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount, 'account_title':account_title, 'from_date':from_date,'to_date':to_date,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "TrialBalance%s.pdf" %("000")
@@ -2175,7 +2583,7 @@ def trial_balance(request):
                 debit_amount = debit_amount + v[2]
             else:
                 credit_amount = credit_amount + v[2]
-        pdf = render_to_pdf('transaction/trial_balance_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount,'from_date':from_date,'to_date':to_date,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+        pdf = render_to_pdf('transaction/trial_balance_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount,'from_date':from_date,'to_date':to_date,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "TrialBalance%s.pdf" %("000")
@@ -2215,7 +2623,7 @@ def sale_detail(request):
                 debit_amount = debit_amount + v[2]
             else:
                 credit_amount = credit_amount + v[2]
-        pdf = render_to_pdf('transaction/trial_balance_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+        pdf = render_to_pdf('transaction/trial_balance_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "TrialBalance%s.pdf" %("000")
@@ -2262,7 +2670,7 @@ def sale_detail_item_wise(request):
         for value in row:
             total = total + value[3]
         print(total)
-        pdf = render_to_pdf('transaction/sale_detail_item_wise_pdf.html', {'company_info':company_info,'image':image,'row':row,'from_date':from_date, 'to_date':to_date,'total':total,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+        pdf = render_to_pdf('transaction/sale_detail_item_wise_pdf.html', {'company_info':company_info,'image':image,'row':row,'from_date':from_date, 'to_date':to_date,'total':total,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "Sale_Detail_Item_Wise%s.pdf" %("000")
@@ -2313,7 +2721,7 @@ def sale_summary_item_wise(request):
             total = total + value[5]
         account_id = ChartOfAccount.objects.filter(id = account_id).first()
         account_title = account_id.account_title
-        pdf = render_to_pdf('transaction/sale_summary_item_wise_pdf.html', {'company_info':company_info,'image':image,'row':row,'from_date':from_date, 'to_date':to_date,'total':total, 'all_accounts':all_accounts, 'account_title':account_title,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+        pdf = render_to_pdf('transaction/sale_summary_item_wise_pdf.html', {'company_info':company_info,'image':image,'row':row,'from_date':from_date, 'to_date':to_date,'total':total, 'all_accounts':all_accounts, 'account_title':account_title,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "Sale_Detail_Item_Wise%s.pdf" %("000")
@@ -2359,7 +2767,7 @@ def sales_tax_invoice(request,pk):
         total_amount = round(total_amount)
     lines = lines + len(detail) + len(detail)
     total_lines = 36 - lines
-    pdf = render_to_pdf('transaction/sales_tax_invoice_pdf_lines.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    pdf = render_to_pdf('transaction/sales_tax_invoice_pdf_lines.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "SaleTaxInvoice%s.pdf" %(header.sale_no)
@@ -2405,7 +2813,7 @@ def commercial_invoice(request,pk):
 
     lines = lines + len(detail) + len(detail)
     total_lines = 36 - lines
-    pdf = render_to_pdf('transaction/commercial_invoice_pdf_lines.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles})
+    pdf = render_to_pdf('transaction/commercial_invoice_pdf_lines.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "SaleTaxInvoice%s.pdf" %(header.sale_no)
@@ -2420,8 +2828,9 @@ def multi_companies(request):
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
     all_companies = Company_info.objects.all()
-    return render(request,'transaction/multi_companies.html',{'all_companies':all_companies,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_inventory_roles':allow_inventory_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request,'transaction/multi_companies.html',{'all_companies':all_companies,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 def new_multi_companies(request):
@@ -2442,4 +2851,4 @@ def new_multi_companies(request):
         cnic = request.POST.get('cnic')
         new_companies = Company_info(company_name = company_name, company_address = company_address, phone_no = phone_no, email = email_address,  website = web_site, ntn = ntn, stn = stn, cnic = cnic)
         new_companies.save()
-    return render(request,'transaction/new_multi_company.html',{'all_companies':all_companies,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_inventory_roles':allow_inventory_roles,'allow_transaction_roles':allow_transaction_roles})
+    return render(request,'transaction/new_multi_company.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
