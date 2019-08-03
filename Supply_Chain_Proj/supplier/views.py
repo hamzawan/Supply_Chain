@@ -7,7 +7,7 @@ from .models import (RfqSupplierHeader,RfqSupplierDetail,
                     Company_info)
 from customer.models import (DcHeaderCustomer, PoHeaderCustomer, QuotationHeaderCustomer, RfqCustomerHeader)
 from inventory.models import Add_products
-from transaction.models import ChartOfAccount
+from transaction.models import ChartOfAccount,PurchaseDetail
 from django.core import serializers
 from django.forms.models import model_to_dict
 import json
@@ -624,7 +624,7 @@ def edit_quotation_supplier(request,pk):
         quotation_header.account_id = account_id
         quotation_header.follow_up = edit_quotation_follow_up
         quotation_header.footer_remarks = edit_footer_remarks
-        quotation_header.save();
+        quotation_header.save()
 
         header_id = QuotationHeaderSupplier.objects.get(id = pk)
         items = json.loads(request.POST.get('items'))
@@ -995,6 +995,17 @@ def print_dc_supplier(request,pk):
         return response
     return HttpResponse("Not found")
 
+
+@user_passes_test(allow_delivery_challan_delete)
+def delete_delivery_challan_supplier(request,pk):
+    if PurchaseDetail.objects.filter(dc_ref = pk).all():
+        messages.add_message(request, messages.ERROR, "Permission to delete denied.")
+    else:
+        DcDetailSupplier.objects.filter(dc_id_id = pk).all().delete()
+        DcHeaderSupplier.objects.filter(id = pk).delete()
+        messages.add_message(request, messages.SUCCESS, "Supplier Delivery Challan Deleted")
+        
+    return redirect('delivery-challan-supplier')
 
 
 @user_passes_test(allow_mrn_display)

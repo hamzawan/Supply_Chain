@@ -6,7 +6,7 @@ from .models import (RfqCustomerHeader, RfqCustomerDetail,
                     DcHeaderCustomer, DcDetailCustomer)
 from supplier.models import Company_info
 from inventory.models import Add_products
-from transaction.models import ChartOfAccount
+from transaction.models import ChartOfAccount,SaleDetail
 from django.core import serializers
 from django.forms.models import model_to_dict
 import json
@@ -1008,6 +1008,19 @@ def print_dc_customer(request,pk):
         response['Content-Disposition'] = content
         return response
     return HttpResponse("Not found")
+
+
+@user_passes_test(allow_delivery_challan_delete)
+def delete_delivery_challan_customer(request,pk):
+    if SaleDetail.objects.filter(dc_ref = pk).all():
+        messages.add_message(request, messages.ERROR, "Permission to delete denied.")
+    else:
+        DcDetailCustomer.objects.filter(dc_id_id = pk).all().delete()
+        DcHeaderCustomer.objects.filter(id = pk).delete()
+        messages.add_message(request, messages.SUCCESS, "Customer Delivery Challan Deleted")
+        
+    return redirect('delivery-challan-customer')
+
 
 
 

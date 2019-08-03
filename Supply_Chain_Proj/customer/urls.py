@@ -27,6 +27,8 @@ urlpatterns = [
     path('delivery_challan/new', views.new_delivery_challan_customer, name = 'new-delivery-challan-customer'),
     path('delivery_challan/edit/<pk>', views.edit_delivery_challan_customer, name = 'edit-delivery-challan-customer'),
     path('print_dc_customer/<pk>', views.print_dc_customer, name = 'print-dc-customer'),
+    path('delivery_challan/delete/<pk>', views.delete_delivery_challan_customer, name = 'delete-delivery-challan-customer'),
+
 
     path('mrn/', views.mrn_customer, name = 'mrn-customer'),
     path('mrn/edit/<pk>', views.edit_mrn_customer, name = 'edit-mrn-customer'),

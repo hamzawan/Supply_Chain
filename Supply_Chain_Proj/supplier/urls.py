@@ -29,6 +29,7 @@ urlpatterns = [
     path('delivery_challan/new', views.new_delivery_challan_supplier, name = 'new-delivery-challan-supplier'),
     path('delivery_challan/edit/<pk>', views.edit_delivery_challan_supplier, name = 'edit-delivery-challan-supplier'),
     path('print_dc_supplier/<pk>',views.print_dc_supplier, name = 'print-dc-supplier'),
+    path('delivery_challan/delete/<pk>', views.delete_delivery_challan_supplier, name = 'delete-delivery-challan-supplier'),
 
     path('mrn/', views.mrn_supplier, name = 'mrn-supplier'),
     path('mrn/edit/<pk>', views.edit_mrn_supplier, name = 'edit-mrn-supplier'),

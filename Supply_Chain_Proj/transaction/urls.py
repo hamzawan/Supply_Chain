@@ -10,6 +10,7 @@ urlpatterns = [
     path('purchase/', views.purchase, name = 'purchase'),
     path('purchase/new/', views.new_purchase, name = 'new-purchase'),
     path('purchase/edit/<pk>', views.edit_purchase, name = 'edit-purchase'),
+    path('purchase/delete/<pk>', views.delete_purchase, name = 'delete-purchase'),
 
     path('purchase_return_summary/', views.purchase_return_summary, name = 'purchase-return-summary'),
     path('purchase/return/<pk>', views.new_purchase_return, name = 'new-purchase-return'),
@@ -20,6 +21,7 @@ urlpatterns = [
     path('sale/', views.sale, name = 'sale'),
     path('sale/new/', views.new_sale, name = 'new-sale'),
     path('sale/edit/<pk>', views.edit_sale, name = 'edit-sale'),
+    path('sale/delete/<pk>', views.delete_sale, name = 'delete-sale'),
     path('dc/sale/new/<pk>', views.direct_sale, name = 'direct-sale'),
 
 

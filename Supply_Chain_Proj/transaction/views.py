@@ -800,6 +800,23 @@ def edit_purchase(request,pk):
     return render(request, 'transaction/edit_purchase.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'purchase_header':purchase_header, 'purchase_detail':purchase_detail, 'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(allow_purchase_delete)
+def delete_purchase(request,pk):
+    purchase = PurchaseHeader.objects.get(id= pk)
+    if purchase.payment_method == 'Cash':
+        Transactions.objects.filter(refrence_id= purchase,tran_type= "Purchase Invoice").all().delete()
+        PurchaseDetail.objects.filter(purchase_id_id= pk).all().delete()
+        PurchaseHeader.objects.filter(id= pk).all().delete()
+
+    elif purchase.payment_method == "Credit":
+        Transactions.objects.filter(ref_inv_tran_id= purchase,ref_inv_tran_type= "Purchase BPV").all().delete()
+        Transactions.objects.filter(ref_inv_tran_id= purchase,ref_inv_tran_type= "Purchase CPV").all().delete()        
+        PurchaseDetail.objects.filter(purchase_id_id= pk).all().delete()
+        PurchaseHeader.objects.filter(id= pk).all().delete()            
+
+    messages.add_message(request, messages.SUCCESS, "Purchase Deleted")
+    return redirect('purchase')
+
 
 def purchase_return_summary(request):
     allow_customer_roles = customer_roles(request.user)
@@ -1363,6 +1380,24 @@ def edit_sale(request,pk):
             tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/edit_sale.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'sale_header':sale_header, 'sale_detail':sale_detail, 'pk':pk, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+
+
+@user_passes_test(allow_sale_delete)
+def delete_sale(request,pk):
+    sale = SaleHeader.objects.get(id= pk)
+    if sale.payment_method == 'Cash':
+        Transactions.objects.filter(refrence_id= sale,tran_type= "Sale Invoice").all().delete()
+        SaleDetail.objects.filter(sale_id_id= pk).all().delete()
+        SaleHeader.objects.filter(id= pk).all().delete()
+
+    elif sale.payment_method == "Credit":
+        Transactions.objects.filter(ref_inv_tran_id= sale,ref_inv_tran_type= "Sale BRV").all().delete()
+        Transactions.objects.filter(ref_inv_tran_id= sale,ref_inv_tran_type= "Sale CRV").all().delete()        
+        SaleDetail.objects.filter(sale_id_id= pk).all().delete()
+        SaleHeader.objects.filter(id= pk).all().delete()            
+
+    messages.add_message(request, messages.SUCCESS, "Sale Deleted")
+    return redirect('sale')
 
 
 def sale_return_summary(request):

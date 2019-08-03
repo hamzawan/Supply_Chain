@@ -49,7 +49,7 @@
                   {% endif %}
 
                   {% if permission.delete == 1 %}
-                  <a class="delete_purchase"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                  <a class="delete_purchase" href="{% url 'delete-purchase' pk=value.id %}" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
                   {% endif %}
                 </td>
             </tr>
