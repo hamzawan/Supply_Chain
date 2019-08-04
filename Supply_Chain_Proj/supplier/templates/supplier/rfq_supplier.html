@@ -49,7 +49,7 @@
                   {% endif %}
 
                   {% if permission.delete == 1 %}
-                  <a class="delete-rfq-supplier" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                  <a class="delete-rfq-supplier" href="{% url 'delete-rfq-supplier' pk=row.id %}" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
                   {% endif %}
                 </td>
             </tr>

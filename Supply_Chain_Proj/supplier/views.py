@@ -7,7 +7,7 @@ from .models import (RfqSupplierHeader,RfqSupplierDetail,
                     Company_info)
 from customer.models import (DcHeaderCustomer, PoHeaderCustomer, QuotationHeaderCustomer, RfqCustomerHeader)
 from inventory.models import Add_products
-from transaction.models import ChartOfAccount
+from transaction.models import ChartOfAccount,PurchaseDetail
 from django.core import serializers
 from django.forms.models import model_to_dict
 import json
@@ -23,6 +23,7 @@ import xlwt
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from user.models import UserRoles
+from django.contrib import messages
 
 def customer_roles(user):
     user_id = Q(user_id = user.id)
@@ -141,7 +142,7 @@ def allow_quotation_delete(user):
     delete = Q(delete = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -153,7 +154,7 @@ def allow_quotation_print(user):
     r_print = Q(r_print = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -200,7 +201,7 @@ def allow_purchase_order_delete(user):
     delete = Q(delete = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -211,7 +212,7 @@ def allow_purchase_order_print(user):
     r_print = Q(r_print = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -257,7 +258,7 @@ def allow_delivery_challan_delete(user):
     delete = Q(delete = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -268,7 +269,7 @@ def allow_delivery_challan_print(user):
     r_print = Q(r_print = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -505,6 +506,13 @@ def edit_rfq_supplier(request,pk):
     return render(request,'supplier/edit_rfq_supplier.html',{'rfq_header':rfq_header,'pk':pk,'rfq_detail':rfq_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(allow_rfq_delete)
+def delete_rfq_supplier(request,pk):
+    RfqSupplierDetail.objects.filter(rfq_id_id = pk).all().delete()
+    RfqSupplierHeader.objects.filter(id = pk).delete()
+    messages.add_message(request, messages.SUCCESS, "Supplier RFQ Deleted")
+    return redirect('rfq-supplier')
+
 
 @user_passes_test(allow_quotation_display)
 def quotation_supplier(request):
@@ -633,7 +641,7 @@ def edit_quotation_supplier(request,pk):
         quotation_header.account_id = account_id
         quotation_header.follow_up = edit_quotation_follow_up
         quotation_header.footer_remarks = edit_footer_remarks
-        quotation_header.save();
+        quotation_header.save()
 
         header_id = QuotationHeaderSupplier.objects.get(id = pk)
         items = json.loads(request.POST.get('items'))
@@ -677,6 +685,14 @@ def print_quotation_supplier(request,pk):
         response['Content-Disposition'] = content
         return response
     return HttpResponse("Not found")
+
+
+@user_passes_test(allow_quotation_delete)
+def delete_quotation_supplier(request,pk):
+    QuotationDetailSupplier.objects.filter(quotation_id_id = pk).all().delete()
+    QuotationHeaderSupplier.objects.filter(id = pk).delete()
+    messages.add_message(request, messages.SUCCESS, "Supplier Quotation Deleted")
+    return redirect('quotation-supplier')
 
 
 def quotation_export_supplier(request):
@@ -839,7 +855,7 @@ def edit_purchase_order_supplier(request,pk):
         po_header.footer_remarks = edit_footer_remarks
         po_header.follow_up = edit_po_follow_up
         po_header.account_id = account_id
-        po_header.save();
+        po_header.save()
 
         header_id = PoHeaderSupplier.objects.get(id = pk)
         items = json.loads(request.POST.get('items'))
@@ -884,6 +900,13 @@ def print_po_supplier(request,pk):
         return response
     return HttpResponse("Not found")
 
+
+@user_passes_test(allow_purchase_order_delete)
+def delete_purchase_order_supplier(request,pk):
+    PoDetailSupplier.objects.filter(po_id_id = pk).all().delete()
+    PoHeaderSupplier.objects.filter(id = pk).delete()
+    messages.add_message(request, messages.SUCCESS, "Supplier Purchase Order Deleted")
+    return redirect('purchase-order-supplier')
 
 
 @user_passes_test(allow_delivery_challan_display)
@@ -1021,6 +1044,17 @@ def print_dc_supplier(request,pk):
         return response
     return HttpResponse("Not found")
 
+
+@user_passes_test(allow_delivery_challan_delete)
+def delete_delivery_challan_supplier(request,pk):
+    if PurchaseDetail.objects.filter(dc_ref = pk).all():
+        messages.add_message(request, messages.ERROR, "Permission to delete denied.")
+    else:
+        DcDetailSupplier.objects.filter(dc_id_id = pk).all().delete()
+        DcHeaderSupplier.objects.filter(id = pk).delete()
+        messages.add_message(request, messages.SUCCESS, "Supplier Delivery Challan Deleted")
+        
+    return redirect('delivery-challan-supplier')
 
 
 @user_passes_test(allow_mrn_display)

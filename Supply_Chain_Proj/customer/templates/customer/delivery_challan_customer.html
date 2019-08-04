@@ -63,7 +63,7 @@
                   {% endif %}
 
                   {% if permission.delete == 1 %}
-                  <a class="delete-po-supplier"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                  <a class="delete-po-supplier" href="{% url 'delete-delivery-challan-customer' pk=value.id %}" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
                   {% endif %}
 
                   {% endwith %}

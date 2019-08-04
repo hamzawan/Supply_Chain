@@ -354,7 +354,7 @@ def allow_brv_delete(user):
     delete = Q(delete = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -366,7 +366,7 @@ def allow_brv_print(user):
     r_print = Q(r_print = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -811,6 +811,23 @@ def edit_purchase(request,pk):
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/edit_purchase.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'purchase_header':purchase_header, 'purchase_detail':purchase_detail, 'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
+
+@user_passes_test(allow_purchase_delete)
+def delete_purchase(request,pk):
+    purchase = PurchaseHeader.objects.get(id= pk)
+    if purchase.payment_method == 'Cash':
+        Transactions.objects.filter(refrence_id= purchase,tran_type= "Purchase Invoice").all().delete()
+        PurchaseDetail.objects.filter(purchase_id_id= pk).all().delete()
+        PurchaseHeader.objects.filter(id= pk).all().delete()
+
+    elif purchase.payment_method == "Credit":
+        Transactions.objects.filter(ref_inv_tran_id= purchase,ref_inv_tran_type= "Purchase BPV").all().delete()
+        Transactions.objects.filter(ref_inv_tran_id= purchase,ref_inv_tran_type= "Purchase CPV").all().delete()
+        PurchaseDetail.objects.filter(purchase_id_id= pk).all().delete()
+        PurchaseHeader.objects.filter(id= pk).all().delete()
+
+    messages.add_message(request, messages.SUCCESS, "Purchase Deleted")
+    return redirect('purchase')
 
 
 def purchase_return_summary(request):
@@ -1406,6 +1423,24 @@ def edit_sale(request,pk):
     return render(request, 'transaction/edit_sale.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'sale_header':sale_header, 'sale_detail':sale_detail, 'pk':pk, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(allow_sale_delete)
+def delete_sale(request,pk):
+    sale = SaleHeader.objects.get(id= pk)
+    if sale.payment_method == 'Cash':
+        Transactions.objects.filter(refrence_id= sale,tran_type= "Sale Invoice").all().delete()
+        SaleDetail.objects.filter(sale_id_id= pk).all().delete()
+        SaleHeader.objects.filter(id= pk).all().delete()
+
+    elif sale.payment_method == "Credit":
+        Transactions.objects.filter(ref_inv_tran_id= sale,ref_inv_tran_type= "Sale BRV").all().delete()
+        Transactions.objects.filter(ref_inv_tran_id= sale,ref_inv_tran_type= "Sale CRV").all().delete()
+        SaleDetail.objects.filter(sale_id_id= pk).all().delete()
+        SaleHeader.objects.filter(id= pk).all().delete()
+
+    messages.add_message(request, messages.SUCCESS, "Sale Deleted")
+    return redirect('sale')
+
+
 def sale_return_summary(request):
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
@@ -1879,7 +1914,7 @@ def new_cash_receiving_voucher(request):
             jv_detail2 = VoucherDetail(account_id = account_id,  debit = 0.00, credit = -abs(amount),header_id = header_id, invoice_id = invoice_no)
             jv_detail2.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'transaction/bank_receiving_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/new_cash_receiving_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
 
 
@@ -1960,7 +1995,7 @@ def new_bank_receiving_voucher(request):
     invoice_no = request.POST.get('invoice_no', False)
     customers = Q(parent_id = 13)
     suppliers = Q(parent_id = 12)
-    all_accounts = ChartOfAccount.objects.filter(customers|suppliers).all()
+    all_accounts = ChartOfAccount.objects.all()
     banks = Q(parent_id = 16)
     all_bank = ChartOfAccount.objects.filter(banks).all()
     all_invoices = SaleHeader.objects.filter(company).all()
@@ -2045,12 +2080,12 @@ def new_bank_receiving_voucher(request):
                                 date = date, remarks = description, account_id = account_id,ref_inv_tran_id = invoice_no.id,ref_inv_tran_type = "Sale BRV", voucher_id = voucher_id.id, company_id = company, user_id = request.user)
             tran2.save()
             header_id = VoucherHeader.objects.get(voucher_no = get_last_tran_id)
-            jv_detail1 = VoucherDetail(account_id = bank_account, debit = amount, credit = 0.00, header_id = header_id, invoice_id = invoice_no)
+            jv_detail1 = VoucherDetail(account_id = bank_account, debit = amount, credit = 0.00, header_id = header_id, invoice_id = invoice_no.id)
             jv_detail1.save()
-            jv_detail2 = VoucherDetail(account_id = account_id,  debit = 0.00, credit = -abs(amount),header_id = header_id, invoice_id = invoice_no)
+            jv_detail2 = VoucherDetail(account_id = account_id,  debit = 0.00, credit = -abs(amount),header_id = header_id, invoice_id = invoice_no.id)
             jv_detail2.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'transaction/cash_receiving_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/new_bank_receiving_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser, 'all_bank':all_bank})
 
 
 @user_passes_test(allow_brv_delete)
@@ -2739,15 +2774,16 @@ def sales_tax_invoice(request,pk):
     allow_inventory_roles = inventory_roles(request.user)
     cursor = connection.cursor()
     lines = 0
-    total_amount = 0
+    total_amount_item = 0
+    tax_amount = 0
+    ca = 0
     company_info = Company_info.objects.filter(id=1)
     image = Company_info.objects.filter(company_name = "Hamza Enterprises").first()
     header = SaleHeader.objects.filter(id = pk).first()
-    # print(header.footer_remarks)
     detail = cursor.execute('''Select SaleId,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax from(
                             select SD.sale_id_id as SaleID, PS.id,PS.product_name as product_name, PS.product_desc as product_desc, PS.unit as unit,
                             SD.quantity as quantity, SD.cost_price as cost_price, SD.sales_tax as sales_tax,
-                            DC.dc_no as DcNo, PO.PO_no  as po_no
+                            DC.dc_no as DcNo, DCD.PO_no  as po_no
                             from transaction_saledetail SD
                             inner join inventory_add_products PS on PS.id = SD.item_id_id
                             inner join customer_dcheadercustomer DC on SD.dc_ref = DC.id
@@ -2756,18 +2792,74 @@ def sales_tax_invoice(request,pk):
                             group by SD.id
                             )as tblData where tblData.SaleId = %s ''',[pk])
     detail = detail.fetchall()
-    print(detail)
+    hs_code = SaleDetail.objects.filter(sale_id = pk).first()
+    parent_company_name = ChartOfAccount.objects.filter(id = 19).first()
+    cartage_amounts = cursor.execute('''Select SaleId,Cartage_amount ,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax from(
+                                select SD.sale_id_id as SaleID, sum(DC.cartage_amount) as Cartage_amount, PS.id,PS.product_name as product_name, PS.product_desc as product_desc, PS.unit as unit,
+                                SD.quantity as quantity, SD.cost_price as cost_price, SD.sales_tax as sales_tax,
+                                DC.dc_no as DcNo, DCD.po_no  as po_no
+                                from transaction_saledetail SD
+                                inner join inventory_add_products PS on PS.id = SD.item_id_id
+                                inner join customer_dcheadercustomer DC on SD.dc_ref = DC.id
+                                inner join customer_dcdetailcustomer DCD on DCD.dc_id_id = DC.id
+                                left join customer_poheadercustomer PO on PO.id = DCD.po_no
+                                group by DCD.po_no
+                                )as tblData where tblData.SaleId = '2'
+                                order by po_no''')
+    cartage_amounts = cartage_amounts.fetchall()
+    print(cartage_amounts)
+    for c in cartage_amounts:
+        ca = ca + c[1]
+        print(ca)
     for value in detail:
         lines = lines + len(value[4].split('\n'))
         amount = float(value[7] * value[6])
-        total_amount = total_amount + amount
-        sales_tax_amount = total_amount * 17 / 100
-        total_amount = total_amount + sales_tax_amount
-        print(total_amount)
-        total_amount = round(total_amount)
+        total_amount_item = total_amount_item + amount
+        sales_tax_amount = round(amount) * 17 / 100
+        tax_amount = tax_amount + sales_tax_amount
+        tax_amount = round(tax_amount)
+        total_amount_item = total_amount_item + sales_tax_amount
+        total_amount_item = round(total_amount_item)
+    total_amount = total_amount_item + ca + header.additional_tax
+    total_amount = round(total_amount)
     lines = lines + len(detail) + len(detail)
     total_lines = 36 - lines
-    pdf = render_to_pdf('transaction/sales_tax_invoice_pdf_lines.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    pdf = render_to_pdf('transaction/sales_tax_invoice_pdf_lines.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount_item':total_amount_item,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser, 'parent_company_name':parent_company_name, 'cartage_amounts':cartage_amounts,'tax_amount':tax_amount,'total_amount':total_amount,'hs_code':hs_code})
+    # allow_customer_roles = customer_roles(request.user)
+    # allow_supplier_roles = supplier_roles(request.user)
+    # allow_transaction_roles = transaction_roles(request.user)
+    # allow_inventory_roles = inventory_roles(request.user)
+    # cursor = connection.cursor()
+    # lines = 0
+    # total_amount = 0
+    # company_info = Company_info.objects.filter(id=1)
+    # image = Company_info.objects.filter(company_name = "Hamza Enterprises").first()
+    # header = SaleHeader.objects.filter(id = pk).first()
+    # # print(header.footer_remarks)
+    # detail = cursor.execute('''Select SaleId,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax from(
+    #                         select SD.sale_id_id as SaleID, PS.id,PS.product_name as product_name, PS.product_desc as product_desc, PS.unit as unit,
+    #                         SD.quantity as quantity, SD.cost_price as cost_price, SD.sales_tax as sales_tax,
+    #                         DC.dc_no as DcNo, PO.PO_no  as po_no
+    #                         from transaction_saledetail SD
+    #                         inner join inventory_add_products PS on PS.id = SD.item_id_id
+    #                         inner join customer_dcheadercustomer DC on SD.dc_ref = DC.id
+    #                         inner join customer_dcdetailcustomer DCD on DCD.dc_id_id = DC.id
+    #                         left join customer_poheadercustomer PO on PO.id = DCD.po_no
+    #                         group by SD.id
+    #                         )as tblData where tblData.SaleId = %s ''',[pk])
+    # detail = detail.fetchall()
+    # print(detail)
+    # for value in detail:
+    #     lines = lines + len(value[4].split('\n'))
+    #     amount = float(value[7] * value[6])
+    #     total_amount = total_amount + amount
+    #     sales_tax_amount = total_amount * 17 / 100
+    #     total_amount = total_amount + sales_tax_amount
+    #     print(total_amount)
+    #     total_amount = round(total_amount)
+    # lines = lines + len(detail) + len(detail)
+    # total_lines = 36 - lines
+    # pdf = render_to_pdf('transaction/sales_tax_invoice_pdf_lines.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "SaleTaxInvoice%s.pdf" %(header.sale_no)
@@ -2784,14 +2876,16 @@ def commercial_invoice(request,pk):
     allow_inventory_roles = inventory_roles(request.user)
     cursor = connection.cursor()
     lines = 0
-    total_amount = 0
+    total_amount_item = 0
+    tax_amount = 0
+    ca = 0
     company_info = Company_info.objects.filter(id=1)
     image = Company_info.objects.filter(company_name = "Hamza Enterprises").first()
     header = SaleHeader.objects.filter(id = pk).first()
     detail = cursor.execute('''Select SaleId,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax from(
                             select SD.sale_id_id as SaleID, PS.id,PS.product_name as product_name, PS.product_desc as product_desc, PS.unit as unit,
                             SD.quantity as quantity, SD.cost_price as cost_price, SD.sales_tax as sales_tax,
-                            DC.dc_no as DcNo, PO.PO_no  as po_no
+                            DC.dc_no as DcNo, DCD.PO_no  as po_no
                             from transaction_saledetail SD
                             inner join inventory_add_products PS on PS.id = SD.item_id_id
                             inner join customer_dcheadercustomer DC on SD.dc_ref = DC.id
@@ -2800,20 +2894,39 @@ def commercial_invoice(request,pk):
                             group by SD.id
                             )as tblData where tblData.SaleId = %s ''',[pk])
     detail = detail.fetchall()
-    print(detail)
+    hs_code = SaleDetail.objects.filter(sale_id = pk).first()
+    parent_company_name = ChartOfAccount.objects.filter(id = 19).first()
+    cartage_amounts = cursor.execute('''Select SaleId,Cartage_amount ,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax from(
+                                select SD.sale_id_id as SaleID, sum(DC.cartage_amount) as Cartage_amount, PS.id,PS.product_name as product_name, PS.product_desc as product_desc, PS.unit as unit,
+                                SD.quantity as quantity, SD.cost_price as cost_price, SD.sales_tax as sales_tax,
+                                DC.dc_no as DcNo, DCD.po_no  as po_no
+                                from transaction_saledetail SD
+                                inner join inventory_add_products PS on PS.id = SD.item_id_id
+                                inner join customer_dcheadercustomer DC on SD.dc_ref = DC.id
+                                inner join customer_dcdetailcustomer DCD on DCD.dc_id_id = DC.id
+                                left join customer_poheadercustomer PO on PO.id = DCD.po_no
+                                group by DCD.po_no
+                                )as tblData where tblData.SaleId = '2'
+                                order by po_no''')
+    cartage_amounts = cartage_amounts.fetchall()
+    print(cartage_amounts)
+    for c in cartage_amounts:
+        ca = ca + c[1]
+        print(ca)
     for value in detail:
         lines = lines + len(value[4].split('\n'))
         amount = float(value[7] * value[6])
-        total_amount = total_amount + amount
-        sales_tax_amount = amount * 17 / 100
-        print(sales_tax_amount)
-        total_amount = total_amount + sales_tax_amount
-        total_amount = round(total_amount)
-
-
+        total_amount_item = total_amount_item + amount
+        sales_tax_amount = round(amount) * 17 / 100
+        tax_amount = tax_amount + sales_tax_amount
+        tax_amount = round(tax_amount)
+        total_amount_item = total_amount_item + sales_tax_amount
+        total_amount_item = round(total_amount_item)
+    total_amount = total_amount_item + ca + header.additional_tax
+    total_amount = round(total_amount)
     lines = lines + len(detail) + len(detail)
     total_lines = 36 - lines
-    pdf = render_to_pdf('transaction/commercial_invoice_pdf_lines.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    pdf = render_to_pdf('transaction/commercial_invoice_pdf_lines.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount_item':total_amount_item,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser, 'parent_company_name':parent_company_name, 'cartage_amounts':cartage_amounts,'tax_amount':tax_amount,'total_amount':total_amount,'hs_code':hs_code})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "SaleTaxInvoice%s.pdf" %(header.sale_no)

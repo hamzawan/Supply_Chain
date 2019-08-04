@@ -53,7 +53,7 @@
                       {% endif %}
 
                       {% if permission.delete == 1 %}
-                        <a class="delete-all"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                        <a class="delete-all" href="{% url 'delete-quotation-customer' pk=value.id %}"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
                       {% endif %}
 
                   </td>

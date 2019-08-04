@@ -44,7 +44,7 @@
   <div class="footer">
        <div>
          <pre>{{header.footer_description}}</pre>
-         <h1 style="text-align:right;">for Hamza Enterprise</h1>
+         <h1 style="text-align:right;">for {{company_info.0.company_name}}</h1>
        </div>
      </div>
   page <pdf:pagenumber> of <pdf:pagecount>
@@ -76,7 +76,9 @@
        <thead>
          <tr>
            <th align="left" style="width: 180px;"><font size="12px" color="#0a012c">Buyer's Name</font></th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.account_title}}</font></td>
+           <td align="left" style="padding-top:4px;">
+             <font size="12px" color="#0a012c">{{parent_company_name.account_title}} ( {{header.account_id.account_title}} )</font>
+           </td>
            <th align="left" style="width: 180px;"><font size="13px" color="#0a012c">Invoice No.</font</th>
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.sale_no}}</font></td>
          </tr>
@@ -99,14 +101,8 @@
          <tr>
            <th align="left"><font size="12px" color="#0a012c">Sales Tax Number</font</th>
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.stn}}</font></td>
-           <th align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">Delivery Date</font></th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.date}}</font></td>
-         </tr>
-         <tr>
-           <th align="left"><font size="12px" color="#0a012c">NTN No</font</th>
+           <th align="left"><font size="12px" color="#0a012c">NTN  / CNIC</font</th>
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.ntn}}</font></td>
-           <th align="left"><font size="12px" color="#0a012c">Page No</font</th>
-           <td align="left" style="padding-top:4px;" color="#0a012c"><font size="12px">1 of 1</font></td>
          </tr>
        </thead>
        </table>
@@ -125,20 +121,11 @@
           <th><font size="12px">Sales Tax 17%</font></th>
           <th style="width:200px;"><font size="12px">Value Including Sales Tax</font></th>
         </tr>
-        <tr class="heading_row">
-          <th style="width: 70px;"></th>
-          <th style="width:400px;"></th>
-          <th></th>
-          <th></th>
-          <th>in {{header.currency}}</th>
-          <th>in {{header.currency}}</th>
-          <th></th>
-          <th></th>
-        </tr>
       </thead>
       <tbody>
         {% for detail in detail %}
         {% with quantity=detail.6 unit=detail.5 price=detail.7 sales_tax=detail.8 value_of_goods=detail.7|mul:detail.6 tax=detail.7|mul:detail.6|mul:detail.8|div:100 %}
+        {% with value_of_goods_tax=value_of_goods|add:tax|floatformat:2 %}
         {% ifchanged detail.1 and detail.2 %}
         <tr>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
@@ -153,19 +140,17 @@
         {% endifchanged %}
         <tr>
           <td style="width: 70px; text-align: center; border-left:1px solid black; border-right:1px solid black; border-bottom:1px solid black;"><font style="margin-top:-100px;">{{forloop.counter}}</font></td>
-          <td style="border-left:1px solid black; border-right:1px solid black; border-bottom:1px solid black;"><font>{{detail.3}}<font>
-              <pre style="padding:0px; margin-top:-100px;">{{detail.4}}</pre>
-          </td>
+          <td style="border-left:1px solid black; border-right:1px solid black; border-bottom:1px solid black;"><font>{{detail.3}} {{detail.4}}<font></td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{quantity}}</td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{unit}}</td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{price}}</td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{value_of_goods|floatformat:2}}</td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{tax|floatformat:2}}</td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{value_of_goods|add:tax|floatformat:2}}</td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{value_of_goods_tax}}</td>
         </tr>
         {% endwith %}
+        {% endwith %}
         {% endfor %}
-
       <tr class="heading_row">
         <td style="width: 70px;"></td>
         <td style="width:400px;"></td>
@@ -173,16 +158,15 @@
         <td></td>
         <td></td>
         <td></td>
-        <td style="text-align:center;" ><b>Total in {{header.currency}}</b></td>
-        <td style="text-align:center;" >{{total_amount|floatformat:2}}</td>
+        <td style="text-align:center;" ><b>Total</b></td>
+        <td style="text-align:center;" >{{total_amount_item|floatformat:2}}</td>
       </tr>
     </tbody>
   </table>
-  <br>
-  <br>
-  <br>
+  <!-- <p>HS Code: {{hs_code.hs_code}}</p> -->
   <table>
     <tbody>
+      {% for v in cartage_amounts %}
       <tr>
         <td style="width: 70px;"></td>
         <td style="width:400px;"></td>
@@ -190,9 +174,10 @@
         <td></td>
         <td></td>
         <td></td>
-        <td style=" text-align: center; width:300px;" ><b>Cartage Amount:</b></td>
-        <td style="text-align:center; border-bottom:1px solid black;" ></td>
+        <td style=" text-align: center; padding-top:10px;  width:700px;" ><b>Cartage Amount : {{forloop.counter}} Po No : {{v.3}}</b></td>
+        <td style="text-align:center;  border-bottom:1px solid black; width:200px;" >{{v.1|floatformat:2}}</td>
       </tr>
+      {% endfor %}
     </tbody>
   </table>
   <br>
@@ -206,7 +191,7 @@
         <td></td>
         <td></td>
         <td style=" text-align: center; width:300px;" ><b>Sales Tax Amount:</b></td>
-        <td style="text-align:center; border-bottom:1px solid black;" ></td>
+        <td style="text-align:center; border-bottom:1px solid black;" >{{tax_amount|floatformat:2}}</td>
       </tr>
     </tbody>
   </table>
@@ -221,7 +206,7 @@
         <td></td>
         <td></td>
         <td style=" text-align: center; width:300px;" ><b>Additional Tax Amount:</b></td>
-        <td style="text-align:center; border-bottom:1px solid black;" >0.00</td>
+        <td style="text-align:center; border-bottom:1px solid black;" >{{header.additional_tax}}</td>
       </tr>
     </tbody>
   </table>
@@ -236,7 +221,7 @@
         <td></td>
         <td></td>
         <td style=" text-align: center; width:300px;" ><b>Total Amount:</b></td>
-        <td style="text-align:center; border-bottom:1px solid black;" >{{total_amount|floatformat:2}}</td>
+        <td style="text-align:center; border-bottom:1px solid black;"> <b>{{total_amount|floatformat:2}}</b></td>
       </tr>
     </tbody>
   </table>

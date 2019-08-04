@@ -23,6 +23,27 @@ def register(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
+            username = request.POST.getlist('username')[0]
+            user = User.objects.get(username = username)
+            for i in range(11,16):
+                roles = UserRoles.objects.create(user_id=user,form_name="Customer",form_id=1,child_form=i)
+                roles.save()
+
+            for i in range(21,26):
+                roles = UserRoles.objects.create(user_id=user,form_name="Supplier",form_id=2,child_form=i)
+                roles.save()
+
+            for i in range(31,41):
+                if i == 40:
+                    roles = UserRoles.objects.create(user_id=user,form_name="Transaction",form_id=3,child_form=310)
+                    roles.save()
+                else:
+                    roles = UserRoles.objects.create(user_id=user,form_name="Transaction",form_id=3,child_form=i)
+                    roles.save()
+
+            roles = UserRoles.objects.create(user_id=user,form_name="Inventory",form_id=4,child_form=41)
+            roles.save()
+
             messages.success(request, f'Your account has been created! You are now able to log in')
             return redirect('login')
     else:
@@ -940,8 +961,6 @@ def user_roles(request,pk):
 
              value.form_id = form_id_t
              value.save()
-
-
     return render(request, 'user/user_roles.html',{'user':user,'allow_role':allow_role,'allow_role_supplier':allow_role_supplier,'allow_role_transaction':allow_role_transaction,
     'allow_role_inventory':allow_role_inventory,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 

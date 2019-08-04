@@ -65,8 +65,6 @@ def allow_inventory_delete(user):
         return False
 
 def allow_inventory_shop(user):
-    print("Hamza")
-    print(user.id)
     user_id = Q(user_id = 2)
     form_id = Q(form_id = 4)
     child_form = Q(child_form = 41)
