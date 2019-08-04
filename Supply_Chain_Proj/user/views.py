@@ -2,11 +2,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .forms import RegistrationFrom
+from .forms import RegistrationFrom,UserUpdateForm
 from  supplier.models import Company_info
 from .models import UserRoles, FiscalYear
 from django.db.models import Q
-from supplier.views import customer_roles,supplier_roles,transaction_roles,inventory_roles
+from supplier.views import customer_roles,supplier_roles,transaction_roles,inventory_roles,report_roles
 from django.contrib.auth.decorators import user_passes_test
 
 
@@ -20,35 +20,38 @@ def register(request):
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = RegistrationFrom(request.POST)
         if form.is_valid():
             form.save()
             username = request.POST.getlist('username')[0]
             user = User.objects.get(username = username)
             for i in range(11,16):
-                roles = UserRoles.objects.create(user_id=user,form_name="Customer",form_id=1,child_form=i)
+                roles = UserRoles.objects.create(user_id=user,form_name="Customer",form_id=0,child_form=i)
                 roles.save()
 
             for i in range(21,26):
-                roles = UserRoles.objects.create(user_id=user,form_name="Supplier",form_id=2,child_form=i)
+                roles = UserRoles.objects.create(user_id=user,form_name="Supplier",form_id=0,child_form=i)
                 roles.save()    
 
             for i in range(31,41):
                 if i == 40:
-                    roles = UserRoles.objects.create(user_id=user,form_name="Transaction",form_id=3,child_form=310)
+                    roles = UserRoles.objects.create(user_id=user,form_name="Transaction",form_id=0,child_form=310)
                     roles.save()
                 else:    
-                    roles = UserRoles.objects.create(user_id=user,form_name="Transaction",form_id=3,child_form=i)
+                    roles = UserRoles.objects.create(user_id=user,form_name="Transaction",form_id=0,child_form=i)
                     roles.save()
 
-            roles = UserRoles.objects.create(user_id=user,form_name="Inventory",form_id=4,child_form=41)
+            roles = UserRoles.objects.create(user_id=user,form_name="Inventory",form_id=0,child_form=41)
+            roles.save()
+
+            roles = UserRoles.objects.create(user_id=user,form_name="Reports",form_id=0,child_form=0)
             roles.save()
             
             messages.success(request, f'Your account has been created! You are now able to log in')
             return redirect('login')
     else:
         form = RegistrationFrom
-    return render(request, 'user/register.html', {'form': form,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'user/register.html', {'form': form,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 def forgot_password(request):
@@ -62,6 +65,39 @@ def select_company_fiscal(request):
         return redirect('home')
     return render(request, 'user/select_company_fiscal.html',{'company':company,'fiscal_year':fiscal_year})
 
+
+@user_passes_test(Is_superuser)
+def delete_user_roles(request,pk):
+    user = User.objects.get(id= pk)
+    if user.is_superuser:
+        print("SUPER USER CANT DELETEE")
+        messages.add_message(request, messages.ERROR, "Permission to delete denied.")
+    else:
+        UserRoles.objects.filter(user_id_id= pk).all().delete()
+        User.objects.filter(id= pk).all().delete()
+        messages.add_message(request, messages.SUCCESS, "User Deleted.")
+    return redirect('user-list')        
+
+
+
+@user_passes_test(Is_superuser)
+def edit_user(request,pk):
+    user = User.objects.get(id= pk)
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
+    
+    if request.method == 'POST':   
+        form = UserUpdateForm(request.POST,instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'User Profile has been updated!')
+            return redirect('user-list')
+    else:
+        form = UserUpdateForm(instance=user)    
+        
+    return render(request,'user/edit_user.html',{'form':form,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(Is_superuser)
@@ -86,12 +122,30 @@ def user_roles(request,pk):
     form_name_inventory = Q(form_name = "Inventory")
     allow_role_inventory = UserRoles.objects.filter(user_id, form_name_inventory).all()
 
+    form_name_reports = Q(form_name = "Reports")
+    allow_role_reports = UserRoles.objects.filter(user_id, form_name_reports).all()
+    
+
     if request.method == "POST":
         form_id = request.POST.getlist('customer')
         if form_id:
             form_id = 1
         else:
             form_id = 0
+
+
+        form_id_reports = request.POST.getlist('Reports')
+        if form_id_reports:
+            form_id_reports = 5
+        else:
+            form_id_reports = 0 
+
+
+        for i,value in enumerate(allow_role_reports):
+             value.form_id = form_id_reports
+             value.save()
+
+
 
         display = request.POST.getlist('display[]')
         add = request.POST.getlist('add[]')
@@ -964,7 +1018,8 @@ def user_roles(request,pk):
 
 
     return render(request, 'user/user_roles.html',{'user':user,'allow_role':allow_role,'allow_role_supplier':allow_role_supplier,'allow_role_transaction':allow_role_transaction,
-    'allow_role_inventory':allow_role_inventory,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    'allow_role_inventory':allow_role_inventory,
+    'allow_role_reports':allow_role_reports,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(Is_superuser)
@@ -974,4 +1029,4 @@ def user_list(request):
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     all_user = User.objects.all()
-    return render(request, 'user/users.html',{'all_user':all_user,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'user/users.html',{'all_user':all_user,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})

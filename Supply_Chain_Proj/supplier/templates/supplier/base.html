@@ -253,12 +253,15 @@
         </div>
       </li>
       {% endif %}
+
+      {% if allow_report_roles%}
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="{% url 'report' %}" role="button"  aria-haspopup="true" aria-expanded="false">
           <i class="far fa-chart-bar"></i>
           <span>Reports</span>
         </a>
       </li>
+      {% endif %}
       {% if is_superuser %}
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
