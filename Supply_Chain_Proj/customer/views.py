@@ -842,19 +842,20 @@ def delivery_challan_customer(request):
     permission = delivery_challan_roles(request.user)
     all_dc = DcHeaderCustomer.objects.filter(company).all()
     cursor = connection.cursor()
-    is_dc = cursor.execute('''Select Distinct id,dc_no From (
-                            Select distinct dc_id_id, IP.product_code,IP.product_name,
-                            DC.Quantity As DcQuantity,
-                            ifnull(sum(SD.Quantity),0) As SaleQuantity,
-                            (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
-                            from customer_dcdetailcustomer DC
-                            inner join inventory_add_products IP on DC.item_id_id = IP.id
-                            Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
-                            And SD.item_id_id = IP.id
-                            group by dc_id_id,IP.product_code,IP.product_name
-                            ) As tblData
-                            Inner Join customer_dcheadercustomer  HD on  HD.id = tblData.dc_id_id
-                            Where RemainingQuantity > 0''')
+    is_dc = cursor.execute('''Select Distinct id,dc_no,company_id_id From (
+                        Select distinct dc_id_id, IP.product_code,IP.product_name,
+                        DC.Quantity As DcQuantity,
+                        ifnull(sum(SD.Quantity),0) As SaleQuantity,
+                        (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
+                        from customer_dcdetailcustomer DC
+                        inner join inventory_add_products IP on DC.item_id_id = IP.id
+                        Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+                        And SD.item_id_id = IP.id
+                        group by dc_id_id,IP.product_code,IP.product_name
+                        ) As tblData
+                        Inner Join customer_dcheadercustomer HD on  HD.id = tblData.dc_id_id
+                        Where RemainingQuantity > 0 AND Company_id_id = '1'
+                        ''')
     is_dc = is_dc.fetchall()
     return render(request, 'customer/delivery_challan_customer.html',{'all_dc':all_dc,'is_dc':is_dc,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
 
