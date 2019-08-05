@@ -45,11 +45,7 @@
               <td><pre>{{ value.4 }}</pre></td>
               <td>{{ value.7 }}</td>
               <td>{{ value.5 }}</td>
-  			      <td>
-                {% if permission.r_print == 1 %}  
-                <a class="cart" href=""><i class="fas fa-shopping-cart"></i></a>
-                {% endif %}
-                
+  			      <td>                
                 {% if permission.edit == 1 %}
                 <a class="edit_list" href="{% url 'edit-item' pk=value.0 %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
                 {% endif %}
