@@ -40,8 +40,8 @@
                 <td>{{ value.email }}</td>
                 <td>{{ value.website }}</td>
                 <td>
-                  <a class="edit_list" href="{% url 'edit-purchase' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
-                  <a class="delete_purchase"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                  <a class="edit_list" href="{% url 'edit-multi-companies' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
+                  <a class="delete_purchase" href="{% url 'delete-multi-companies' pk=value.id %}" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
                 </td>
             </tr>
             {% endfor %}

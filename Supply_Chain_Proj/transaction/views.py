@@ -4,6 +4,7 @@ from .models import (PurchaseHeader, PurchaseDetail, SaleHeader, SaleDetail, Cha
                     PurchaseReturnHeader, PurchaseReturnDetail, SaleReturnHeader, SaleReturnDetail,
                     Transactions, VoucherHeader, VoucherDetail)
 from supplier.models import Company_info
+from .forms import CompanyUpdateForm
 from inventory.models import Add_products
 from customer.models import DcHeaderCustomer, DcDetailCustomer
 from django.core import serializers
@@ -14,6 +15,7 @@ from django.template.loader import get_template
 from django.db import connection
 from django.core.exceptions import ObjectDoesNotExist
 from user.models import UserRoles
+from user.views import Is_superuser
 from django.contrib.auth.decorators import user_passes_test
 from supplier.views import customer_roles,supplier_roles,transaction_roles,inventory_roles,report_roles
 from django.contrib import messages
@@ -38,6 +40,17 @@ def allow_coa_add(user):
     child_form = Q(child_form = 31)
     add = Q(add = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, add)
+    if allow_role:
+        return True
+    else:
+        return False
+
+def allow_coa_edit(user):
+    user_id = Q(user_id = user.id)
+    form_id = Q(form_id = 3)
+    child_form = Q(child_form = 31)
+    edit = Q(edit = 1)
+    allow_role = UserRoles.objects.filter(user_id, form_id, child_form, edit)
     if allow_role:
         return True
     else:
@@ -1573,6 +1586,43 @@ def chart_of_account(request):
     return render(request, 'transaction/chart_of_account.html',{'all_accounts':all_accounts,'all_accounts_null':all_accounts_null,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(allow_coa_edit)
+def edit_chart_of_account(request,pk):
+    coa = ChartOfAccount.objects.get(id= pk)
+    if request.method == 'POST':
+        coa.account_title = request.POST.get('account_title')
+        coa.parent_id = request.POST.get('account_type')
+        opening_balance = request.POST.get('opening_balance')
+        coa.phone_no = request.POST.get('phone_no')
+        coa.email_address = request.POST.get('email_address')
+        coa.ntn = request.POST.get('ntn')
+        coa.stn = request.POST.get('stn')
+        coa.cnic = request.POST.get('cnic')
+        coa.Address = request.POST.get('address')
+        coa.remarks = request.POST.get('remarks')
+        coa.op_type = request.POST.get('optradio')
+        credit_limits = request.POST.get('credit_limits')
+
+        if credit_limits is "":
+            credit_limits = 0.00
+        else:
+            credit_limits = credit_limits
+
+        coa.credit_limit = credit_limit
+
+        if opening_balance is "":
+            opening_balance = 0
+        if op_type == "credit":
+            opening_balance = -abs(int(opening_balance))
+        
+        coa.opening_balance = opening_balance
+        coa.save()
+        return redirect('chart-of-account')
+    else:
+        return JsonResponse({"data":coa})
+
+
+
 @user_passes_test(report_roles)
 def reports(request):
     allow_customer_roles = customer_roles(request.user)
@@ -2737,6 +2787,7 @@ def commercial_invoice(request,pk):
     return HttpResponse("Not found")
 
 
+@user_passes_test(Is_superuser)
 def multi_companies(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
@@ -2746,6 +2797,7 @@ def multi_companies(request):
     return render(request,'transaction/multi_companies.html',{'all_companies':all_companies,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(Is_superuser)
 def new_multi_companies(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
@@ -2764,3 +2816,25 @@ def new_multi_companies(request):
         new_companies = Company_info(company_name = company_name, company_address = company_address, phone_no = phone_no, email = email_address,  website = web_site, ntn = ntn, stn = stn, cnic = cnic)
         new_companies.save()
     return render(request,'transaction/new_multi_company.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+
+
+@user_passes_test(Is_superuser)
+def edit_multi_companies(request,pk):
+    company = Company_info.objects.get(id= pk)    
+    if request.method == 'POST':   
+        form = CompanyUpdateForm(request.POST,instance=company)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Company Profile has been updated!')
+            return redirect('multi-companies')
+    else:
+        form = CompanyUpdateForm(instance=company)    
+        
+    return render(request,'transaction/edit_multi_company.html',{'form':form})
+
+
+@user_passes_test(Is_superuser)
+def delete_multi_companies(request,pk):
+    Company_info.objects.filter(id= pk).all().delete()
+    messages.add_message(request, messages.SUCCESS, "Company Deleted.")
+    return redirect('multi-companies')        
