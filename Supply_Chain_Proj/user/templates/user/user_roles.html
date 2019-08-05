@@ -1419,6 +1419,31 @@
                 
               </tbody>
             </table>
+
+            <table class="table table-bordered">
+              <!-- Table body -->
+              <tbody>
+                <tr>
+                  <th scope="row" width="400px">
+                    <!-- Default unchecked -->
+                    <div class="custom-control custom-checkbox">
+                      {% if allow_role_reports.0.form_id == 5 %}
+                        <input type="checkbox" class="custom-control-input" name="Reports" id="tableDefaultCheck5" checked>
+                      {% else %}
+                        <input type="checkbox" class="custom-control-input" name="Reports" id="tableDefaultCheck5" >
+                      {% endif %}
+                      <label class="custom-control-label" for="tableDefaultCheck5">Reports</label>
+                    </div>
+                  </th>
+                  <th style="text-align: center;" width="100px">Display</th>
+                  <th style="text-align: center;" width="100px">Add</th>
+                  <th style="text-align: center;" width="100px">Edit</th>
+                  <th style="text-align: center;" width="100px">Delete</th>
+                  <th style="text-align: center;" width="100px">Print</th>
+                </tr>
+              </tbody>
+            </table>
+                  
             <div class="text-right">
               <button type="submit" class="btn btn-success" name="button">Submit</button>
             </div>

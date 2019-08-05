@@ -43,9 +43,11 @@
                 {% endif %}
                 <td>{{ row.date_joined }}</td>
                 <td>
-                      <a class="edit_list" href="#"><i class="material-icons">&#xE254;</i></a>
+                      <a class="edit_list" href="{% url 'edit-user-roles' pk=row.id %}"><i class="material-icons">&#xE254;</i></a>
+                      
                       <a class="delete" href="{% url 'user-roles' pk=row.id %}"><i class="fas fa-tasks"></i></a>
-                      <a class="delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                      
+                      <a class="delete" href="{% url 'delete-user-roles' pk=row.id %}" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
                 </td>
             </tr>
             {% endfor %}

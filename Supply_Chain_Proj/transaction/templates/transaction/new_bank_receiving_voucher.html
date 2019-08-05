@@ -49,7 +49,7 @@
             <div class="col-md-2">
               <label for="">Bank Account</label>
               <select class="form-control form-control-sm" id="bank_account">
-                {% for value in all_bank %}
+                {% for value in all_accounts %}
                 <option value="{{value.id}}">{{value.account_title}}</option>
                 {% endfor %}
               </select>

@@ -15,7 +15,7 @@ from django.db import connection
 from django.core.exceptions import ObjectDoesNotExist
 from user.models import UserRoles
 from django.contrib.auth.decorators import user_passes_test
-from supplier.views import customer_roles,supplier_roles,transaction_roles,inventory_roles
+from supplier.views import customer_roles,supplier_roles,transaction_roles,inventory_roles,report_roles
 from django.contrib import messages
 from num2words import num2words
 from supplier.models import Company_info
@@ -85,7 +85,7 @@ def allow_purchase_delete(user):
     delete = Q(delete = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -97,7 +97,7 @@ def allow_purchase_return(user):
     r_return = Q(r_return = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_return)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -144,7 +144,7 @@ def allow_purchase_return_delete(user):
     delete = Q(delete = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -191,7 +191,7 @@ def allow_sale_delete(user):
     delete = Q(delete = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -202,7 +202,7 @@ def allow_sale_return(user):
     r_return = Q(r_return = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_return)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -249,7 +249,7 @@ def allow_sale_return_delete(user):
     delete = Q(delete = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -413,7 +413,7 @@ def allow_crv_delete(user):
     delete = Q(delete = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -425,7 +425,7 @@ def allow_crv_print(user):
     r_print = Q(r_print = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -471,7 +471,7 @@ def allow_bpv_delete(user):
     delete = Q(delete = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -483,7 +483,7 @@ def allow_bpv_print(user):
     r_print = Q(r_print = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -533,7 +533,7 @@ def allow_cpv_delete(user):
     delete = Q(delete = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -544,7 +544,7 @@ def allow_cpv_print(user):
     r_print = Q(r_print = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -635,8 +635,8 @@ def purchase(request):
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     permission = purchase_roles(request.user)
-    all_purchases = PurchaseHeader.objects.filter(company).all()
-    return render(request, 'transaction/purchase.html',{'all_purchases': all_purchases,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    all_purchases = PurchaseHeader.objects.all()
+    return render(request, 'transaction/purchase.html',{'all_purchases': all_purchases,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 
@@ -717,7 +717,7 @@ def new_purchase(request):
             tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = purchase_account, tran_type = "", amount = total_amount, date = date, remarks = "Amount Debit",ref_inv_tran_id = header_id, ref_inv_tran_type = "Purchase Invoice", company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/new_purchase.html',{'all_item_code':all_item_code,'get_last_purchase_no':get_last_purchase_no, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/new_purchase.html',{'all_item_code':all_item_code,'get_last_purchase_no':get_last_purchase_no, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_purchase_edit)
@@ -809,7 +809,7 @@ def edit_purchase(request,pk):
             tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = purchase_account, tran_type = "Purchase Invoice", amount = total_amount, date = date, remarks = "Amount Debit", company_id = company , user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/edit_purchase.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'purchase_header':purchase_header, 'purchase_detail':purchase_detail, 'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/edit_purchase.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'purchase_header':purchase_header, 'purchase_detail':purchase_detail, 'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_purchase_delete)
@@ -839,8 +839,8 @@ def purchase_return_summary(request):
     allow_transaction_roles = transaction_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
-    all_purchase_return = PurchaseReturnHeader.objects.filter(company).all()
-    return render(request, 'transaction/purchase_return_summary.html',{'all_purchase_return': all_purchase_return,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    all_purchase_return = PurchaseReturnHeader.objects.all()
+    return render(request, 'transaction/purchase_return_summary.html',{'all_purchase_return': all_purchase_return,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 
@@ -912,7 +912,7 @@ def new_purchase_return(request,pk):
             tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = purchase_account, tran_type = "", amount = -abs(total_amount), date = date, remarks = "Amount Debit", ref_inv_tran_id = header_id ,ref_inv_tran_type = "Purchase Return Invoice", user_id = request.user, copmany_id = company)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/purchase_return.html',{'purchase_header':purchase_header, 'purchase_detail': purchase_detail,'pk':pk,'get_last_purchase_no':get_last_purchase_no,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/purchase_return.html',{'purchase_header':purchase_header, 'purchase_detail': purchase_detail,'pk':pk,'get_last_purchase_no':get_last_purchase_no,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 
@@ -978,7 +978,7 @@ def edit_purchase_return(request,pk):
             tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = purchase_account, tran_type = "Purchase Return Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit", company = company_id, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/edit_purchase_return.html',{'purchase_header':purchase_header, 'purchase_detail': purchase_detail,'pk':pk,'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/edit_purchase_return.html',{'purchase_header':purchase_header, 'purchase_detail': purchase_detail,'pk':pk,'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_sale_display)
@@ -992,7 +992,7 @@ def sale(request):
     allow_inventory_roles = inventory_roles(request.user)
     permission = sale_roles(request.user)
     all_sales = SaleHeader.objects.filter(company).all()
-    return render(request, 'transaction/sale.html',{'all_sales': all_sales,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/sale.html',{'all_sales': all_sales,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 
@@ -1043,7 +1043,7 @@ def new_sale(request):
                                             group by dc_id_id,COA.id,COA.account_title,IP.product_code,IP.product_name
                                             ) As tblData
                                             Inner Join customer_dcheadercustomer HD on  HD.id = tblData.dc_id_id
-                                            Where RemainingQuantity > 0 AND accountid = %s ''',[get_account.id])
+                                            Where RemainingQuantity > 0 AND accountid = %s AND HD.company_id_id = %s ''',[get_account.id, company.id])
                 customer_dc = customer_dc.fetchall()
                 return JsonResponse({'customer_dc':customer_dc})
         except ObjectDoesNotExist:
@@ -1064,7 +1064,7 @@ def new_sale(request):
                                 group by dc_id_id,COA.id,COA.account_title,IP.product_code,IP.product_name
                                 ) As tblData
                                 Inner Join customer_dcheadercustomer HD on  HD.id = tblData.dc_id_id
-                                Where RemainingQuantity > 0''')
+                                Where RemainingQuantity > 0 AND HD.company_id_id = %s ''',[company.id])
         all_dc = all_dc.fetchall()
         return JsonResponse({'all_dc':all_dc})
 
@@ -1180,7 +1180,7 @@ def new_sale(request):
             tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = sale_account, tran_type = "", amount = -abs(total_amount), date = date, remarks = "Amount Debit",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice", company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/new_sales.html',{'get_last_sale_no':get_last_sale_no, 'all_accounts':all_accounts, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/new_sales.html',{'get_last_sale_no':get_last_sale_no, 'all_accounts':all_accounts, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 def direct_sale(request, pk):
@@ -1267,7 +1267,7 @@ def direct_sale(request, pk):
             tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = sale_account, tran_type = "", amount = -abs(total_amount), date = date, remarks = "Amount Debit",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice", company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/direct_invoice.html',{'all_item_code':all_item_code,'get_last_sale_no':get_last_sale_no, 'all_accounts':all_accounts, 'dc_header':dc_header, 'dc_detail':dc_detail, 'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/direct_invoice.html',{'all_item_code':all_item_code,'get_last_sale_no':get_last_sale_no, 'all_accounts':all_accounts, 'dc_header':dc_header, 'dc_detail':dc_detail, 'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 
@@ -1288,6 +1288,8 @@ def edit_sale(request,pk):
     sale_detail = SaleDetail.objects.filter(sale_id = sale_header.id).all()
     all_accounts = ChartOfAccount.objects.all()
     customer_name_sale = request.POST.get('customer_name_sale')
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
     if customer_name_sale:
         try:
             get_account = ChartOfAccount.objects.get(account_title = customer_name_sale)
@@ -1305,7 +1307,7 @@ def edit_sale(request,pk):
                                             group by dc_id_id,COA.id,COA.account_title,IP.product_code,IP.product_name
                                             ) As tblData
                                             Inner Join customer_dcheadercustomer HD on  HD.id = tblData.dc_id_id
-                                            Where RemainingQuantity > 0 AND accountid = %s ''',[get_account.id])
+                                            Where RemainingQuantity > 0 AND accountid = %s AND HD.company_id_id = %s ''',[get_account.id, company.id])
                 customer_dc = customer_dc.fetchall()
                 return JsonResponse({'customer_dc':customer_dc})
         except ObjectDoesNotExist:
@@ -1326,7 +1328,7 @@ def edit_sale(request,pk):
                                 group by dc_id_id,COA.id,COA.account_title,IP.product_code,IP.product_name
                                 ) As tblData
                                 Inner Join customer_dcheadercustomer HD on  HD.id = tblData.dc_id_id
-                                Where RemainingQuantity > 0''')
+                                Where RemainingQuantity > 0 AND HD.company_id_id = %s ''',[company.id])
         all_dc = all_dc.fetchall()
         return JsonResponse({'all_dc':all_dc})
     dc_code_sale = request.POST.get('dc_code_sale')
@@ -1420,7 +1422,7 @@ def edit_sale(request,pk):
             tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = sale_account, tran_type = "", amount = -abs(total_amount), date = date, remarks = "Amount Debit", ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice" ,company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/edit_sale.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'sale_header':sale_header, 'sale_detail':sale_detail, 'pk':pk, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/edit_sale.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'sale_header':sale_header, 'sale_detail':sale_detail, 'pk':pk, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_sale_delete)
@@ -1450,8 +1452,8 @@ def sale_return_summary(request):
     allow_transaction_roles = transaction_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
-    all_sales_return = SaleReturnHeader.filter(company).objects.all()
-    return render(request, 'transaction/sale_return_summary.html',{'all_sales_return': all_sales_return,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    all_sales_return = SaleReturnHeader.objects.all()
+    return render(request, 'transaction/sale_return_summary.html',{'all_sales_return': all_sales_return,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 
@@ -1520,7 +1522,7 @@ def new_sale_return(request,pk):
             tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = sale_return_account, tran_type = "", amount = total_amount, date = date, remarks = "",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice Return" ,company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk,'get_last_sale_no':get_last_sale_no,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk,'get_last_sale_no':get_last_sale_no,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 
@@ -1587,7 +1589,7 @@ def edit_sale_return(request,pk):
             tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_return_account, tran_type = "Sale Return Invoice", amount = total_amount, date = date, remarks = "", company_id = company , user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/edit_sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk,'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/edit_sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk,'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 
@@ -1625,16 +1627,17 @@ def chart_of_account(request):
             opening_balance = -abs(int(opening_balance))
         coa = ChartOfAccount(account_title = account_title, parent_id = account_type, opening_balance = opening_balance, phone_no = phone_no, email_address = email_address, ntn = ntn, stn = stn, cnic = cnic ,Address = address, remarks = remarks, credit_limit=credit_limits)
         coa.save()
-    return render(request, 'transaction/chart_of_account.html',{'all_accounts':all_accounts,'all_accounts_null':all_accounts_null,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/chart_of_account.html',{'all_accounts':all_accounts,'all_accounts_null':all_accounts_null,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+@user_passes_test(report_roles)
 def reports(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     all_accounts = ChartOfAccount.objects.all()
-    return render(request,'transaction/reports.html',{'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request,'transaction/reports.html',{'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 def journal_voucher_summary(request):
@@ -1646,7 +1649,7 @@ def journal_voucher_summary(request):
     cursor = connection.cursor()
     all_voucher = cursor.execute(''' select * from transaction_voucherheader where voucher_no LIKE '%JV%' ''')
     all_voucher = all_voucher.fetchall()
-    return render(request, 'transaction/journal_voucher_summary.html',{'all_voucher':all_voucher,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'permission':permission,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/journal_voucher_summary.html',{'all_voucher':all_voucher,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'permission':permission,'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_jv_display)
@@ -1659,8 +1662,7 @@ def journal_voucher(request):
     allow_inventory_roles = inventory_roles(request.user)
     permission = journal_voucher_roles(request.user)
     cursor = connection.cursor()
-    get_last_tran_id = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%JV%'
-                                    order by voucher_no DESC LIMIT 1 ''')
+    get_last_tran_id = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%JV%' AND company_id_id = %s order by voucher_no DESC LIMIT 1  ''',[company.id])
     get_last_tran_id = get_last_tran_id.fetchall()
 
     date = datetime.date.today()
@@ -1708,7 +1710,7 @@ def journal_voucher(request):
                 jv_detail2.save()
         return JsonResponse({"result":"success"})
     return render(request, 'transaction/journal_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,
-    'permission':permission,'is_superuser':request.user.is_superuser})
+    'allow_report_roles':report_roles(request.user),'permission':permission,'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_jv_edit)
@@ -1770,7 +1772,7 @@ def edit_journal_voucher(request, pk):
                 jv_detail2 = VoucherDetail(account_id = account_id,  debit = 0.00, credit = -abs(float(value["credit"])), header_id = header_id)
                 jv_detail2.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'transaction/edit_journal_voucher.html',{"all_accounts":all_accounts,'jv_header':jv_header, 'jv_detail':jv_detail,'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/edit_journal_voucher.html',{"all_accounts":all_accounts,'jv_header':jv_header, 'jv_detail':jv_detail,'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_crv_display)
@@ -1785,24 +1787,22 @@ def view_cash_receiving(request, pk):
     header_id = VoucherHeader.objects.get(id=pk)
     voucher_header = VoucherHeader.objects.filter(company, id=pk).first()
     voucher_detail = VoucherDetail.objects.filter(header_id=header_id.id).all()
-    return render(request, 'transaction/view_cash_receiving_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/view_cash_receiving_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_crv_display)
 def cash_receiving_voucher(request):
-    company =  request.session['company']
-    company = Company_info.objects.get(id = company)
-    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     permission = crv_roles(request.user)
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
     cursor = connection.cursor()
-    all_vouchers = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%CRV%'
-                                        order by voucher_no''')
+    all_vouchers = cursor.execute(f'''select * from transaction_voucherheader where voucher_no LIKE '%CRV%' AND company_id_id = {company.id} '''.format(company=company.id))
     all_vouchers = all_vouchers.fetchall()
-    return render(request, 'transaction/cash_receiving_voucher.html', {'all_vouchers': all_vouchers,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/cash_receiving_voucher.html', {'all_vouchers': all_vouchers,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_crv_add)
@@ -1814,8 +1814,7 @@ def new_cash_receiving_voucher(request):
     company = Company_info.objects.get(id = company)
     allow_inventory_roles = inventory_roles(request.user)
     cursor = connection.cursor()
-    get_last_tran_id = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%CRV%'
-                                        order by voucher_no DESC LIMIT 1''')
+    get_last_tran_id = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%CRV%' order by voucher_no DESC LIMIT 1  ''')
     get_last_tran_id = get_last_tran_id.fetchall()
 
     date = datetime.date.today()
@@ -1843,7 +1842,7 @@ def new_cash_receiving_voucher(request):
                                 from transaction_saleheader HD
                                 Inner join transaction_saledetail DT on DT.sale_id_id = HD.id
                                 Left Join transaction_chartofaccount COA on HD.account_id_id = COA.id
-                                Where Payment_method = 'Credit' And HD.account_id_id = %s AND HD.sale_no = %s AND HD.ID Not In
+                                Where Payment_method = 'Credit' And HD.account_id_id = %s AND HD.sale_no = %s AND HD.company_id_id = %s AND HD.ID Not In
                                 (Select ref_inv_tran_id from transaction_transactions Where ref_inv_tran_type = 'Sale CRV')
                                 Group by HD.ID,HD.account_id_id,account_title
                                 Union All
@@ -1853,11 +1852,11 @@ def new_cash_receiving_voucher(request):
                                 from transaction_saleheader HD
                                 Inner join transaction_saledetail DT on DT.sale_id_id = HD.id
                                 Inner Join transaction_chartofaccount COA on HD.account_id_id = COA.id
-                                Where Payment_method = 'Credit' AND HD.account_id_id = %s AND HD.sale_no = %s
+                                Where Payment_method = 'Credit' AND HD.account_id_id = %s AND HD.sale_no = %s AND HD.company_id_id = %s
                                 Group By HD.ID,HD.account_id_id,account_title
                                 Having InvAmount > RcvAmount
                                 ) As tblPendingInvoice
-                                Order By ID''',[id.id,invoice_no,id.id,id.id,invoice_no])
+                                Order By ID''',[id.id,invoice_no,company.id,id.id,id.id,invoice_no, company.id])
             pi = pi.fetchall()
             return JsonResponse({'pi':pi})
         else:
@@ -1867,7 +1866,7 @@ def new_cash_receiving_voucher(request):
                                 from transaction_saleheader HD
                                 Inner join transaction_saledetail DT on DT.sale_id_id = HD.id
                                 Left Join transaction_chartofaccount COA on HD.account_id_id = COA.id
-                                Where Payment_method = 'Credit' And HD.account_id_id = %s AND HD.ID Not In
+                                Where Payment_method = 'Credit' And HD.account_id_id = %s AND HD.company_id_id = %s AND HD.ID Not In
                                 (Select ref_inv_tran_id from transaction_transactions Where ref_inv_tran_type = 'Sale CRV')
                                 Group by HD.ID,HD.account_id_id,account_title
                                 Union All
@@ -1877,11 +1876,11 @@ def new_cash_receiving_voucher(request):
                                 from transaction_saleheader HD
                                 Inner join transaction_saledetail DT on DT.sale_id_id = HD.id
                                 Inner Join transaction_chartofaccount COA on HD.account_id_id = COA.id
-                                Where Payment_method = 'Credit' AND HD.account_id_id = %s
+                                Where Payment_method = 'Credit' AND HD.account_id_id = %s AND HD.company_id_id = %s
                                 Group By HD.ID,HD.account_id_id,account_title
                                 Having InvAmount > RcvAmount
                                 ) As tblPendingInvoice
-                                Order By ID''',[id.id,id.id,id.id])
+                                Order By ID''',[id.id,company.id,id.id,id.id,company.id])
             pi = pi.fetchall()
             return JsonResponse({'pi':pi})
     if request.method == "POST":
@@ -1913,7 +1912,7 @@ def new_cash_receiving_voucher(request):
             jv_detail2 = VoucherDetail(account_id = account_id,  debit = 0.00, credit = -abs(amount),header_id = header_id, invoice_id = invoice_no.id)
             jv_detail2.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'transaction/new_cash_receiving_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/new_cash_receiving_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 
@@ -1947,21 +1946,22 @@ def view_bank_receiving(request, pk):
     header_id = VoucherHeader.objects.get(id=pk)
     voucher_header = VoucherHeader.objects.filter(company, id=pk).first()
     voucher_detail = VoucherDetail.objects.filter(header_id=header_id.id).all()
-    return render(request, 'transaction/view_bank_receiving_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/view_bank_receiving_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_brv_display)
 def bank_receiving_voucher(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     cursor = connection.cursor()
     permission = brv_roles(request.user)
-    all_vouchers = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%BRV%'
-                                        order by voucher_no''')
+    all_vouchers = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%BRV%' AND company_id_id = {company} '''.format(company=company.id))
     all_vouchers = all_vouchers.fetchall()
-    return render(request, 'transaction/bank_receiving_voucher.html', {'all_vouchers': all_vouchers,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/bank_receiving_voucher.html', {'all_vouchers': all_vouchers,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_brv_add)
@@ -1996,7 +1996,7 @@ def new_bank_receiving_voucher(request):
     suppliers = Q(parent_id = 12)
     all_accounts = ChartOfAccount.objects.all()
     banks = Q(parent_id = 16)
-    all_bank = ChartOfAccount.objects.filter(banks).all()
+    # all_bank = ChartOfAccount.objects.all()
     all_invoices = SaleHeader.objects.filter(company).all()
     user = request.user
     if account_name:
@@ -2018,11 +2018,11 @@ def new_bank_receiving_voucher(request):
                                 from transaction_saleheader HD
                                 Inner join transaction_saledetail DT on DT.sale_id_id = HD.id
                                 Inner Join transaction_chartofaccount COA on HD.account_id_id = COA.id
-                                Where Payment_method = 'Credit' AND HD.account_id_id = %s AND HD.sale_no = %s
+                                Where Payment_method = 'Credit' AND HD.account_id_id = %s AND HD.sale_no = %s AND HD.company_id_id = %s
                                 Group By HD.ID,HD.account_id_id,account_title
                                 Having InvAmount > RcvAmount
                                 ) As tblPendingInvoice
-                                Order By ID''',[id.id,invoice_no,id.id,id.id,invoice_no])
+                                Order By ID''',[id.id,invoice_no,company.id,id.id,id.id,invoice_no,company.id])
             pi = pi.fetchall()
             return JsonResponse({'pi':pi,'bank_account':bank_account,'account_id':account_id.account_id})
         else:
@@ -2033,7 +2033,7 @@ def new_bank_receiving_voucher(request):
                                 from transaction_saleheader HD
                                 Inner join transaction_saledetail DT on DT.sale_id_id = HD.id
                                 Left Join transaction_chartofaccount COA on HD.account_id_id = COA.id
-                                Where Payment_method = 'Credit' And HD.account_id_id = %s AND HD.ID Not In
+                                Where Payment_method = 'Credit' And HD.account_id_id = %s AND HD.company_id_id = %s AND HD.ID Not In
                                 (Select ref_inv_tran_id from transaction_transactions Where ref_inv_tran_type = 'Sale CRV' or ref_inv_tran_type = 'Sale BRV')
                                 Group by HD.ID,HD.account_id_id,account_title
                                 Union All
@@ -2043,11 +2043,11 @@ def new_bank_receiving_voucher(request):
                                 from transaction_saleheader HD
                                 Inner join transaction_saledetail DT on DT.sale_id_id = HD.id
                                 Inner Join transaction_chartofaccount COA on HD.account_id_id = COA.id
-                                Where Payment_method = 'Credit' AND HD.account_id_id = %s
+                                Where Payment_method = 'Credit' AND HD.account_id_id = %s AND HD.company_id_id = %s
                                 Group By HD.ID,HD.account_id_id,account_title
                                 Having InvAmount > RcvAmount
                                 ) As tblPendingInvoice
-                                Order By ID''',[id.id,id.id,id.id])
+                                Order By ID''',[id.id,company.id,id.id,id.id,company.id])
             pi = pi.fetchall()
             return JsonResponse({'pi':pi,'bank_account':bank_account,'account_id':account_id.account_id})
     if request.method == "POST":
@@ -2084,7 +2084,8 @@ def new_bank_receiving_voucher(request):
             jv_detail2 = VoucherDetail(account_id = account_id,  debit = 0.00, credit = -abs(amount),header_id = header_id, invoice_id = invoice_no.id)
             jv_detail2.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'transaction/new_bank_receiving_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser, 'all_bank':all_bank})
+    return render(request, 'transaction/new_bank_receiving_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+
 
 
 @user_passes_test(allow_brv_delete)
@@ -2117,21 +2118,22 @@ def view_bank_payment(request, pk):
     header_id = VoucherHeader.objects.get(id=pk)
     voucher_header = VoucherHeader.objects.filter(company,id=pk).first()
     voucher_detail = VoucherDetail.objects.filter(header_id=header_id.id).all()
-    return render(request, 'transaction/view_bank_payment_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/view_bank_payment_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_bpv_display)
 def bank_payment_voucher(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     permission = bpv_roles(request.user)
     cursor = connection.cursor()
-    all_vouchers = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%BPV%'
-                                        order by voucher_no''')
+    all_vouchers = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%BPV%' AND company_id_id = {company}'''.format(company=company.id))
     all_vouchers = all_vouchers.fetchall()
-    return render(request, 'transaction/bank_payment_voucher.html', {'all_vouchers': all_vouchers,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/bank_payment_voucher.html', {'all_vouchers': all_vouchers,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_bpv_add)
@@ -2153,7 +2155,6 @@ def new_bank_payment_voucher(request):
     if get_last_tran_id:
         get_last_tran_id = get_last_tran_id[0][1]
         get_last_tran_id = get_last_tran_id[7:]
-        print(get_last_tran_id)
         serial = str((int(get_last_tran_id) + 1))
         get_last_tran_id = date[2:]+'BPV'+serial
     else:
@@ -2164,11 +2165,13 @@ def new_bank_payment_voucher(request):
     invoice_no = request.POST.get('invoice_no', False)
     customers = Q(parent_id = 13)
     suppliers = Q(parent_id = 12)
-    all_accounts = ChartOfAccount.objects.filter(customers|suppliers).all()
+    all_accounts = ChartOfAccount.objects.all()
     banks = Q(parent_id = 16)
     all_bank = ChartOfAccount.objects.filter(banks).all()
     all_invoices = PurchaseHeader.objects.filter(company).all()
     user = request.user
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
     if account_name:
         if check == "1":
             account_id = ChartOfAccount.objects.filter(account_title = bank_account).first()
@@ -2178,7 +2181,7 @@ def new_bank_payment_voucher(request):
                                 from transaction_purchaseheader HD
                                 Inner join transaction_purchasedetail DT on DT.purchase_id_id = HD.id
                                 Left Join transaction_chartofaccount COA on HD.account_id_id = COA.id
-                                Where Payment_method = 'Credit' And HD.account_id_id = %s AND HD.purchase_no = %s AND HD.ID Not In
+                                Where Payment_method = 'Credit' And HD.account_id_id = %s AND HD.purchase_no = %s AND HD.company_id_id = %s AND HD.ID Not In
                                 (Select ref_inv_tran_id from transaction_transactions Where ref_inv_tran_type = 'Purchase BPV' or ref_inv_tran_type = 'Purchase CPV')
                                 Group by HD.ID,HD.account_id_id,account_title
                                 Union All
@@ -2188,11 +2191,11 @@ def new_bank_payment_voucher(request):
                                 from transaction_purchaseheader HD
                                 Inner join transaction_purchasedetail DT on DT.purchase_id_id = HD.id
                                 Inner Join transaction_chartofaccount COA on HD.account_id_id = COA.id
-                                Where Payment_method = 'Credit' AND HD.account_id_id = %s AND HD.purchase_no = %s
+                                Where Payment_method = 'Credit' AND HD.account_id_id = %s AND HD.purchase_no = %s AND HD.company_id_id = %s
                                 Group By HD.ID,HD.account_id_id,account_title
                                 Having InvAmount > RcvAmount
                                 ) As tblPendingInvoice
-                                Order By ID''',[id.id,invoice_no,id.id,id.id,invoice_no])
+                                Order By ID''',[id.id,invoice_no,company.id,id.id,id.id,invoice_no,company.id])
             pi = pi.fetchall()
             return JsonResponse({'pi':pi,'bank_account':bank_account,'account_id':account_id.account_id})
         else:
@@ -2203,7 +2206,7 @@ def new_bank_payment_voucher(request):
                                 from transaction_purchaseheader HD
                                 Inner join transaction_purchasedetail DT on DT.purchase_id_id = HD.id
                                 Left Join transaction_chartofaccount COA on HD.account_id_id = COA.id
-                                Where Payment_method = 'Credit' And HD.account_id_id = %s AND HD.ID Not In
+                                Where Payment_method = 'Credit' And HD.account_id_id = %s AND HD.company_id_id = %s AND HD.ID Not In
                                 (Select ref_inv_tran_id from transaction_transactions Where ref_inv_tran_type = 'Purchase BPV' or ref_inv_tran_type = 'Purchase CPV')
                                 Group by HD.ID,HD.account_id_id,account_title
                                 Union All
@@ -2213,11 +2216,11 @@ def new_bank_payment_voucher(request):
                                 from transaction_purchaseheader HD
                                 Inner join transaction_purchasedetail DT on DT.purchase_id_id = HD.id
                                 Inner Join transaction_chartofaccount COA on HD.account_id_id = COA.id
-                                Where Payment_method = 'Credit' AND HD.account_id_id = %s
+                                Where Payment_method = 'Credit' AND HD.account_id_id = %s AND HD.company_id_id = %s
                                 Group By HD.ID,HD.account_id_id,account_title
                                 Having InvAmount > RcvAmount
                                 ) As tblPendingInvoice
-                                Order By ID''',[id.id,id.id,id.id])
+                                Order By ID''',[id.id,company.id,id.id,id.id,company.id])
             pi = pi.fetchall()
             return JsonResponse({'pi':pi,'bank_account':bank_account,'account_id':account_id.account_id})
     if request.method == "POST":
@@ -2254,7 +2257,7 @@ def new_bank_payment_voucher(request):
             jv_detail2 = VoucherDetail(account_id = account_id,  debit = amount, credit = 0.00,header_id = header_id, invoice_id = invoice_no.id)
             jv_detail2.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'transaction/new_bank_payment_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/new_bank_payment_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser,'all_bank':all_bank,'all_invoices':all_invoices})
 
 
 
@@ -2288,21 +2291,22 @@ def view_cash_payment(request, pk):
     header_id = VoucherHeader.objects.get(id=pk)
     voucher_header = VoucherHeader.objects.filter(company, id=pk).first()
     voucher_detail = VoucherDetail.objects.filter(header_id=header_id.id).all()
-    return render(request, 'transaction/view_cash_receiving_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/view_cash_receiving_voucher.html', {'voucher_header': voucher_header,'voucher_detail': voucher_detail,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_cpv_display)
 def cash_payment_voucher(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     permission = cpv_roles(request.user)
     cursor = connection.cursor()
-    all_vouchers = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%CPV%'
-                                        order by voucher_no''')
+    all_vouchers = cursor.execute('''select * from transaction_voucherheader where voucher_no LIKE '%CPV%' AND company_id_id = {company}'''.format(company=company.id))
     all_vouchers = all_vouchers.fetchall()
-    return render(request, 'transaction/cash_payment_voucher.html', {'all_vouchers': all_vouchers,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/cash_payment_voucher.html', {'all_vouchers': all_vouchers,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_cpv_add)
@@ -2343,7 +2347,7 @@ def new_cash_payment_voucher(request):
                                 from transaction_purchaseheader HD
                                 Inner join transaction_purchasedetail DT on DT.purchase_id_id = HD.id
                                 Left Join transaction_chartofaccount COA on HD.account_id_id = COA.id
-                                Where Payment_method = 'Credit' And HD.account_id_id = %s AND HD.purchase_no = %s AND HD.ID Not In
+                                Where Payment_method = 'Credit' And HD.account_id_id = %s AND HD.purchase_no = %s AND HD.company_id_id = %s AND HD.ID Not In
                                 (Select ref_inv_tran_id from transaction_transactions Where ref_inv_tran_type = 'Purchase BPV' or ref_inv_tran_type = 'Purchase CPV')
                                 Group by HD.ID,HD.account_id_id,account_title
                                 Union All
@@ -2353,11 +2357,11 @@ def new_cash_payment_voucher(request):
                                 from transaction_purchaseheader HD
                                 Inner join transaction_purchasedetail DT on DT.purchase_id_id = HD.id
                                 Inner Join transaction_chartofaccount COA on HD.account_id_id = COA.id
-                                Where Payment_method = 'Credit' AND HD.account_id_id = %s AND HD.purchase_no = %s
+                                Where Payment_method = 'Credit' AND HD.account_id_id = %s AND HD.purchase_no = %s AND HD.company_id_id = %s
                                 Group By HD.ID,HD.account_id_id,account_title
                                 Having InvAmount > RcvAmount
                                 ) As tblPendingInvoice
-                                Order By ID''',[id.id,invoice_no,id.id,id.id,invoice_no])
+                                Order By ID''',[id.id,invoice_no,company.id,id.id,id.id,invoice_no,company.id])
             pi = pi.fetchall()
             return JsonResponse({'pi':pi})
         else:
@@ -2367,7 +2371,7 @@ def new_cash_payment_voucher(request):
                                 from transaction_purchaseheader HD
                                 Inner join transaction_purchasedetail DT on DT.purchase_id_id = HD.id
                                 Left Join transaction_chartofaccount COA on HD.account_id_id = COA.id
-                                Where Payment_method = 'Credit' And HD.account_id_id = %s AND HD.ID Not In
+                                Where Payment_method = 'Credit' And HD.account_id_id = %s AND HD.company_id_id = %s AND HD.ID Not In
                                 (Select ref_inv_tran_id from transaction_transactions Where ref_inv_tran_type = 'Purchase BPV' or ref_inv_tran_type = 'Purchase CPV')
                                 Group by HD.ID,HD.account_id_id,account_title
                                 Union All
@@ -2377,11 +2381,11 @@ def new_cash_payment_voucher(request):
                                 from transaction_purchaseheader HD
                                 Inner join transaction_purchasedetail DT on DT.purchase_id_id = HD.id
                                 Inner Join transaction_chartofaccount COA on HD.account_id_id = COA.id
-                                Where Payment_method = 'Credit' AND HD.account_id_id = %s
+                                Where Payment_method = 'Credit' AND HD.account_id_id = %s AND HD.company_id_id = %s
                                 Group By HD.ID,HD.account_id_id,account_title
                                 Having InvAmount > RcvAmount
                                 ) As tblPendingInvoice
-                                Order By ID''',[id.id,id.id,id.id])
+                                Order By ID''',[id.id,company.id,id.id,id.id,company.id])
             pi = pi.fetchall()
             return JsonResponse({'pi':pi})
     if request.method == "POST":
@@ -2413,7 +2417,7 @@ def new_cash_payment_voucher(request):
             jv_detail2 = VoucherDetail(account_id = account_id,  debit = amount, credit = 0.00,header_id = header_id, invoice_id = invoice_no.id)
             jv_detail2.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'transaction/new_cash_payment_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'all_invoices':all_invoices,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/new_cash_payment_voucher.html',{"all_accounts":all_accounts, 'get_last_tran_id':get_last_tran_id,'all_invoices':all_invoices,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 
@@ -2580,7 +2584,7 @@ def account_ledger(request):
                     credit_amount = credit_amount + v[5]
         account_id = ChartOfAccount.objects.filter(id = pk).first()
         account_title = account_id.account_title
-        pdf = render_to_pdf('transaction/account_ledger_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount, 'account_title':account_title, 'from_date':from_date,'to_date':to_date,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+        pdf = render_to_pdf('transaction/account_ledger_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount, 'account_title':account_title, 'from_date':from_date,'to_date':to_date,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "TrialBalance%s.pdf" %("000")
@@ -2617,7 +2621,7 @@ def trial_balance(request):
                 debit_amount = debit_amount + v[2]
             else:
                 credit_amount = credit_amount + v[2]
-        pdf = render_to_pdf('transaction/trial_balance_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount,'from_date':from_date,'to_date':to_date,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+        pdf = render_to_pdf('transaction/trial_balance_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount,'from_date':from_date,'to_date':to_date,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "TrialBalance%s.pdf" %("000")
@@ -2657,7 +2661,7 @@ def sale_detail(request):
                 debit_amount = debit_amount + v[2]
             else:
                 credit_amount = credit_amount + v[2]
-        pdf = render_to_pdf('transaction/trial_balance_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+        pdf = render_to_pdf('transaction/trial_balance_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "TrialBalance%s.pdf" %("000")
@@ -2704,7 +2708,7 @@ def sale_detail_item_wise(request):
         for value in row:
             total = total + value[3]
         print(total)
-        pdf = render_to_pdf('transaction/sale_detail_item_wise_pdf.html', {'company_info':company_info,'image':image,'row':row,'from_date':from_date, 'to_date':to_date,'total':total,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+        pdf = render_to_pdf('transaction/sale_detail_item_wise_pdf.html', {'company_info':company_info,'image':image,'row':row,'from_date':from_date, 'to_date':to_date,'total':total,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "Sale_Detail_Item_Wise%s.pdf" %("000")
@@ -2755,7 +2759,7 @@ def sale_summary_item_wise(request):
             total = total + value[5]
         account_id = ChartOfAccount.objects.filter(id = account_id).first()
         account_title = account_id.account_title
-        pdf = render_to_pdf('transaction/sale_summary_item_wise_pdf.html', {'company_info':company_info,'image':image,'row':row,'from_date':from_date, 'to_date':to_date,'total':total, 'all_accounts':all_accounts, 'account_title':account_title,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+        pdf = render_to_pdf('transaction/sale_summary_item_wise_pdf.html', {'company_info':company_info,'image':image,'row':row,'from_date':from_date, 'to_date':to_date,'total':total, 'all_accounts':all_accounts, 'account_title':account_title,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "Sale_Detail_Item_Wise%s.pdf" %("000")
@@ -2823,7 +2827,7 @@ def sales_tax_invoice(request,pk):
     total_amount = round(total_amount)
     lines = lines + len(detail) + len(detail)
     total_lines = 36 - lines
-    pdf = render_to_pdf('transaction/sales_tax_invoice_pdf_lines.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount_item':total_amount_item,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser, 'parent_company_name':parent_company_name, 'cartage_amounts':cartage_amounts,'tax_amount':tax_amount,'total_amount':total_amount,'hs_code':hs_code})
+    pdf = render_to_pdf('transaction/sales_tax_invoice_pdf_lines.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount_item':total_amount_item,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser, 'parent_company_name':parent_company_name, 'cartage_amounts':cartage_amounts,'tax_amount':tax_amount,'total_amount':total_amount,'hs_code':hs_code,'allow_report_roles':report_roles(request.user)})
     # allow_customer_roles = customer_roles(request.user)
     # allow_supplier_roles = supplier_roles(request.user)
     # allow_transaction_roles = transaction_roles(request.user)
@@ -2925,7 +2929,7 @@ def commercial_invoice(request,pk):
     total_amount = round(total_amount)
     lines = lines + len(detail) + len(detail)
     total_lines = 36 - lines
-    pdf = render_to_pdf('transaction/commercial_invoice_pdf_lines.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount_item':total_amount_item,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser, 'parent_company_name':parent_company_name, 'cartage_amounts':cartage_amounts,'tax_amount':tax_amount,'total_amount':total_amount,'hs_code':hs_code})
+    pdf = render_to_pdf('transaction/commercial_invoice_pdf_lines.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount_item':total_amount_item,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser, 'parent_company_name':parent_company_name, 'cartage_amounts':cartage_amounts,'tax_amount':tax_amount,'total_amount':total_amount,'hs_code':hs_code,'allow_report_roles':report_roles(request.user)})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "SaleTaxInvoice%s.pdf" %(header.sale_no)
@@ -2942,7 +2946,7 @@ def multi_companies(request):
     allow_inventory_roles = inventory_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     all_companies = Company_info.objects.all()
-    return render(request,'transaction/multi_companies.html',{'all_companies':all_companies,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request,'transaction/multi_companies.html',{'all_companies':all_companies,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 def new_multi_companies(request):
@@ -2963,4 +2967,4 @@ def new_multi_companies(request):
         cnic = request.POST.get('cnic')
         new_companies = Company_info(company_name = company_name, company_address = company_address, phone_no = phone_no, email = email_address,  website = web_site, ntn = ntn, stn = stn, cnic = cnic)
         new_companies.save()
-    return render(request,'transaction/new_multi_company.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request,'transaction/new_multi_company.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})

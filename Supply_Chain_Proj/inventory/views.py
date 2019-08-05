@@ -6,7 +6,7 @@ from itertools import chain
 import json
 from django.db import connection
 from django.contrib import messages
-from supplier.views import customer_roles,supplier_roles,transaction_roles,inventory_roles
+from supplier.views import customer_roles,supplier_roles,transaction_roles,inventory_roles,report_roles
 from django.db.models import Q
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Q
@@ -60,7 +60,7 @@ def allow_inventory_delete(user):
     delete = Q(delete = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, delete)
     if allow_role:
-        return False
+        return True
     else:
         return False
 
@@ -105,7 +105,7 @@ def item_stock(request):
                     ''')
     row = cursor.fetchall()
     return render(request, 'inventory/item_stock.html',{'row':row,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,
-    'permission':permission,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    'permission':permission,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_inventory_add)
@@ -114,11 +114,11 @@ def new_item_stock(request):
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
-    return render(request, 'inventory/new_item_stock.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'inventory/new_item_stock.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 
-@user_passes_test(allow_inventory_shop)
+@user_passes_test(allow_inventory_add)
 def add_product(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
@@ -156,7 +156,7 @@ def add_product(request):
             new_products.save()
             serial_no = serial_no + 1
         return JsonResponse({"result":"success"})
-    return render(request, 'inventory/add_product.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'inventory/add_product.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_inventory_edit)
@@ -182,15 +182,10 @@ def edit_item(request,pk):
         all_detail.opening_stock = opening_stock
         all_detail.save()
         return JsonResponse({"result":"success"})
-    return render(request, 'inventory/edit_item.html', {'all_detail':all_detail,'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
+    return render(request, 'inventory/edit_item.html', {'all_detail':all_detail,'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 def item_avaliable(pk):
-    allow_customer_roles = customer_roles(request.user)
-    allow_supplier_roles = supplier_roles(request.user)
-    allow_transaction_roles = transaction_roles(request.user)
-    allow_transaction_roles = transaction_roles(request.user)
-    allow_inventory_roles = inventory_roles(request.user)
     cusror = connection.cursor()
     row = cusror.execute('''select case
                              when exists (select id from customer_rfqcustomerdetail  where item_id_id = %s)
@@ -207,7 +202,6 @@ def item_avaliable(pk):
     res_list = [x[0] for x in row]
     if res_list[0] == "n":
         Add_products.objects.filter(id = pk).delete()
-        messages.add_message(request, messages.SUCCESS, "Item Deleted")
         return True
     else:
         return False
