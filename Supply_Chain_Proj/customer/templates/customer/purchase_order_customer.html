@@ -39,11 +39,11 @@
                   <td> {{ value.po_no }} </td>
                   <td> {{value.account_id.account_title}} </td>
                   <td> {{ value.date }} </td>
-                  <td> User1  </td>
+                  <td> {{value.user_id.username}} </td>
                   <td> {{ value.currency }} </td>
                   <td> {{ value.exchange_rate }} </td>
                   <td>
-                    
+
                     {% if permission.edit == 1 %}
                     <a class="edit_list" href="{% url 'edit-purchase-order-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
                     {% endif %}
@@ -51,7 +51,7 @@
                     {% if permission.r_print == 1 %}
                     <a href="{% url 'print-po-customer' pk=value.id %}" target="_blank"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a>
                     {% endif %}
-                    
+
                     {% if permission.delete == 1 %}
                     <a class="delete-all" href="{% url 'delete-purchase-order-customer' pk=value.id %}"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
                     {% endif %}

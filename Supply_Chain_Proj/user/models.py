@@ -19,3 +19,16 @@ class FiscalYear(models.Model):
     fiscal_year = models.CharField(max_length = 100)
     database_name = models.CharField(max_length = 100)
     is_current_year = models.IntegerField()
+
+class Company_info(models.Model):
+    company_name = models.CharField(max_length = 100)
+    company_address = models.TextField()
+    company_logo = models.TextField()
+    phone_no = models.CharField(max_length = 100)
+    mobile_no = models.CharField(max_length = 100)
+    email = models.CharField(max_length = 100)
+    website = models.CharField(max_length = 100)
+    ntn = models.CharField(max_length = 100)
+    stn = models.CharField(max_length = 100)
+    cnic = models.CharField(max_length = 100)
+    user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)

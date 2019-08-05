@@ -392,16 +392,20 @@ def edit_rfq_customer(request,pk):
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
-    rfq_header = RfqCustomerHeader.objects.filter(id = pk).first()
-    rfq_detail = RfqCustomerDetail.objects.filter(rfq_id = pk).all()
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
+    rfq_header = RfqCustomerHeader.objects.filter(company,id = pk).first()
+    rfq_detail = RfqCustomerDetail.objects.filter(rfq_id = rfq_header.id).all()
     all_accounts = ChartOfAccount.objects.all()
     all_item_code = list(Add_products.objects.values('product_code'))
     try:
         item_code = request.POST.get('item_code',False)
+        print(item_code)
         if item_code:
             item_id = Add_products.objects.get(product_code = item_code)
             data = Add_products.objects.filter(id = item_id.id)
-            item_code_exist = RfqCustomerDetail.objects.filter(item_id = item_id, rfq_id = pk).first()
+            item_code_exist = RfqCustomerDetail.objects.filter(item_id = data, rfq_id = pk).first()
             if item_code_exist:
                 return HttpResponse(json.dumps({'message':"Item Already Exist"}))
             row = serializers.serialize('json',data)
@@ -484,6 +488,9 @@ def new_quotation_customer(request):
         row = serializers.serialize('json',data)
         return HttpResponse(json.dumps({'row':row}))
     if request.method == 'POST':
+        company =  request.session['company']
+        company = Company_info.objects.get(id = company)
+
         customer = request.POST.get('customer',False)
         attn = request.POST.get('attn',False)
         prcbasis = request.POST.get('prcbasis',False)
@@ -504,7 +511,7 @@ def new_quotation_customer(request):
             follow_up = '2010-06-22'
         quotation_header = QuotationHeaderCustomer(quotation_no = get_last_quotation_no, date = date, attn = attn, prc_basis = prcbasis,
                                                 leadtime = leadtime, validity = validity, payment = payment, yrref = yrref, remarks = remarks, currency = currency,
-                                                exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, footer_remarks = footer_remarks ,account_id = account_id)
+                                                exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, footer_remarks = footer_remarks ,account_id = account_id, company_id = company, user_id = request.user)
         quotation_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = QuotationHeaderCustomer.objects.get(quotation_no = get_last_quotation_no)
@@ -537,8 +544,13 @@ def edit_quotation_customer(request,pk):
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
-    quotation_header = QuotationHeaderCustomer.objects.filter(id = pk).first()
-    quotation_detail = QuotationDetailCustomer.objects.filter(quotation_id = pk).all()
+
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
+
+    quotation_header = QuotationHeaderCustomer.objects.filter(company, id = pk).first()
+    quotation_detail = QuotationDetailCustomer.objects.filter(quotation_id = quotation_header.id).all()
     all_item_code = list(Add_products.objects.values('product_code'))
     all_accounts = ChartOfAccount.objects.all()
     item_code = request.POST.get('item_code',False)
@@ -604,12 +616,17 @@ def print_quotation_customer(request,pk):
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
+
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
+
     lines = 0
     total_amount = 0
     company_info = Company_info.objects.filter(id = 1)
     image = Company_info.objects.filter(id = 1).first()
-    header = QuotationHeaderCustomer.objects.filter(id = pk).first()
-    detail = QuotationDetailCustomer.objects.filter(quotation_id = pk).all()
+    header = QuotationHeaderCustomer.objects.filter(company, id = pk).first()
+    detail = QuotationDetailCustomer.objects.filter(quotation_id = header.id).all()
     for value in detail:
         amount = float(value.unit_price * value.quantity)
         total_amount = total_amount + amount
@@ -640,6 +657,10 @@ def purchase_order_customer(request):
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     permission = purchase_order_roles(request.user)
+
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     all_po = PoHeaderCustomer.objects.all()
     return render(request, 'customer/purchase_order_customer.html',{'all_po':all_po,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
@@ -686,9 +707,11 @@ def new_purchase_order_customer(request):
             follow_up = follow_up
         else:
             follow_up = '2010-06-22'
+        company =  request.session['company']
+        company = Company_info.objects.get(id = company)
         po_header = PoHeaderCustomer(po_no = get_last_po_no, date = date, attn = attn, prc_basis = prcbasis, po_client = po_client,
                                                 leadtime = leadtime, validity = validity, payment = payment, remarks = remarks, currency = currency,
-                                                exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, footer_remarks = footer_remarks ,account_id = account_id)
+                                                exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, footer_remarks = footer_remarks ,account_id = account_id, user_id = request.user, company_id = company)
         po_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = PoHeaderCustomer.objects.get(po_no = get_last_po_no)
@@ -706,18 +729,20 @@ def edit_purchase_order_customer(request,pk):
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
-    po_header = PoHeaderCustomer.objects.filter(id = pk).first()
-    po_detail = PoDetailCustomer.objects.filter(po_id = pk).all()
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
+    po_header = PoHeaderCustomer.objects.filter(company, id = pk).first()
+    po_detail = PoDetailCustomer.objects.filter(po_id = po_header.id).all()
     all_item_code = list(Add_products.objects.values('product_code'))
-    all_accounts = ChartOfAccount.objects.all()
+    all_accounts = ChartOfAccount.objects.filter(company).all()
     item_code = request.POST.get('item_code',False)
     if item_code:
         item_id = Add_products.objects.get(product_code = item_code)
         data = Add_products.objects.filter(id = item_id.id)
-        item_code_exist = PoDetailCustomer.objects.filter(item_id = item_id, po_id = pk).first()
+        item_code_exist = PoDetailCustomer.objects.filter(company,item_id = item_id, po_id = pk).first()
         if item_code_exist:
             return HttpResponse(json.dumps({'message':"Item Already Exist"}))
-            print(data)
         row = serializers.serialize('json',data)
         return HttpResponse(json.dumps({'row':row}))
     if request.method == 'POST':
@@ -775,12 +800,15 @@ def print_po_customer(request,pk):
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     lines = 0
     total_amount = 0
     company_info = Company_info.objects.filter(id = 1)
     image = Company_info.objects.filter(id = 1).first()
-    header = PoHeaderCustomer.objects.filter(id = pk).first()
-    detail = PoDetailCustomer.objects.filter(po_id = pk).all()
+    header = PoHeaderCustomer.objects.filter(company, id = pk).first()
+    detail = PoDetailCustomer.objects.filter(company,po_id = pk).all()
     for value in detail:
         amount = float(value.unit_price * value.quantity)
         total_amount = total_amount + amount
@@ -804,32 +832,40 @@ def delete_po_customer(request,pk):
 
 @user_passes_test(allow_delivery_challan_display)
 def delivery_challan_customer(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     permission = delivery_challan_roles(request.user)
-    all_dc = DcHeaderCustomer.objects.all()
+    all_dc = DcHeaderCustomer.objects.filter(company).all()
     cursor = connection.cursor()
-    is_dc = cursor.execute('''Select Distinct id,dc_no From (
-                            Select distinct dc_id_id, IP.product_code,IP.product_name,
-                            DC.Quantity As DcQuantity,
-                            ifnull(sum(SD.Quantity),0) As SaleQuantity,
-                            (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
-                            from customer_dcdetailcustomer DC
-                            inner join inventory_add_products IP on DC.item_id_id = IP.id
-                            Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
-                            And SD.item_id_id = IP.id
-                            group by dc_id_id,IP.product_code,IP.product_name
-                            ) As tblData
-                            Inner Join customer_dcheadercustomer  HD on  HD.id = tblData.dc_id_id
-                            Where RemainingQuantity > 0''')
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    is_dc = cursor.execute('''Select Distinct id,dc_no,company_id_id From (
+                        Select distinct dc_id_id, IP.product_code,IP.product_name,
+                        DC.Quantity As DcQuantity,
+                        ifnull(sum(SD.Quantity),0) As SaleQuantity,
+                        (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
+                        from customer_dcdetailcustomer DC
+                        inner join inventory_add_products IP on DC.item_id_id = IP.id
+                        Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+                        And SD.item_id_id = IP.id
+                        group by dc_id_id,IP.product_code,IP.product_name
+                        ) As tblData
+                        Inner Join customer_dcheadercustomer HD on  HD.id = tblData.dc_id_id
+                        Where RemainingQuantity > 0 AND Company_id_id = %s
+                        ''',[company.id])
     is_dc = is_dc.fetchall()
     return render(request, 'customer/delivery_challan_customer.html',{'all_dc':all_dc,'is_dc':is_dc,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_delivery_challan_add)
 def new_delivery_challan_customer(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -856,7 +892,7 @@ def new_delivery_challan_customer(request):
     item_code_po_dc = request.POST.get('item_code_po_dc',False)
 
     if item_code_po_dc:
-        id = PoHeaderCustomer.objects.get(po_client = item_code_po_dc)
+        id = PoHeaderCustomer.objects.get(company, po_client = item_code_po_dc)
         item_id = PoDetailCustomer.objects.filter(po_id = id).all()
         for value in item_id:
             row.append(value.item_id.id)
@@ -864,34 +900,34 @@ def new_delivery_challan_customer(request):
         row = cursor.execute(f'''select * from inventory_add_products where id in ({a})''')
         row = row.fetchall()
         return JsonResponse({'row':row,'id':id.id})
-    get_item_code = request.POST.get('item_code', False)
-    quantity = request.POST.get('quantity', False)
-    if get_item_code:
-        cursor.execute('''Select item_code, item_name,Item_description,Unit,SUM(quantity) As qty From (
-                        Select 'Opening Stock' As TranType,Product_Code As Item_Code,Product_Name As Item_name,Product_desc As Item_description,Unit As unit,Opening_Stock as Quantity From inventory_add_products
-                        where product_code = %s
-                        union All
-                        Select 'Purchase' As TranType,Item_Code,Item_name,Item_description,unit,Quantity From transaction_purchasedetail
-                        where item_code = %s
-                        union All
-                        Select 'Purchase Return' As TranType,Item_Code,Item_name,Item_description,unit,Quantity * -1 From transaction_purchasereturndetail
-                        where item_code = %s
-                        union All
-                        Select 'Sale' As TranType,Item_Code,Item_name,Item_description,unit,Quantity * -1 From transaction_saledetail
-                        where item_code = %s
-                        union All
-                        Select 'Sale Return' As TranType,Item_Code,Item_name,Item_description,unit,Quantity  From transaction_salereturndetail
-                        where item_code = %s
-                        ) As tblTemp
-                        Group by Item_Code''',[get_item_code,get_item_code,get_item_code,get_item_code,get_item_code])
-        row = cursor.fetchall()
-        print(row)
-        a = row[0][4]
-        b = quantity
-        if int(a) >= int(b):
-            return JsonResponse({"message":"True"})
-        else:
-            return JsonResponse({"message":"False"})
+    # get_item_code = request.POST.get('item_code', False)
+    # quantity = request.POST.get('quantity', False)
+    # if get_item_code:
+    #     cursor.execute('''Select item_code, item_name,Item_description,Unit,SUM(quantity) As qty From (
+    #                     Select 'Opening Stock' As TranType,Product_Code As Item_Code,Product_Name As Item_name,Product_desc As Item_description,Unit As unit,Opening_Stock as Quantity From inventory_add_products
+    #                     where product_code = %s
+    #                     union All
+    #                     Select 'Purchase' As TranType,Item_Code,Item_name,Item_description,unit,Quantity From transaction_purchasedetail
+    #                     where item_code = %s
+    #                     union All
+    #                     Select 'Purchase Return' As TranType,Item_Code,Item_name,Item_description,unit,Quantity * -1 From transaction_purchasereturndetail
+    #                     where item_code = %s
+    #                     union All
+    #                     Select 'Sale' As TranType,Item_Code,Item_name,Item_description,unit,Quantity * -1 From transaction_saledetail
+    #                     where item_code = %s
+    #                     union All
+    #                     Select 'Sale Return' As TranType,Item_Code,Item_name,Item_description,unit,Quantity  From transaction_salereturndetail
+    #                     where item_code = %s
+    #                     ) As tblTemp
+    #                     Group by Item_Code''',[get_item_code,get_item_code,get_item_code,get_item_code,get_item_code])
+    #     row = cursor.fetchall()
+    #     print(row)
+    #     a = row[0][4]
+    #     b = quantity
+    #     if int(a) >= int(b):
+    #         return JsonResponse({"message":"True"})
+    #     else:
+    #         return JsonResponse({"message":"False"})
     if request.method == 'POST':
         dc_customer = request.POST.get('customer', False)
         cartage_amount = request.POST.get('cartage_amount', False)
@@ -908,11 +944,12 @@ def new_delivery_challan_customer(request):
             cartage_amount = cartage_amount
         else:
             cartage_amount = 0.00
-        dc_header = DcHeaderCustomer(dc_no = get_last_dc_no, date = date, follow_up = follow_up,cartage_amount = cartage_amount, comments = comments, footer_remarks = footer_remarks ,account_id = account_id)
+        dc_header = DcHeaderCustomer(dc_no = get_last_dc_no, date = date, follow_up = follow_up,cartage_amount = cartage_amount, comments = comments, footer_remarks = footer_remarks ,account_id = account_id, user_id = request.user, company_id = company)
         dc_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = DcHeaderCustomer.objects.get(dc_no = get_last_dc_no)
         for value in items:
+            print(value["po_no"])
             item_id = Add_products.objects.get(id = value["id"])
             dc_detail = DcDetailCustomer(item_id = item_id, quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, po_no = value["po_no"] ,dc_id = header_id)
             dc_detail.save()
@@ -922,6 +959,9 @@ def new_delivery_challan_customer(request):
 
 @user_passes_test(allow_delivery_challan_edit)
 def edit_delivery_challan_customer(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -929,9 +969,9 @@ def edit_delivery_challan_customer(request,pk):
     data = ''
     row = []
     cursor = connection.cursor()
-    dc_header = DcHeaderCustomer.objects.filter(id = pk).first()
-    dc_detail = DcDetailCustomer.objects.filter(dc_id = pk).all()
-    all_po_code = PoHeaderCustomer.objects.all()
+    dc_header = DcHeaderCustomer.objects.filter(company, id = pk).first()
+    dc_detail = DcDetailCustomer.objects.filter(dc_id = dc_header.id).all()
+    all_po_code = PoHeaderCustomer.objects.filter(company).all()
     all_item_code = list(Add_products.objects.values('product_code'))
     all_accounts = ChartOfAccount.objects.all()
     item_code = request.POST.get('item_code')
@@ -945,7 +985,7 @@ def edit_delivery_challan_customer(request,pk):
         return HttpResponse(json.dumps({'row':row}))
     item_code_po_dc = request.POST.get('item_code_po_dc',False)
     if item_code_po_dc:
-        id = PoHeaderCustomer.objects.get(po_client = item_code_po_dc)
+        id = PoHeaderCustomer.objects.get(company, po_client = item_code_po_dc)
         item_id = PoDetailCustomer.objects.filter(po_id = id).all()
         for value in item_id:
             row.append(value.item_id.id)
@@ -973,8 +1013,6 @@ def edit_delivery_challan_customer(request,pk):
         items = json.loads(request.POST.get('items'))
         for value in items:
             item_id = Add_products.objects.get(id = value["id"])
-            print("hamza")
-            print(item_id)
             dc_detail_update = DcDetailCustomer(item_id = item_id, quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, po_no = value["po_no"] ,dc_id = header_id)
             dc_detail_update.save()
         return JsonResponse({"result":"success"})
@@ -991,13 +1029,12 @@ def print_dc_customer(request,pk):
     total_amount = 0
     company_info = Company_info.objects.all()
     image = Company_info.objects.filter(id = 1).first()
-    header = DcHeaderCustomer.objects.filter(id = pk).first()
-    detail = DcDetailCustomer.objects.filter(dc_id = pk).all()
+    header = DcHeaderCustomer.objects.filter(company, id = pk).first()
+    detail = DcDetailCustomer.objects.filter(dc_id = header.id).all()
     for value in detail:
         lines = lines + len(value.item_description.split('\n'))
         amount = float(value.unit_price * value.quantity)
         total_amount = total_amount + amount
-    print(total_amount)
     lines = lines + len(detail) + len(detail)
     total_lines = 36 - lines
     pdf = render_to_pdf('customer/dc_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
@@ -1018,7 +1055,7 @@ def delete_delivery_challan_customer(request,pk):
         DcDetailCustomer.objects.filter(dc_id_id = pk).all().delete()
         DcHeaderCustomer.objects.filter(id = pk).delete()
         messages.add_message(request, messages.SUCCESS, "Customer Delivery Challan Deleted")
-        
+
     return redirect('delivery-challan-customer')
 
 
@@ -1026,6 +1063,9 @@ def delete_delivery_challan_customer(request,pk):
 
 @user_passes_test(allow_mrn_display)
 def mrn_customer(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -1037,12 +1077,15 @@ def mrn_customer(request):
 
 @user_passes_test(allow_mrn_edit)
 def edit_mrn_customer(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
-    dc_header = DcHeaderCustomer.objects.filter(id=pk).first()
-    dc_detail = DcDetailCustomer.objects.filter(dc_id=pk).all()
+    dc_header = DcHeaderCustomer.objects.filter(company, id=pk).first()
+    dc_detail = DcDetailCustomer.objects.filter(dc_id=dc_header.id).all()
     if request.method == 'POST':
         follow_up = request.POST.get('follow_up', False)
         dc_header.follow_up = follow_up

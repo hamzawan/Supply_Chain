@@ -31,13 +31,13 @@ def register(request):
 
             for i in range(21,26):
                 roles = UserRoles.objects.create(user_id=user,form_name="Supplier",form_id=0,child_form=i)
-                roles.save()    
+                roles.save()
 
             for i in range(31,41):
                 if i == 40:
                     roles = UserRoles.objects.create(user_id=user,form_name="Transaction",form_id=0,child_form=310)
                     roles.save()
-                else:    
+                else:
                     roles = UserRoles.objects.create(user_id=user,form_name="Transaction",form_id=0,child_form=i)
                     roles.save()
 
@@ -46,7 +46,7 @@ def register(request):
 
             roles = UserRoles.objects.create(user_id=user,form_name="Reports",form_id=0,child_form=0)
             roles.save()
-            
+
             messages.success(request, f'Your account has been created! You are now able to log in')
             return redirect('login')
     else:
@@ -76,7 +76,7 @@ def delete_user_roles(request,pk):
         UserRoles.objects.filter(user_id_id= pk).all().delete()
         User.objects.filter(id= pk).all().delete()
         messages.add_message(request, messages.SUCCESS, "User Deleted.")
-    return redirect('user-list')        
+    return redirect('user-list')
 
 
 
@@ -87,16 +87,16 @@ def edit_user(request,pk):
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
-    
-    if request.method == 'POST':   
+
+    if request.method == 'POST':
         form = UserUpdateForm(request.POST,instance=user)
         if form.is_valid():
             form.save()
             messages.success(request, f'User Profile has been updated!')
             return redirect('user-list')
     else:
-        form = UserUpdateForm(instance=user)    
-        
+        form = UserUpdateForm(instance=user)
+
     return render(request,'user/edit_user.html',{'form':form,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
@@ -124,7 +124,7 @@ def user_roles(request,pk):
 
     form_name_reports = Q(form_name = "Reports")
     allow_role_reports = UserRoles.objects.filter(user_id, form_name_reports).all()
-    
+
 
     if request.method == "POST":
         form_id = request.POST.getlist('customer')
@@ -138,7 +138,7 @@ def user_roles(request,pk):
         if form_id_reports:
             form_id_reports = 5
         else:
-            form_id_reports = 0 
+            form_id_reports = 0
 
 
         for i,value in enumerate(allow_role_reports):
@@ -1015,8 +1015,6 @@ def user_roles(request,pk):
 
              value.form_id = form_id_t
              value.save()
-
-
     return render(request, 'user/user_roles.html',{'user':user,'allow_role':allow_role,'allow_role_supplier':allow_role_supplier,'allow_role_transaction':allow_role_transaction,
     'allow_role_inventory':allow_role_inventory,
     'allow_role_reports':allow_role_reports,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})

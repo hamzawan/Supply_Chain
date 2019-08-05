@@ -2,7 +2,7 @@ from django.db import models
 from transaction.models import ChartOfAccount
 import datetime
 from django.contrib.auth.models import User
-from supplier.models import Company_info
+from user.models import Company_info
 from inventory.models import Add_products
 
 class CompanyUser(models.Model):
@@ -70,6 +70,7 @@ class PoHeaderCustomer(models.Model):
     show_notification = models.BooleanField(default = True)
     footer_remarks = models.TextField()
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True,)
+    company_id = models.ForeignKey(Company_info, models.SET_NULL, blank = True, null = True)
     user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
 
 class PoDetailCustomer(models.Model):
@@ -91,7 +92,8 @@ class DcHeaderCustomer(models.Model):
     comments = models.CharField(max_length = 100)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True)
     user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
-    
+    company_id = models.ForeignKey(Company_info, models.SET_NULL, blank = True, null = True)
+
 
 class DcDetailCustomer(models.Model):
     item_id = models.ForeignKey(Add_products, models.SET_NULL, blank = True, null = True)

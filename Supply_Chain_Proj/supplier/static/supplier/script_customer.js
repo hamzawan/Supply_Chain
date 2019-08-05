@@ -1354,6 +1354,7 @@ $(document).ready(function(){
 							var cartage_amount = $('#cartage_amount').val();
 							var comments = $('#comments').val();
 							var follow_up = $('#follow_up').val();
+							var po_client = $('#item_code_po_dc').val();
 							var footer_remarks = $('#footer_remarks').val();
 
 							table.find('tr').each(function (i, el){
@@ -1373,7 +1374,7 @@ $(document).ready(function(){
 												row["quantity"] = ($(this).text());
 										}
 										else if (i === 7) {
-												row["po_no"] = ($(this).text());
+												row["po_no"] = po_client
 										}
 									});
 									data.push(row);

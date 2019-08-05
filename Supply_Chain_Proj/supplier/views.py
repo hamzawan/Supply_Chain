@@ -342,13 +342,12 @@ def mrn_roles(user):
     return mrn_roles
 
 
-
-
 def home(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
+    print(allow_customer_roles)
     today = datetime.date.today()
     cursor = connection.cursor()
     cursor.execute('''select rfq_no , date, account_id_id
@@ -394,17 +393,22 @@ def home(request):
 
 @user_passes_test(allow_rfq_display)
 def rfq_supplier(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     permission = rfq_roles(request.user)
     all_rfq = RfqSupplierHeader.objects.all()
-    return render(request, 'supplier/rfq_supplier.html',{'all_rfq':all_rfq, 'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+    return render(request, 'supplier/rfq_supplier.html',{'all_rfq':all_rfq, 'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_rfq_add)
 def new_rfq_supplier(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -442,12 +446,13 @@ def new_rfq_supplier(request):
         else:
             follow_up = '2010-10-06'
         date = datetime.date.today()
-        rfq_header = RfqSupplierHeader(rfq_no = get_last_rfq_no, date = date , attn = attn, follow_up = follow_up, footer_remarks = footer_remarks ,account_id = account_id)
+        rfq_header = RfqSupplierHeader(rfq_no = get_last_rfq_no, date = date , attn = attn, follow_up = follow_up, footer_remarks = footer_remarks ,account_id = account_id, company_id = company, user_id = request.user)
         rfq_header.save()
         header_id = RfqSupplierHeader.objects.get(rfq_no=get_last_rfq_no)
         for value in items:
-            rfq_detail = RfqSupplierDetail(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"],
-                                            quantity = value["quantity"], unit = value["unit"], rfq_id = header_id)
+            id = value["id"]
+            id = Add_products.objects.get(id = id)
+            rfq_detail = RfqSupplierDetail(item_id = id, quantity = value["quantity"], unit = value["unit"], rfq_id = header_id)
             rfq_detail.save()
         return JsonResponse({"result": "success"})
     return render(request,'supplier/new_rfq_supplier.html',{'get_last_rfq_no':get_last_rfq_no, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
@@ -455,20 +460,23 @@ def new_rfq_supplier(request):
 
 @user_passes_test(allow_rfq_edit)
 def edit_rfq_supplier(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
-    rfq_header = RfqSupplierHeader.objects.filter(id = pk).first()
-    rfq_detail = RfqSupplierDetail.objects.filter(rfq_id = pk).all()
+    rfq_header = RfqSupplierHeader.objects.filter(company,id = pk).first()
+    rfq_detail = RfqSupplierDetail.objects.filter(rfq_id = rfq_header.id).all()
     all_item_code = list(Add_products.objects.values('product_code'))
     all_accounts = ChartOfAccount.objects.all()
     try:
         item_code = request.POST.get('item_code',False)
-        print(item_code)
         if item_code:
-            data = Add_products.objects.filter(product_code = item_code)
-            item_code_exist = RfqSupplierDetail.objects.filter(item_code = item_code, rfq_id = pk).first()
+            item_id = Add_products.objects.get(product_code = item_code)
+            item_code_exist = RfqSupplierDetail.objects.filter(item_id = item_id, rfq_id = rfq_header.id).first()
+            data = Add_products.objects.filter(id = item_id.id)
             if item_code_exist:
                 return HttpResponse(json.dumps({'message':"Item Already Exist"}))
             row = serializers.serialize('json',data)
@@ -495,8 +503,10 @@ def edit_rfq_supplier(request,pk):
             header_id = RfqSupplierHeader.objects.get(id = pk)
             items = json.loads(request.POST.get('items'))
             for value in items:
-                rfq_detail_update = RfqSupplierDetail(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"], unit = value["unit"], rfq_id = header_id)
-                rfq_detail_update.save()
+                id = value["id"]
+                id = Add_products.objects.get(id = id)
+                rfq_detail = RfqSupplierDetail(item_id = id, quantity = value["quantity"], unit = value["unit"], rfq_id = header_id, company_id = company, user_id = request.user)
+                rfq_detail.save()
             return JsonResponse({"result":"success"})
     except IntegrityError:
         print("Data Already Exist")
@@ -513,17 +523,22 @@ def delete_rfq_supplier(request,pk):
 
 @user_passes_test(allow_quotation_display)
 def quotation_supplier(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     permission = quotation_roles2(request.user)
     all_quotation = QuotationHeaderSupplier.objects.all()
-    return render(request, 'supplier/quotation_supplier.html',{'all_quotation':all_quotation,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+    return render(request, 'supplier/quotation_supplier.html',{'all_quotation':all_quotation,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_quotation_add)
 def new_quotation_supplier(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -542,9 +557,8 @@ def new_quotation_supplier(request):
     item_code_quotation = request.POST.get('item_code_quotation',False)
     if item_code_quotation:
         data = Add_products.objects.filter(product_code = item_code_quotation)
-        for value in data:
-            print(value.product_code)
         row = serializers.serialize('json',data)
+        print(row)
         return HttpResponse(json.dumps({'row':row}))
     if request.method == 'POST':
         supplier = request.POST.get('supplier',False)
@@ -569,13 +583,14 @@ def new_quotation_supplier(request):
         date = datetime.date.today()
         quotation_header = QuotationHeaderSupplier(quotation_no = get_last_quotation_no, date = date, attn = attn, prc_basis = prcbasis,
                                                 leadtime = leadtime, validity = validity, payment = payment, remarks = remarks, currency = currency,
-                                                exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, footer_remarks = footer_remarks, account_id = account_id)
+                                                exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, footer_remarks = footer_remarks, account_id = account_id, company_id = company, user_id = request.user)
         quotation_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = QuotationHeaderSupplier.objects.get(quotation_no = get_last_quotation_no)
         for value in items:
-            quotation_detail = QuotationDetailSupplier(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"],
-                                            quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_id = header_id)
+            id = value["id"]
+            id = Add_products.objects.get(id = id)
+            quotation_detail = QuotationDetailSupplier(item_id = id,  quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_id = header_id)
             quotation_detail.save()
         return JsonResponse({'result':'success'})
     return render(request, 'supplier/new_quotation_supplier.html',{'all_item_code':all_item_code,'get_last_quotation_no':get_last_quotation_no,'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
@@ -583,19 +598,23 @@ def new_quotation_supplier(request):
 
 @user_passes_test(allow_quotation_edit)
 def edit_quotation_supplier(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
-    quotation_header = QuotationHeaderSupplier.objects.filter(id = pk).first()
-    quotation_detail = QuotationDetailSupplier.objects.filter(quotation_id = pk).all()
+    quotation_header = QuotationHeaderSupplier.objects.filter(company, id = pk).first()
+    quotation_detail = QuotationDetailSupplier.objects.filter(quotation_id = quotation_header.id).all()
     all_accounts = ChartOfAccount.objects.all()
     print(quotation_detail)
     all_item_code = list(Add_products.objects.values('product_code'))
     item_code = request.POST.get('item_code',False)
     if item_code:
-        data = Add_products.objects.filter(product_code = item_code)
-        item_code_exist = QuotationDetailSupplier.objects.filter(item_code = item_code, quotation_id = pk).first()
+        item_id = Add_products.objects.get(product_code = item_code)
+        item_code_exist = QuotationDetailSupplier.objects.filter(item_id = item_id, quotation_id = quotation_header.id).first()
+        data = Add_products.objects.filter(id = item_id.id)
         if item_code_exist:
             return HttpResponse(json.dumps({'message':"Item Already Exist"}))
         row = serializers.serialize('json',data)
@@ -613,8 +632,6 @@ def edit_quotation_supplier(request,pk):
         edit_quotation_exchange_rate = request.POST.get('exchange_rate',False)
         edit_quotation_follow_up = request.POST.get('follow_up',False)
         edit_footer_remarks = request.POST.get('edit_footer_remarks',False)
-
-
         try:
             account_id = ChartOfAccount.objects.get(account_title = edit_supplier)
         except ChartOfAccount.DoesNotExist:
@@ -637,24 +654,29 @@ def edit_quotation_supplier(request,pk):
         items = json.loads(request.POST.get('items'))
         print(items)
         for value in items:
-            quotation_detail_update = QuotationDetailSupplier(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_id = header_id)
-            quotation_detail_update.save()
+            id = value["id"]
+            id = Add_products.objects.get(id = id)
+            quotation_detail = QuotationDetailSupplier(item_id = id,  quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_id = header_id)
+            quotation_detail.save()
         return JsonResponse({"result":"success"})
     return render(request,'supplier/edit_quotation_supplier.html',{'quotation_header':quotation_header,'pk':pk,'quotation_detail':quotation_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_quotation_print)
 def print_quotation_supplier(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
-    allow_transaction_roles = transaction_roles(request.user)    
+    allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     lines = 0
     total_amount = 0
     company_info = Company_info.objects.all()
     image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
-    header = QuotationHeaderSupplier.objects.filter(id = pk).first()
-    detail = QuotationDetailSupplier.objects.filter(quotation_id = pk).all()
+    header = QuotationHeaderSupplier.objects.filter(company,id = pk).first()
+    detail = QuotationDetailSupplier.objects.filter(quotation_id = header.id).all()
     for value in detail:
         lines = lines + len(value.item_description.split('\n'))
         amount = float(value.unit_price * value.quantity)
@@ -718,17 +740,22 @@ def quotation_export_supplier(request):
 
 @user_passes_test(allow_purchase_order_display)
 def purchase_order_supplier(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     permission = purchase_order_roles(request.user)
     all_po = PoHeaderSupplier.objects.all()
-    return render(request, 'supplier/purchase_order_supplier.html',{'all_po':all_po,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+    return render(request, 'supplier/purchase_order_supplier.html',{'all_po':all_po,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_purchase_order_add)
 def new_purchase_order_supplier(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -770,13 +797,14 @@ def new_purchase_order_supplier(request):
         date = datetime.date.today()
         po_header = PoHeaderSupplier(po_no = get_last_po_no, date = date, attn = attn, prc_basis = prcbasis,
                                                 leadtime = leadtime, validity = validity, payment = payment, remarks = remarks, currency = currency,
-                                                exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, footer_remarks = footer_remarks ,account_id = account_id)
+                                                exchange_rate = exchange_rate, follow_up = follow_up, show_notification = True, footer_remarks = footer_remarks ,account_id = account_id, company_id = company, user_id = request.user)
         po_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = PoHeaderSupplier.objects.get(po_no = get_last_po_no)
         for value in items:
-            po_detail = PoDetailSupplier(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"],
-                                            quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_no = "to be define" ,po_id = header_id)
+            id = value["id"]
+            id = Add_products.objects.get(id = id)
+            po_detail = PoDetailSupplier(item_id = id, quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_no = "to be define" ,po_id = header_id)
             po_detail.save()
         return JsonResponse({'result':'success'})
     return render(request, 'supplier/new_purchase_order_supplier.html',{'all_item_code':all_item_code,'get_last_po_no':get_last_po_no, 'all_accounts': all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
@@ -784,18 +812,22 @@ def new_purchase_order_supplier(request):
 
 @user_passes_test(allow_purchase_order_edit)
 def edit_purchase_order_supplier(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
-    po_header = PoHeaderSupplier.objects.filter(id = pk).first()
-    po_detail = PoDetailSupplier.objects.filter(po_id = pk).all()
+    po_header = PoHeaderSupplier.objects.filter(company, id = pk).first()
+    po_detail = PoDetailSupplier.objects.filter(po_id = po_header.id).all()
     all_item_code = list(Add_products.objects.values('product_code'))
     all_accounts = ChartOfAccount.objects.all()
     item_code = request.POST.get('item_code')
     if item_code:
-        data = Add_products.objects.filter(product_code = item_code)
-        item_code_exist = PoDetailSupplier.objects.filter(item_code = item_code, po_id = pk).first()
+        item_id = Add_products.objects.get(product_code = item_code)
+        item_code_exist = PoDetailSupplier.objects.filter(item_id = item_id, po_id = po_header.id).first()
+        data = Add_products.objects.filter(id = item_id.id)
         if item_code_exist:
             return HttpResponse(json.dumps({'message':"Item Already Exist"}))
         row = serializers.serialize('json',data)
@@ -835,26 +867,30 @@ def edit_purchase_order_supplier(request,pk):
         header_id = PoHeaderSupplier.objects.get(id = pk)
         items = json.loads(request.POST.get('items'))
         for value in items:
-            po_detail_update = PoDetailSupplier(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], po_id = header_id)
-            po_detail_update.save()
+            id = value["id"]
+            id = Add_products.objects.get(id = id)
+            po_detail = PoDetailSupplier(item_id = id, quantity = value["quantity"], unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], quotation_no = "to be define" ,po_id = header_id)
+            po_detail.save()
         return JsonResponse({"result":"success"})
     return render(request,'supplier/edit_purchase_order_supplier.html',{'po_header':po_header,'pk':pk,'po_detail':po_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_purchase_order_print)
 def print_po_supplier(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
-    allow_transaction_roles = transaction_roles(request.user)    
+    allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     lines = 0
     total_amount = 0
     company_info = Company_info.objects.all()
     image = Company_info.objects.filter(id = 1).first()
     print(image.company_logo)
-    header = PoHeaderSupplier.objects.filter(id = pk).first()
-    print(header)
-    detail = PoDetailSupplier.objects.filter(po_id = pk).all()
+    header = PoHeaderSupplier.objects.filter(company, id = pk).first()
+    detail = PoDetailSupplier.objects.filter(po_id = header.id).all()
     for value in detail:
         lines = lines + len(value.item_description.split('\n'))
         amount = float(value.unit_price * value.quantity)
@@ -882,6 +918,9 @@ def delete_purchase_order_supplier(request,pk):
 
 @user_passes_test(allow_delivery_challan_display)
 def delivery_challan_supplier(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -893,6 +932,8 @@ def delivery_challan_supplier(request):
 
 @user_passes_test(allow_delivery_challan_add)
 def new_delivery_challan_supplier(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -925,13 +966,13 @@ def new_delivery_challan_supplier(request):
         except ChartOfAccount.DoesNotExist:
             return JsonResponse({"result":"No Account Found "+dc_supplier+""})
         date = datetime.date.today()
-        dc_header = DcHeaderSupplier(dc_no = get_last_dc_no, date = date, footer_remarks = footer_remarks, follow_up = follow_up ,account_id = account_id)
+        dc_header = DcHeaderSupplier(dc_no = get_last_dc_no, date = date, footer_remarks = footer_remarks, follow_up = follow_up ,account_id = account_id, company_id = company, user_id = request.user)
         dc_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = DcHeaderSupplier.objects.get(dc_no = get_last_dc_no)
         for value in items:
-            dc_detail = DcDetailSupplier(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"],
-                                            quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0,  unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], po_no = "to be define" ,dc_id = header_id)
+            item_id = Add_products.objects.get(id = value["id"])
+            dc_detail = DcDetailSupplier(item_id = item_id, quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, po_no = "" ,dc_id = header_id)
             dc_detail.save()
         return JsonResponse({'result':'success'})
     return render(request, 'supplier/new_delivery_challan_supplier.html',{'all_item_code':all_item_code,'get_last_dc_no':get_last_dc_no,'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
@@ -939,18 +980,22 @@ def new_delivery_challan_supplier(request):
 
 @user_passes_test(allow_delivery_challan_edit)
 def edit_delivery_challan_supplier(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
-    dc_header = DcHeaderSupplier.objects.filter(id = pk).first()
-    dc_detail = DcDetailSupplier.objects.filter(dc_id = pk).all()
+    dc_header = DcHeaderSupplier.objects.filter(company, id = pk).first()
+    dc_detail = DcDetailSupplier.objects.filter(dc_id = dc_header.id).all()
     all_accounts = ChartOfAccount.objects.all()
     all_item_code = list(Add_products.objects.values('product_code'))
     item_code = request.POST.get('item_code')
     if item_code:
-        data = Add_products.objects.filter(product_code = item_code)
-        item_code_exist = DcDetailSupplier.objects.filter(item_code = item_code, dc_id = pk).first()
+        item_id = Add_products.objects.get(product_code = item_code)
+        item_code_exist = DcDetailSupplier.objects.filter(item_id = item_id, dc_id = dc_detail.id).first()
+        data = Add_products.objects.filter(id = item_id.id)
         if item_code_exist:
             return HttpResponse(json.dumps({'message':"Item Already Exist"}))
         row = serializers.serialize('json',data)
@@ -964,7 +1009,6 @@ def edit_delivery_challan_supplier(request,pk):
             account_id = ChartOfAccount.objects.get(account_title = dc_supplier)
         except ChartOfAccount.DoesNotExist:
             return JsonResponse({"result":"No Account Found "+dc_supplier+""})
-        print(edit_footer_remarks)
         dc_header.account_id = account_id
         dc_header.follow_up = follow_up
         dc_header.footer_remarks = edit_footer_remarks
@@ -972,14 +1016,19 @@ def edit_delivery_challan_supplier(request,pk):
         header_id = DcHeaderSupplier.objects.get(id = pk)
         items = json.loads(request.POST.get('items'))
         for value in items:
-            dc_detail_update = DcDetailSupplier(item_code = value["item_code"], item_name = value["item_name"], item_description = value["item_description"], quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, unit = value["unit"], unit_price = value["unit_price"], remarks = value["remarks"], dc_id = header_id)
-            dc_detail_update.save()
+            print(value["id"])
+            item_id = Add_products.objects.get(id = value["id"])
+            dc_detail = DcDetailSupplier(item_id = item_id, quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, po_no = "" ,dc_id = header_id, remarks = value["remarks"], unit = value["unit"])
+            dc_detail.save()
         return JsonResponse({"result":"success"})
     return render(request,'supplier/edit_delivery_challan_supplier.html',{'dc_header':dc_header,'pk':pk,'dc_detail':dc_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_delivery_challan_print)
 def print_dc_supplier(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -987,8 +1036,8 @@ def print_dc_supplier(request,pk):
     lines = 0
     company_info = Company_info.objects.all()
     image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
-    header = DcHeaderSupplier.objects.filter(id = pk).first()
-    detail = DcDetailSupplier.objects.filter(dc_id = pk).all()
+    header = DcHeaderSupplier.objects.filter(company, id = pk).first()
+    detail = DcDetailSupplier.objects.filter(dc_id = header.id).all()
     for value in detail:
         lines = lines + len(value.item_description.split('\n'))
     lines = lines + len(detail) + len(detail)
@@ -1011,12 +1060,15 @@ def delete_delivery_challan_supplier(request,pk):
         DcDetailSupplier.objects.filter(dc_id_id = pk).all().delete()
         DcHeaderSupplier.objects.filter(id = pk).delete()
         messages.add_message(request, messages.SUCCESS, "Supplier Delivery Challan Deleted")
-        
+
     return redirect('delivery-challan-supplier')
 
 
 @user_passes_test(allow_mrn_display)
 def mrn_supplier(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -1028,12 +1080,15 @@ def mrn_supplier(request):
 
 @user_passes_test(allow_mrn_edit)
 def edit_mrn_supplier(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
-    dc_header = DcHeaderSupplier.objects.filter(id=pk).first()
-    dc_detail = DcDetailSupplier.objects.filter(dc_id=pk).all()
+    dc_header = DcHeaderSupplier.objects.filter(company, id=pk).first()
+    dc_detail = DcDetailSupplier.objects.filter(dc_id=dc_header.id).all()
     if request.method == 'POST':
         follow_up = request.POST.get('follow_up', False)
         dc_header.follow_up = follow_up
@@ -1047,6 +1102,9 @@ def edit_mrn_supplier(request,pk):
 
 
 def show_notification(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -1054,22 +1112,22 @@ def show_notification(request):
     eventId = request.POST.get('eventId', False)
     if eventId:
         if eventId[:2] == "DC":
-            account_info = DcHeaderCustomer.objects.filter(dc_no = eventId).first()
+            account_info = DcHeaderCustomer.objects.filter(company, dc_no = eventId).first()
             tran_no = account_info.dc_no
             account_title = account_info.account_id.account_title
             return JsonResponse({'account_title':account_title, 'tran_no': tran_no})
         elif eventId[:2] == "PO":
-            account_info = PoHeaderCustomer.objects.filter(po_no = eventId).first()
+            account_info = PoHeaderCustomer.objects.filter(company, po_no = eventId).first()
             tran_no = account_info.po_no
             account_title = account_info.account_id.account_title
             return JsonResponse({'account_title':account_title, 'tran_no': tran_no})
         elif eventId[:2] == "QU":
-            account_info = QuotationHeaderCustomer.objects.filter(quotation_no = eventId).first()
+            account_info = QuotationHeaderCustomer.objects.filter(company, quotation_no = eventId).first()
             tran_no = account_info.quotation_no
             account_title = account_info.account_id.account_title
             return JsonResponse({'account_title':account_title, 'tran_no': tran_no})
         elif eventId[:2] == "RF":
-            account_info = RfqCustomerHeader.objects.filter(rfq_no = eventId).first()
+            account_info = RfqCustomerHeader.objects.filter(company, rfq_no = eventId).first()
             tran_no = account_info.rfq_no
             account_title = account_info.account_id.account_title
             return JsonResponse({'account_title':account_title, 'tran_no': tran_no})
@@ -1077,6 +1135,9 @@ def show_notification(request):
 
 
 def update_notification_customer(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -1095,25 +1156,25 @@ def update_notification_customer(request):
         print(postpone_customer)
         tran_no = request.POST.get("tran_no", False)
         if tran_no[:2] == "DC":
-            update_dc = DcHeaderCustomer.objects.filter(dc_no = tran_no).first()
+            update_dc = DcHeaderCustomer.objects.filter(company, dc_no = tran_no).first()
             update_dc.follow_up = postpone_customer
             update_dc.show_notification = turn_off
             update_dc.save()
             return redirect('home')
         elif tran_no[:2] == "PO":
-            update_po = PoHeaderCustomer.objects.filter(po_no = tran_no).first()
+            update_po = PoHeaderCustomer.objects.filter(company, po_no = tran_no).first()
             update_po.follow_up = postpone_customer
             update_po.show_notification = turn_off
             update_po.save()
             return redirect('home')
         elif tran_no[:2] == "QU":
-            update_qu = QuotationHeaderCustomer.objects.filter(quotation_no = tran_no).first()
+            update_qu = QuotationHeaderCustomer.objects.filter(company, quotation_no = tran_no).first()
             update_qu.follow_up = postpone_customer
             update_qu.show_notification = turn_off
             update_qu.save()
             return redirect('home')
         elif tran_no[:2] == "RF":
-            update_rfq = RfqCustomerHeader.objects.filter(rfq_no = tran_no).first()
+            update_rfq = RfqCustomerHeader.objects.filter(company, rfq_no = tran_no).first()
             update_rfq.follow_up = postpone_customer
             update_rfq.show_notification = turn_off
             update_rfq.save()
@@ -1122,6 +1183,9 @@ def update_notification_customer(request):
 
 
 def show_notification_supplier(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -1129,22 +1193,22 @@ def show_notification_supplier(request):
     eventId = request.POST.get('eventId', False)
     if eventId:
         if eventId[:2] == "DC":
-            account_info = DcHeaderSupplier.objects.filter(dc_no = eventId).first()
+            account_info = DcHeaderSupplier.objects.filter(company, dc_no = eventId).first()
             tran_no = account_info.dc_no
             account_title = account_info.account_id.account_title
             return JsonResponse({'account_title':account_title, 'tran_no': tran_no})
         elif eventId[:2] == "PO":
-            account_info = PoHeaderSupplier.objects.filter(po_no = eventId).first()
+            account_info = PoHeaderSupplier.objects.filter(company, po_no = eventId).first()
             tran_no = account_info.po_no
             account_title = account_info.account_id.account_title
             return JsonResponse({'account_title':account_title, 'tran_no': tran_no})
         elif eventId[:2] == "QU":
-            account_info = QuotationHeaderSupplier.objects.filter(quotation_no = eventId).first()
+            account_info = QuotationHeaderSupplier.objects.filter(company, quotation_no = eventId).first()
             tran_no = account_info.quotation_no
             account_title = account_info.account_id.account_title
             return JsonResponse({'account_title':account_title, 'tran_no': tran_no})
         elif eventId[:2] == "RF":
-            account_info = RfqSupplierHeader.objects.filter(rfq_no = eventId).first()
+            account_info = RfqSupplierHeader.objects.filter(company, rfq_no = eventId).first()
             tran_no = account_info.rfq_no
             account_title = account_info.account_id.account_title
             return JsonResponse({'account_title':account_title, 'tran_no': tran_no})
@@ -1152,6 +1216,9 @@ def show_notification_supplier(request):
 
 
 def update_notification_supplier(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -1171,25 +1238,25 @@ def update_notification_supplier(request):
         tran_no = request.POST.get("tran_no", False)
         print(tran_no)
         if tran_no[:2] == "DC":
-            update_dc = DcHeaderSupplier.objects.filter(dc_no = tran_no).first()
+            update_dc = DcHeaderSupplier.objects.filter(company, dc_no = tran_no).first()
             update_dc.follow_up = postpone_supplier
             update_dc.show_notification = turn_off
             update_dc.save()
             return redirect('home')
         elif tran_no[:2] == "PO":
-            update_po = PoHeaderSupplier.objects.filter(po_no = tran_no).first()
+            update_po = PoHeaderSupplier.objects.filter(company, po_no = tran_no).first()
             update_po.follow_up = postpone_supplier
             update_po.show_notification = turn_off
             update_po.save()
             return redirect('home')
         elif tran_no[:2] == "QU":
-            update_qu = QuotationHeaderSupplier.objects.filter(quotation_no = tran_no).first()
+            update_qu = QuotationHeaderSupplier.objects.filter(company, quotation_no = tran_no).first()
             update_qu.follow_up = postpone_supplier
             update_qu.show_notification = turn_off
             update_qu.save()
             return redirect('home')
         elif tran_no[:2] == "RF":
-            update_rfq = RfqSupplierHeader.objects.filter(rfq_no = tran_no).first()
+            update_rfq = RfqSupplierHeader.objects.filter(company, rfq_no = tran_no).first()
             update_rfq.follow_up = postpone_supplier
             update_rfq.show_notification = turn_off
             update_rfq.save()

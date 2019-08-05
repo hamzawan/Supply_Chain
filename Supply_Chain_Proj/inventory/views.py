@@ -65,15 +65,17 @@ def allow_inventory_delete(user):
         return False
 
 def allow_inventory_shop(user):
-    user_id = Q(user_id = user.id)
+    user_id = Q(user_id = 2)
     form_id = Q(form_id = 4)
     child_form = Q(child_form = 41)
     r_print = Q(r_print = 1)
     allow_role = UserRoles.objects.filter(user_id, form_id, child_form, r_print)
+    print(allow_role)
     if allow_role:
         return True
     else:
         return False
+
 
 @user_passes_test(allow_inventory_display)
 def item_stock(request):
@@ -184,11 +186,6 @@ def edit_item(request,pk):
 
 
 def item_avaliable(pk):
-    allow_customer_roles = customer_roles(request.user)
-    allow_supplier_roles = supplier_roles(request.user)
-    allow_transaction_roles = transaction_roles(request.user)
-    allow_transaction_roles = transaction_roles(request.user)
-    allow_inventory_roles = inventory_roles(request.user)
     cusror = connection.cursor()
     row = cusror.execute('''select case
                              when exists (select id from customer_rfqcustomerdetail  where item_id_id = %s)
@@ -205,7 +202,6 @@ def item_avaliable(pk):
     res_list = [x[0] for x in row]
     if res_list[0] == "n":
         Add_products.objects.filter(id = pk).delete()
-        messages.add_message(request, messages.SUCCESS, "Item Deleted")
         return True
     else:
         return False

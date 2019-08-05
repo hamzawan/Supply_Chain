@@ -65,11 +65,11 @@ $(document).ready(function(){
 					 .done(function done(data){
 						 var type = JSON.parse(data.row);
 						 console.log(type);
-							 // Append table with add row form on add new button click
 				 			$(this).attr("disabled", "disabled");
 				 			var index = $("table tbody tr:last-child").index();
 				 					var row = '<tr>' +
 				 							'<td>'+count+'</td>' +
+											'<td style="display:none;">'+type[0]['pk']+'</td>' +
 				 							'<td>'+type[0].fields['product_code']+'</td>' +
 				 							'<td>'+type[0].fields['product_name']+'</td>' +
 				 							'<td><pre>'+type[0].fields['product_desc']+'</pre></td>' +
@@ -151,6 +151,7 @@ $(document).ready(function(){
 					{
 						var $tds = $(this).find('td');
 						var row = {
+							'id': "",
 							'item_code' : "",
 							'item_name' : "",
 							'item_description' : "",
@@ -159,7 +160,7 @@ $(document).ready(function(){
 						};
 						$tds.each(function(i, el){
 							if (i === 1) {
-									row["item_code"] = ($(this).text());
+									row["id"] = ($(this).text());
 							}
 							if (i === 2) {
 									row["item_name"] = ($(this).text());
@@ -167,10 +168,10 @@ $(document).ready(function(){
 							else if (i === 3) {
 									row["item_description"] = ($(this).text());
 							}
-							else if (i === 4) {
+							else if (i === 5) {
 									row["unit"] = ($(this).text());
 							}
-							else if (i === 5) {
+							else if (i === 6) {
 									row["quantity"] = ($(this).text());
 							}
 						});
@@ -226,11 +227,12 @@ $(document).ready(function(){
 								 for (var i = 0; i < type.length; i++) {
 								 var index = $("table tbody tr:last-child").index();
 										 var row = '<tr>' +
-												 '<td><input type="text" readonly class="form-control" value='+count+'></td>' +
-												 '<td><input type="text" class="form-control" readonly value='+ type[i].fields['product_code'] +'></td>' +
-												 '<td><input type="text" class="form-control" readonly value='+ type[i].fields['product_name'] +'></td>' +
-												 '<td><input type="text" class="form-control" readonly value='+ type[i].fields['product_desc'] +'></td>' +
-												 '<td><input type="text" class="form-control" required ></td>' +
+												 '<td>'+count+'</td>' +
+												 '<td style="display:none;">'+type[i]['pk']+'</td>' +
+												 '<td>'+ type[i].fields['product_code'] +'</td>' +
+												 '<td>'+ type[i].fields['product_name'] +'</td>' +
+												 '<td>'+ type[i].fields['product_desc'] +'</td>' +
+												 '<td><input type="text" class="form-control" value="'+ type[i].fields['unit'] +'" required ></td>' +
 												 '<td><input type="text" class="form-control" required ></td>' +
 									 '<td><a class="add-rfq-edit" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-rfq-edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-rfq-edit" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 										 '</tr>';
@@ -301,6 +303,7 @@ $(document).ready(function(){
 				//UPDATE EDIT RFQ SUPPLIER
 					//updating data into supplier rfq using ajax request
 					$('#edit-rfq-supplier-form').on('submit',function(e){
+						console.log("clicked");
 						e.preventDefault();
 						var table = $('#edit-rfq-supplier-table');
 						var edit_rfq_supplier = $("#edit_rfq_supplier").val()
@@ -315,7 +318,7 @@ $(document).ready(function(){
 							{
 								var $tds = $(this).find('td');
 								var row = {
-									'item_code' : "",
+									'id' : "",
 									'item_name' : "",
 									'item_description' : "",
 									'unit' : "",
@@ -323,19 +326,18 @@ $(document).ready(function(){
 								};
 								$tds.each(function(i, el){
 									if (i === 1) {
-											row["item_code"] = ($(this).text());
-									}
-									if (i === 2) {
-											row["item_name"] = ($(this).text());
+											row["id"] = ($(this).text());
+											console.log($(this).text());
 									}
 									else if (i === 3) {
 											row["item_description"] = ($(this).text());
 									}
-									else if (i === 4) {
+									else if (i === 5) {
 											row["unit"] = ($(this).text());
 									}
-									else if (i === 5) {
+									else if (i === 6) {
 											row["quantity"] = ($(this).text());
+											console.log($(this).text());
 									}
 								});
 								data.push(row);
@@ -391,11 +393,12 @@ $(document).ready(function(){
 						 var index = $("table tbody tr:last-child").index();
 								 var row = '<tr>' +
 										 '<td>'+count+'</td>' +
+										 '<td style="display:none;">'+type[0]['pk']+'</td>' +
 										 '<td>'+ type[0].fields['product_code'] +'</td>' +
 										 '<td>'+ type[0].fields['product_name'] +'</td>' +
 										 '<td>'+ type[0].fields['product_desc'] +'</td>' +
 										 '<td><input type="text" class="form-control" required ></td>' +
-										 '<td><input type="text" class="form-control" required ></td>' +
+										 '<td><input type="text" class="form-control" required value="'+ type[0].fields['unit'] +'" ></td>' +
 										 '<td><input type="text" class="form-control" required ></td>' +
 										 '<td><input type="text" class="form-control" required ></td>' +
 							 '<td><a class="add-quotation" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-quotation" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-quotation" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
@@ -439,16 +442,16 @@ $(document).ready(function(){
 			// Edit row on edit button click
 			$(document).on("click", ".edit-quotation", function(){
 					$(this).parents("tr").find("td:not(:last-child)").each(function(i){
-						if (i === 4 ) {
+						if (i === 5 ) {
 							$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 						}
-						if (i === 5) {
+						if (i === 6) {
 							$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 						}
-						if (i === 6 ) {
+						if (i === 7 ) {
 							$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 						}
-						if (i === 7) {
+						if (i === 8) {
 							$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 						}
 			});
@@ -494,6 +497,7 @@ $(document).ready(function(){
 						{
 							var $tds = $(this).find('td');
 							var row = {
+								'id': "",
 								'item_code' : "",
 								'item_name' : "",
 								'item_description' : "",
@@ -504,24 +508,18 @@ $(document).ready(function(){
 							};
 							$tds.each(function(i, el){
 								if (i === 1) {
-										row["item_code"] = ($(this).text());
-								}
-								if (i === 2) {
-										row["item_name"] = ($(this).text());
-								}
-								else if (i === 3) {
-										row["item_description"] = ($(this).text());
-								}
-								else if (i === 4) {
-										row["quantity"] = ($(this).text());
+										row["id"] = ($(this).text());
 								}
 								else if (i === 5) {
-										row["unit"] = ($(this).text());
+										row["quantity"] = ($(this).text());
 								}
 								else if (i === 6) {
-										row["unit_price"] = ($(this).text());
+										row["unit"] = ($(this).text());
 								}
 								else if (i === 7) {
+										row["unit_price"] = ($(this).text());
+								}
+								else if (i === 8) {
 										row["remarks"] = ($(this).text());
 								}
 							});
@@ -580,7 +578,8 @@ $(document).ready(function(){
 									 for (var i = 0; i < type.length; i++) {
 									 var index = $("table tbody tr:last-child").index();
 											 var row = '<tr>' +
-													 '<td><input type="text" readonly class="form-control" value='+count+'></td>' +
+													 '<td>'+ count +'</td>' +
+													 '<td style="display:none;">'+type[i]['pk']+'</td>' +
 													 '<td>'+ type[i].fields['product_code'] +'</td>' +
 													 '<td>'+ type[i].fields['product_name'] +'</td>' +
 													 '<td>'+ type[i].fields['product_desc'] +'</td>' +
@@ -629,16 +628,16 @@ $(document).ready(function(){
 						// Edit row on edit button click
 						$(document).on("click", ".edit-quotation-edit", function(){
 								$(this).parents("tr").find("td:not(:last-child)").each(function(i){
-									if (i === 4 ) {
-										$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
-									}
-									if (i === 5) {
+									if (i === 5 ) {
 										$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
 									}
 									if (i === 6) {
 										$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
 									}
 									if (i === 7) {
+										$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
+									}
+									if (i === 8) {
 										$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
 									}
 						});
@@ -686,7 +685,7 @@ $(document).ready(function(){
 							{
 								var $tds = $(this).find('td');
 								var row = {
-									'item_code' : "",
+									'id' : "",
 									'item_name' : "",
 									'item_description' : "",
 									'quantity' : "",
@@ -696,24 +695,18 @@ $(document).ready(function(){
 								};
 								$tds.each(function(i, el){
 									if (i === 1) {
-											row["item_code"] = ($(this).text());
-									}
-									if (i === 2) {
-											row["item_name"] = ($(this).text());
-									}
-									else if (i === 3) {
-											row["item_description"] = ($(this).text());
-									}
-									else if (i === 4) {
-											row["quantity"] = ($(this).text());
+											row["id"] = ($(this).text());
 									}
 									else if (i === 5) {
-											row["unit"] = ($(this).text());
+											row["quantity"] = ($(this).text());
 									}
 									else if (i === 6) {
-											row["unit_price"] = ($(this).text());
+											row["unit"] = ($(this).text());
 									}
 									else if (i === 7) {
+											row["unit_price"] = ($(this).text());
+									}
+									else if (i === 8) {
 											row["remarks"] = ($(this).text());
 									}
 								});
@@ -777,11 +770,12 @@ $(document).ready(function(){
 						 var index = $("table tbody tr:last-child").index();
 								 var row = '<tr>' +
 										 '<td>'+count+'</td>' +
+										 '<td style="display:none;">'+type[0]['pk']+'</td>' +
 										 '<td>'+ type[0].fields['product_code'] +'</td>' +
 										 '<td>'+ type[0].fields['product_name'] +'</td>' +
 										 '<td><pre>'+ type[0].fields['product_desc'] +'</pre></td>' +
 										 '<td><input type="text" class="form-control form-control-sm" required ></td>' +
-										 '<td><input type="text" class="form-control" required ></td>' +
+										 '<td><input type="text" class="form-control" value="'+ type[0].fields['unit'] +'" required ></td>' +
 										 '<td><input type="text" class="form-control" required ></td>' +
 										 '<td><input type="text" class="form-control" required ></td>' +
 							 '<td><a class="add-po" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-po" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-po" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
@@ -825,16 +819,16 @@ $(document).ready(function(){
 			// Edit row on edit button click
 			$(document).on("click", ".edit-po", function(){
 					$(this).parents("tr").find("td:not(:last-child)").each(function(i){
-						if (i === 4 ) {
+						if (i === 5 ) {
 							$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 						}
-						if (i === 5) {
+						if (i === 6) {
 							$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 						}
-						if (i === 6 ) {
+						if (i === 7 ) {
 							$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 						}
-						if (i === 7) {
+						if (i === 8) {
 							$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 						}
 			});
@@ -879,7 +873,7 @@ $(document).ready(function(){
 					{
 						var $tds = $(this).find('td');
 						var row = {
-							'item_code' : "",
+							'id' : "",
 							'item_name' : "",
 							'item_description' : "",
 							'quantity' : "",
@@ -889,24 +883,18 @@ $(document).ready(function(){
 						};
 						$tds.each(function(i, el){
 							if (i === 1) {
-									row["item_code"] = ($(this).text());
-							}
-							if (i === 2) {
-									row["item_name"] = ($(this).text());
-							}
-							else if (i === 3) {
-									row["item_description"] = ($(this).text());
-							}
-							else if (i === 4) {
-									row["quantity"] = ($(this).text());
+									row["id"] = ($(this).text());
 							}
 							else if (i === 5) {
-									row["unit"] = ($(this).text());
+									row["quantity"] = ($(this).text());
 							}
 							else if (i === 6) {
-									row["unit_price"] = ($(this).text());
+									row["unit"] = ($(this).text());
 							}
 							else if (i === 7) {
+									row["unit_price"] = ($(this).text());
+							}
+							else if (i === 8) {
 									row["remarks"] = ($(this).text());
 							}
 						});
@@ -965,12 +953,13 @@ $(document).ready(function(){
 								 for (var i = 0; i < type.length; i++) {
 								 var index = $("table tbody tr:last-child").index();
 										 var row = '<tr>' +
-												 '<td><input type="text" readonly class="form-control" value='+count+'></td>' +
+												 '<td>'+count+'</td>' +
+												 '<td style="display:none;">'+type[0]['pk']+'</td>' +
 												 '<td>'+ type[i].fields['product_code'] +'</td>' +
 												 '<td>'+ type[i].fields['product_name'] +'</td>' +
 												 '<td>'+ type[i].fields['product_desc'] +'</td>' +
 												 '<td><input type="text" class="form-control" required ></td>' +
-												 '<td><input type="text" class="form-control" required ></td>' +
+												 '<td><input type="text" class="form-control" value="'+ type[i].fields['unit'] +'" required ></td>' +
 												 '<td><input type="text" class="form-control" required ></td>' +
 												 '<td><input type="text" class="form-control" required ></td>' +
 									 '<td><a class="add-po-edit" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-po-edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-po-edit" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
@@ -1014,16 +1003,16 @@ $(document).ready(function(){
 					// Edit row on edit button click
 					$(document).on("click", ".edit-po-edit", function(){
 							$(this).parents("tr").find("td:not(:last-child)").each(function(i){
-								if (i === 4 ) {
-									$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
-								}
-								if (i === 5) {
+								if (i === 5 ) {
 									$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
 								}
 								if (i === 6) {
 									$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
 								}
 								if (i === 7) {
+									$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
+								}
+								if (i === 8) {
 									$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
 								}
 					});
@@ -1069,7 +1058,7 @@ $(document).ready(function(){
 						{
 							var $tds = $(this).find('td');
 							var row = {
-								'item_code' : "",
+								'id' : "",
 								'item_name' : "",
 								'item_description' : "",
 								'quantity' : "",
@@ -1079,24 +1068,18 @@ $(document).ready(function(){
 							};
 							$tds.each(function(i, el){
 								if (i === 1) {
-										row["item_code"] = ($(this).text());
-								}
-								if (i === 2) {
-										row["item_name"] = ($(this).text());
-								}
-								else if (i === 3) {
-										row["item_description"] = ($(this).text());
-								}
-								else if (i === 4) {
-										row["quantity"] = ($(this).text());
+										row["id"] = ($(this).text());
 								}
 								else if (i === 5) {
-										row["unit"] = ($(this).text());
+										row["quantity"] = ($(this).text());
 								}
 								else if (i === 6) {
-										row["unit_price"] = ($(this).text());
+										row["unit"] = ($(this).text());
 								}
 								else if (i === 7) {
+										row["unit_price"] = ($(this).text());
+								}
+								else if (i === 8) {
 										row["remarks"] = ($(this).text());
 								}
 							});
@@ -1129,7 +1112,7 @@ $(document).ready(function(){
 									alert(data.result)
 								}
 								else {
-									alert("Purchase Order Submitted");
+									alert("Purchase Order Updated");
 									location.reload();
 								}
 							})
@@ -1157,14 +1140,16 @@ $(document).ready(function(){
 						 .done(function done(data){
 							 if (data.row) {
 								 var type = JSON.parse(data.row);
+								 console.log(type);
 								 var index = $("table tbody tr:last-child").index();
 										 var row = '<tr>' +
 												 '<td>'+count+'</td>' +
-												 '<td>'+ type[0].fields['product_code'] +'</td>' +
+												 '<td style="display:none;">'+type[0]['pk']+'</td>' +
+										 	 	 '<td>'+ type[0].fields['product_code'] +'</td>' +
 												 '<td>'+ type[0].fields['product_name'] +'</td>' +
 												 '<td><pre>'+ type[0].fields['product_desc'] +'</pre></td>' +
 												 '<td><input type="text" class="form-control form-control-sm" required ></td>' +
-												 '<td><input type="text" class="form-control" required ></td>' +
+												 '<td><input type="text" class="form-control" value="'+ type[0].fields['unit'] +'" required ></td>' +
 												 '<td><input type="text" class="form-control" required ></td>' +
 												 '<td><input type="text" class="form-control" required ></td>' +
 									 '<td><a class="add-dc" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-dc" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-dc" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
@@ -1208,16 +1193,16 @@ $(document).ready(function(){
 					// Edit row on edit button click
 					$(document).on("click", ".edit-dc", function(){
 							$(this).parents("tr").find("td:not(:last-child)").each(function(i){
-								if (i === 4 ) {
+								if (i === 5 ) {
 									$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 								}
-								if (i === 5) {
+								if (i === 6) {
 									$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 								}
-								if (i === 6 ) {
+								if (i === 7 ) {
 									$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 								}
-								if (i === 7) {
+								if (i === 8) {
 									$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 								}
 					});
@@ -1254,7 +1239,7 @@ $(document).ready(function(){
 								{
 									var $tds = $(this).find('td');
 									var row = {
-										'item_code' : "",
+										'id' : "",
 										'item_name' : "",
 										'item_description' : "",
 										'quantity' : "",
@@ -1264,24 +1249,18 @@ $(document).ready(function(){
 									};
 									$tds.each(function(i, el){
 										if (i === 1) {
-												row["item_code"] = ($(this).text());
-										}
-										if (i === 2) {
-												row["item_name"] = ($(this).text());
-										}
-										else if (i === 3) {
-												row["item_description"] = ($(this).text());
-										}
-										else if (i === 4) {
-												row["quantity"] = ($(this).text());
+												row["id"] = ($(this).text());
 										}
 										else if (i === 5) {
-												row["unit"] = ($(this).text());
+												row["quantity"] = ($(this).text());
 										}
 										else if (i === 6) {
-												row["unit_price"] = ($(this).text());
+												row["unit"] = ($(this).text());
 										}
 										else if (i === 7) {
+												row["unit_price"] = ($(this).text());
+										}
+										else if (i === 8) {
 												row["remarks"] = ($(this).text());
 										}
 									});
@@ -1580,13 +1559,13 @@ $(document).ready(function(){
 											 for (var i = 0; i < type.length; i++) {
 											 var index = $("table tbody tr:last-child").index();
 													 var row = '<tr>' +
-															 '<td><input type="text" readonly class="form-control" value='+count+'></td>' +
+															 '<td>'+count+'</td>' +
+															 '<td style="display:none;">'+type[0]['pk']+'</td>' +
 															 '<td>'+ type[i].fields['product_code'] +'</td>' +
 															 '<td>'+ type[i].fields['product_name'] +'</td>' +
 															 '<td>'+ type[i].fields['product_desc'] +'</td>' +
 															 '<td><input type="text" class="form-control" required ></td>' +
-															 '<td><input type="text" class="form-control" required ></td>' +
-															 '<td><input type="text" class="form-control" required ></td>' +
+															 '<td><input type="text" class="form-control" value="'+ type[i].fields['unit'] +'" required ></td>' +
 															 '<td><input type="text" class="form-control" required ></td>' +
 												 '<td><a class="add-dc-edit" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-dc-edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-dc-edit" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 													 '</tr>';
@@ -1673,7 +1652,7 @@ $(document).ready(function(){
 							{
 								var $tds = $(this).find('td');
 								var row = {
-									'item_code' : "",
+									'id' : "",
 									'item_name' : "",
 									'item_description' : "",
 									'quantity' : "",
@@ -1683,23 +1662,15 @@ $(document).ready(function(){
 								};
 								$tds.each(function(i, el){
 									if (i === 1) {
-											row["item_code"] = ($(this).text());
-									}
-									if (i === 2) {
-											row["item_name"] = ($(this).text());
-									}
-									else if (i === 3) {
-											row["item_description"] = ($(this).text());
-									}
-									else if (i === 4) {
-											row["quantity"] = ($(this).text());
+											row["id"] = ($(this).text());
 									}
 									else if (i === 5) {
-											row["unit"] = ($(this).text());
+											row["quantity"] = ($(this).text());
 									}
 									else if (i === 6) {
-											row["unit_price"] = ($(this).text());
+											row["unit"] = ($(this).text());
 									}
+
 									else if (i === 7) {
 											row["remarks"] = ($(this).text());
 									}
