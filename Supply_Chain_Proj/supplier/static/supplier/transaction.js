@@ -42,6 +42,10 @@ $(document).ready(function(){
 
 	$(".has_id").click(function(){
 			 edit_id = this.id;
+			 console.log("HERE",edit_id);
+			 $.get("chart_of_account/edit/"+ edit_id, function(data, status){
+				alert("Data: " + data + "\nStatus: " + status);
+			});
 		});
 
 	function getCookie(c_name)

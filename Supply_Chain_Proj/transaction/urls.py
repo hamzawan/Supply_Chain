@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
 
     path('chart_of_account/new', views.chart_of_account, name = 'chart-of-account'),
+    path('chart_of_account/edit/<pk>', views.edit_chart_of_account, name = 'edit-chart-of-account'),
     path('reports/', views.reports, name = 'report'),
 
     path('purchase/', views.purchase, name = 'purchase'),
@@ -71,4 +72,6 @@ urlpatterns = [
 
     path('companies/', views.multi_companies, name = 'multi-companies'),
     path('companies/new', views.new_multi_companies, name = 'new-multi-companies'),
+    path('companies/edit/<pk>', views.edit_multi_companies, name = 'edit-multi-companies'),
+    path('companies/delete/<pk>', views.delete_multi_companies, name = 'delete-multi-companies'),
 ]
