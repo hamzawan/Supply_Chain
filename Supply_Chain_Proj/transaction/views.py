@@ -4,12 +4,13 @@ from .models import (PurchaseHeader, PurchaseDetail, SaleHeader, SaleDetail, Cha
                     PurchaseReturnHeader, PurchaseReturnDetail, SaleReturnHeader, SaleReturnDetail,
                     Transactions, VoucherHeader, VoucherDetail)
 from supplier.models import Company_info
-from .forms import CompanyUpdateForm
+from .forms import CompanyUpdateForm,COAUpdateForm
 from inventory.models import Add_products
 from customer.models import DcHeaderCustomer, DcDetailCustomer
 from django.core import serializers
 from django.db.models import Q, Count
 import json, datetime
+from decimal import Decimal
 from supplier.utils import render_to_pdf
 from django.template.loader import get_template
 from django.db import connection
@@ -1693,7 +1694,7 @@ def chart_of_account(request):
         if opening_balance is "":
             opening_balance = 0
         if op_type == "credit":
-            opening_balance = -abs(int(opening_balance))
+            opening_balance = -abs(Decimal(opening_balance))
         coa = ChartOfAccount(account_title = account_title, parent_id = account_type, opening_balance = opening_balance, phone_no = phone_no, email_address = email_address, ntn = ntn, stn = stn, cnic = cnic ,Address = address, remarks = remarks, credit_limit=credit_limits)
         coa.save()
     return render(request, 'transaction/chart_of_account.html',{'all_accounts':all_accounts,'all_accounts_null':all_accounts_null,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
@@ -1703,36 +1704,34 @@ def chart_of_account(request):
 def edit_chart_of_account(request,pk):
     coa = ChartOfAccount.objects.get(id= pk)
     if request.method == 'POST':
-        coa.account_title = request.POST.get('account_title')
-        coa.parent_id = request.POST.get('account_type')
-        opening_balance = request.POST.get('opening_balance')
-        coa.phone_no = request.POST.get('phone_no')
-        coa.email_address = request.POST.get('email_address')
-        coa.ntn = request.POST.get('ntn')
-        coa.stn = request.POST.get('stn')
-        coa.cnic = request.POST.get('cnic')
-        coa.Address = request.POST.get('address')
-        coa.remarks = request.POST.get('remarks')
-        coa.op_type = request.POST.get('optradio')
-        credit_limits = request.POST.get('credit_limits')
+        form = COAUpdateForm(request.POST,instance=coa)
+        if form.is_valid():
+            form.save()
+            opening_balance = request.POST.get('opening_balance')
+            credit_limit = request.POST.get('credit_limit')
+            op_type = request.POST.get('optradio')            
+            if credit_limit is "":
+                credit_limit = 0.00
+            else:
+                credit_limit = credit_limit
 
-        if credit_limits is "":
-            credit_limits = 0.00
-        else:
-            credit_limits = credit_limits
+            coa.credit_limit = credit_limit
 
-        coa.credit_limit = credit_limit
-
-        if opening_balance is "":
-            opening_balance = 0
-        if op_type == "credit":
-            opening_balance = -abs(int(opening_balance))
-        
-        coa.opening_balance = opening_balance
-        coa.save()
-        return redirect('chart-of-account')
+            if opening_balance is "":
+                opening_balance = 0
+            if op_type == "credit":
+                print("HERE",opening_balance)
+                opening_balance = -abs(Decimal(opening_balance))
+                print("AFTER ERROR")
+            coa.opening_balance = opening_balance
+            coa.save()
+            messages.success(request, f'Chart of Account has been updated!')        
+            return redirect('chart-of-account')
     else:
-        return JsonResponse({"data":coa})
+        form = COAUpdateForm(instance=coa)    
+        
+    return render(request,'transaction/edit_chart_of_account.html',{'form':form})
+
 
 
 
