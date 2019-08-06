@@ -822,7 +822,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 									 '<td><a class="add-transaction-sale" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-transaction-sale" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="delete-transaction-sale" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 										 '</tr>';
 										 count++;
-									 $("table").append(row);
+									 $("#new-sale-table").append(row);
 								 $("table tbody tr").eq(index + 1).find(".edit-transaction-sale, .add-transaction-sale").toggle();
 										 $('[data-toggle="tooltip"]').tooltip();
 										 $('#item_code_sale').val("");
@@ -860,7 +860,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 								'<td><a class="add-transaction-sale" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-transaction-sale" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="delete-transaction-sale" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 									'</tr>';
 									count++;
-								$("table").append(row);
+								$("#new-sale-table").append(row);
 							$("table tbody tr").eq(index + i+1).find(".edit-transaction-sale, .add-transaction-sale").toggle();
 									$('[data-toggle="tooltip"]').tooltip();
 									$('#dc_code_sale').val("");
@@ -1107,12 +1107,25 @@ $('#last_grand_total').val(amount.toFixed(2));
 				$('#last_grand_total').val(amount.toFixed(2));
 				})
 
-
+			$('.add-cartage').on('click', function(){
+						var index = $("#cartage-table tbody tr:last-child").index();
+				var row = '<tr>' +
+						'<td><b>Cartage Amount:</b>&nbsp;&nbsp;&nbsp;</td>' +
+						'<td><input type="text" class="form-control form-control-sm" style="width:100px;" value="" id=""></td>' +
+						'<td>&nbsp;&nbsp;&nbsp;<b>PO No:</b>&nbsp;&nbsp;&nbsp;</td>' +
+						'<td><input type="text" class="form-control form-control-sm" style="width:100px;" value="" id=""></td>' +
+					 '<td><a class="add-cart" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-cartage" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-cartage" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+				'</tr>';
+			$("#cartage-table").append(row);
+			$("#cartage-table tbody tr").eq(index + 1).find(".add-cart, .edit-cartage").toggle();
+			});
 
 			$('#new-sale-submit').on('submit',function(e){
 				e.preventDefault();
 				var table = $('#new-sale-table');
+				var cartage_table = $('#cartage-table');
 				var data = [];
+				var datax = [];
 				var sale_id = $('#sale_id').val();
 				var follow_up = $('#follow_up').val();
 				var credit_days = $('#credit_days').val();
@@ -1164,6 +1177,29 @@ $('#last_grand_total').val(amount.toFixed(2));
 					}
 				});
 
+
+				cartage_table.find('tr').each(function (i, el){
+					if(i != 0)
+					{
+						var $tdc = $(this).find('td');
+						var rowx = {
+							'cartage_amount' : "",
+							'po_no': "",
+						};
+						$tdc.each(function(i, el){
+							if (i === 1) {
+									rowx["cartage_amount"] = ($(this).text());
+									console.log($(this).text());
+							}
+							if (i === 3) {
+									rowx["po_no"] = ($(this).text());
+									console.log($(this).text());
+							}
+						});
+						datax.push(rowx);
+					}
+				});
+
 					 req =	$.ajax({
 							headers: { "X-CSRFToken": getCookie("csrftoken") },
 							type: 'POST',
@@ -1179,6 +1215,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 								'additional_tax':additional_tax,
 								'withholding_tax':withholding_tax,
 								'items': JSON.stringify(data),
+								'cartage': JSON.stringify(datax),
 							},
 							dataType: 'json'
 						})
@@ -3292,7 +3329,56 @@ $.fn.extend({
 			}
 		});
 
+
+		// Add row on add button click
+		$(document).on("click", ".add-cart", function(){
+		var empty = false;
+		var input = $(this).parents("tr").find('input[type="text"]');
+				input.each(function(){
+			if(!$(this).val()){
+				$(this).addClass("error");
+				empty = true;
+			}
+			else{
+					$(this).removeClass("error");
+					}
+		});
+		$(this).parents("tr").find(".error").first().focus();
+		if(!empty){
+			input.each(function(){
+				$(this).parent("td").html($(this).val());
+			});
+			$(this).parents("tr").find(".add-cart, .edit-cartage").toggle();
+		}
+
+		});
+
+					// Edit row on edit button click
+	$(document).on("click", ".edit-cartage", function(){
+			$(this).parents("tr").find("td:not(:last-child)").each(function(i){
+					if (i === 1) {
+						$(this).html('<input type="text" style="width:100px;" class="form-control" value="' + $(this).text() + '">');
+					}
+					if (i === 3) {
+						 $(this).html('<input type="text" style="width:100px;" class="form-control" value="' + $(this).text() + '">');
+					}
+
+		});
+		$(this).parents("tr").find(".add-cart, .edit-cartage").toggle();
+		});
+
+		// Delete row on delete button click
+		$(document).on("click", ".delete-cartage", function(){
+			var row =  $(this).closest('tr');
+			var siblings = row.siblings();
+			siblings.each(function(index) {
+			$(this).children('td').first().text(index + 1);
+			});
+			$(this).parents("tr").remove();
+		});
+
 		document.getElementById('box').onchange = function() {
-    document.getElementById('invoice_no').disabled = !this.checked;
+		document.getElementById('invoice_no').disabled = !this.checked;
 		};
+
 });

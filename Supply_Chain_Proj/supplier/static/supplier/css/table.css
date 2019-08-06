@@ -179,6 +179,23 @@ line-height: 13px;
 margin-right: 4px;
 }
 
+
+.table-title .insert-cartage{
+float: right;
+height: 30px;
+font-weight: bold;
+font-size: 12px;
+text-shadow: none;
+min-width: 100px;
+border-radius: 50px;
+line-height: 13px;
+}
+
+
+.table-title .insert-cartage i {
+margin-right: 4px;
+}
+
 .table-title .add-item-purchase{
 float: right;
 height: 30px;
@@ -208,6 +225,22 @@ line-height: 13px;
 
 
 .table-title .add-item-sale i {
+margin-right: 4px;
+}
+
+
+.add-cartage{
+float: right;
+height: 30px;
+font-weight: bold;
+font-size: 12px;
+text-shadow: none;
+min-width: 100px;
+border-radius: 50px;
+line-height: 13px;
+}
+
+.add-cartage i {
 margin-right: 4px;
 }
 
@@ -1963,6 +1996,61 @@ display: none;
 }
 
 /* ================================================================================================= */
+
+#cartage-table tr th{
+    font-size: 10px;
+}
+#cartage-table tr td{
+    font-size: 14px;
+}
+#cartage-table tr th, #cartage-table tr td {
+    border-color: #e9e9e9;
+}
+#cartage-table th i {
+    font-size: 13px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+#cartage-table th:last-child {
+    width: 100px;
+}
+#cartage-table td a {
+cursor: pointer;
+    display: inline-block;
+    margin: 0 5px;
+min-width: 24px;
+}
+#cartage-table td a.add-cart {
+    color: #27C46B;
+}
+#cartage-table td a.edit-cartage {
+    color: #FFC107;
+}
+#cartage-table td a.delete-cartage {
+    color: #E34724;
+}
+
+#cartage-table td i {
+    font-size: 16px;
+}
+#cartage-table td a.add-cart i {
+    font-size: 19px;
+  margin-right: -1px;
+    position: relative;
+    top: 3px;
+}
+#cartage-table .form-control {
+    height: 32px;
+    line-height: 32px;
+    box-shadow: none;
+    border-radius: 2px;
+}
+#cartage-table .form-control.error {
+border-color: #f50000;
+}
+#cartage-table td .add-cart {
+display: none;
+}
 
 /* ================================================================================================= */
 

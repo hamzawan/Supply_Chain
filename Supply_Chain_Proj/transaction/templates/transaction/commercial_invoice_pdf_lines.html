@@ -125,7 +125,8 @@
       <tbody>
         {% for detail in detail %}
         {% with quantity=detail.6 unit=detail.5 price=detail.7 sales_tax=detail.8 value_of_goods=detail.7|mul:detail.6 tax=detail.7|mul:detail.6|mul:detail.8|div:100 %}
-        {% with value_of_goods_tax=value_of_goods|add:tax|floatformat:2 %}
+        {% with value_of_goods_tax=value_of_goods|floatformat:"0"|add:tax|floatformat:"0"|floatformat:2 %}
+        <h1>{{value_of_goods|floatformat:"0"|add:tax|floatformat:"0"|floatformat:2}}</h1>
         {% ifchanged detail.1 and detail.2 %}
         <tr>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>

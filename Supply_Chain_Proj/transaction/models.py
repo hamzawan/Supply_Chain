@@ -155,3 +155,9 @@ class Transactions(models.Model):
     voucher_id = models.CharField(max_length = 100)
     user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
     company_id = models.ForeignKey(Company_info, models.SET_NULL, blank = True, null = True)
+
+
+class Cartage_and_Po(models.Model):
+    cartage = models.DecimalField(max_digits = 8, decimal_places = 2)
+    po_no = models.CharField(max_length = 100)
+    invoice_id = models.IntegerField()

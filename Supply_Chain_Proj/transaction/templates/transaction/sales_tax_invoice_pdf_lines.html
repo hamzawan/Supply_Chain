@@ -131,6 +131,7 @@
       <tbody>
         {% for detail in detail %}
         {% with quantity=detail.6 unit=detail.5 price=detail.7 sales_tax=detail.8 value_of_goods=detail.7|mul:detail.6 tax=detail.7|mul:detail.6|mul:detail.8|div:100 %}
+        {% with value_of_goods_tax=value_of_goods|floatformat:"0"|add:tax|floatformat:"0"|floatformat:2 %}
         <tr>
           <td style="width: 70px; text-align: center; border-left:1px solid black; border-right:1px solid black; border-bottom:1px solid black;"><font style="margin-top:-100px;">{{forloop.counter}}</font></td>
           <td style="border-left:1px solid black; border-right:1px solid black; border-bottom:1px solid black;"><font>{{detail.3}}<font></td>
@@ -139,23 +140,11 @@
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{price}}</td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{value_of_goods|floatformat:2}}</td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{tax|floatformat:2}}</td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{value_of_goods|add:tax|floatformat:2}}</td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{value_of_goods_tax}}</td>
         </tr>
         {% endwith %}
+        {% endwith %}
         {% endfor %}
-      <!-- {% for i in i|rjust:total_lines %}
-      <tr style="height:6px;">
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
-      </tr>
-      {% endfor %} -->
-
       <tr class="heading_row">
         <td style="width: 70px;"></td>
         <td style="width:400px;"></td>

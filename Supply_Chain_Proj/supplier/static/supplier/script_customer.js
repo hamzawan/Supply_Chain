@@ -1093,7 +1093,7 @@ $(document).ready(function(){
 												 '<td style="display:none;"></td>' +
 									 '<td><a class="add-dc-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-dc-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-dc-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 										 '</tr>';
-									 $("table").append(row);
+									 $("#new-dc-customer-table").append(row);
 								 $("table tbody tr").eq(index + 1).find(".add-dc-customer, .edit-dc-customer").toggle();
 										 $('[data-toggle="tooltip"]').tooltip();
 									 $('#item_code_dc').val("");
@@ -1790,5 +1790,6 @@ $(document).ready(function(){
 	 					$('#tran_no_input_supplier').val( data.tran_no );
 	 				});
 	 		 });
+
 
 });

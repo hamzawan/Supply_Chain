@@ -771,11 +771,11 @@ $(document).ready(function(){
 								 var row = '<tr>' +
 										 '<td>'+count+'</td>' +
 										 '<td style="display:none;">'+type[0]['pk']+'</td>' +
-										 '<td>'+ type[0].fields['product_code'] +'</td>' +
-										 '<td>'+ type[0].fields['product_name'] +'</td>' +
-										 '<td><pre>'+ type[0].fields['product_desc'] +'</pre></td>' +
+										 '<td>'+type[0].fields['product_code']+'</td>' +
+										 '<td>'+type[0].fields['product_name']+'</td>' +
+										 '<td><pre>'+type[0].fields['product_desc']+'</pre></td>' +
 										 '<td><input type="text" class="form-control form-control-sm" required ></td>' +
-										 '<td><input type="text" class="form-control" value="'+ type[0].fields['unit'] +'" required ></td>' +
+										 '<td><input type="text" class="form-control" value="'+type[0].fields['unit']+'" required ></td>' +
 										 '<td><input type="text" class="form-control" required ></td>' +
 										 '<td><input type="text" class="form-control" required ></td>' +
 							 '<td><a class="add-po" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-po" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-po" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +

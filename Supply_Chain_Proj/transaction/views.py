@@ -1007,7 +1007,7 @@ def new_sale(request):
     item_amount = 0
     total_amount = 0
     get_account = ''
-
+    ca = 0
     cursor = connection.cursor()
 
     # dc_detail = cursor.execute('''Select Distinct id,item_code, item_name, item_description From (
@@ -1167,6 +1167,24 @@ def new_sale(request):
         tax = ((item_amount * float(withholding_tax)) / 100)
         total_amount = tax + item_amount
         header_id = header_id.id
+        cartage_amounts = cursor.execute('''Select SaleId,Cartage_amount ,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax from(
+                                    select SD.sale_id_id as SaleID, sum(DC.cartage_amount) as Cartage_amount, PS.id,PS.product_name as product_name, PS.product_desc as product_desc, PS.unit as unit,
+                                    SD.quantity as quantity, SD.cost_price as cost_price, SD.sales_tax as sales_tax,
+                                    DC.dc_no as DcNo, DCD.po_no  as po_no
+                                    from transaction_saledetail SD
+                                    inner join inventory_add_products PS on PS.id = SD.item_id_id
+                                    inner join customer_dcheadercustomer DC on SD.dc_ref = DC.id
+                                    inner join customer_dcdetailcustomer DCD on DCD.dc_id_id = DC.id
+                                    left join customer_poheadercustomer PO on PO.id = DCD.po_no
+                                    group by DCD.po_no
+                                    )as tblData where tblData.SaleId = %s
+                                    order by po_no''',[header_id])
+        cartage_amounts = cartage_amounts.fetchall()
+        print(cartage_amounts)
+        for c in cartage_amounts:
+            ca = ca + c[1]
+            print(ca)
+        total_amount = total_amount + ca
         cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
         if payment_method == 'Cash':
             tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit",  ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
@@ -1238,6 +1256,8 @@ def direct_sale(request, pk):
         sale_header = SaleHeader(sale_no = sale_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = withholding_tax, account_id = account_id, follow_up = '2010-06-10', company_id = company, user_id = request.user)
 
         items = json.loads(request.POST.get('items'))
+        cart = json.loads(request.POST.get('cartage'))
+        print(cart)
         print(items)
         sale_header.save()
         header_id = SaleHeader.objects.get(sale_no = sale_id)
@@ -1254,6 +1274,23 @@ def direct_sale(request, pk):
         item_amount = item_amount + float(cartage_amount) + float(additional_tax)
         total_amount = item_amount
         header_id = header_id.id
+        cartage_amounts = cursor.execute('''Select SaleId,Cartage_amount ,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax from(
+                                    select SD.sale_id_id as SaleID, sum(DC.cartage_amount) as Cartage_amount, PS.id,PS.product_name as product_name, PS.product_desc as product_desc, PS.unit as unit,
+                                    SD.quantity as quantity, SD.cost_price as cost_price, SD.sales_tax as sales_tax,
+                                    DC.dc_no as DcNo, DCD.po_no  as po_no
+                                    from transaction_saledetail SD
+                                    inner join inventory_add_products PS on PS.id = SD.item_id_id
+                                    inner join customer_dcheadercustomer DC on SD.dc_ref = DC.id
+                                    inner join customer_dcdetailcustomer DCD on DCD.dc_id_id = DC.id
+                                    left join customer_poheadercustomer PO on PO.id = DCD.po_no
+                                    group by DCD.po_no
+                                    )as tblData where tblData.SaleId = %s
+                                    order by po_no''',[pk])
+        cartage_amounts = cartage_amounts.fetchall()
+        print(cartage_amounts)
+        for c in cartage_amounts:
+            ca = ca + c[1]
+            print(ca)
         cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
         if payment_method == 'Cash':
             tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit",ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
@@ -1273,6 +1310,7 @@ def direct_sale(request, pk):
 
 @user_passes_test(allow_sale_edit)
 def edit_sale(request,pk):
+    ca = 0
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
     company = Q(company_id = company)
@@ -1401,6 +1439,24 @@ def edit_sale(request,pk):
         item_amount = item_amount + float(cartage_amount) + float(additional_tax)
         total_amount = item_amount
         header_id = header_id.id
+        cartage_amounts = cursor.execute('''Select SaleId,Cartage_amount ,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax from(
+                                    select SD.sale_id_id as SaleID, sum(DC.cartage_amount) as Cartage_amount, PS.id,PS.product_name as product_name, PS.product_desc as product_desc, PS.unit as unit,
+                                    SD.quantity as quantity, SD.cost_price as cost_price, SD.sales_tax as sales_tax,
+                                    DC.dc_no as DcNo, DCD.po_no  as po_no
+                                    from transaction_saledetail SD
+                                    inner join inventory_add_products PS on PS.id = SD.item_id_id
+                                    inner join customer_dcheadercustomer DC on SD.dc_ref = DC.id
+                                    inner join customer_dcdetailcustomer DCD on DCD.dc_id_id = DC.id
+                                    left join customer_poheadercustomer PO on PO.id = DCD.po_no
+                                    group by DCD.po_no
+                                    )as tblData where tblData.SaleId = %s
+                                    order by po_no''',[pk])
+        cartage_amounts = cartage_amounts.fetchall()
+        print(cartage_amounts)
+        for c in cartage_amounts:
+            ca = ca + c[1]
+            print(ca)
+        total_amount = total_amount + ca
         cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
         if sale_header.payment_method == 'Cash':
             refrence_id = Q(refrence_id = header_id)
@@ -1417,9 +1473,9 @@ def edit_sale(request,pk):
             delete = Transactions.objects.filter(refrence_id, tran_type)
             delete.delete()
             sale_account = ChartOfAccount.objects.get(account_title = 'Sales')
-            tran1 = Transactions(refrence_id = 0, refrence_date = date, account_id = account_id, tran_type = "", amount = total_amount, date = date, remarks = "Amount Debit", ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice" ,company_id = company, user_id = request.user)
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit", ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = sale_account, tran_type = "", amount = -abs(total_amount), date = date, remarks = "Amount Debit", ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice" ,company_id = company, user_id = request.user)
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_account, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit", ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/edit_sale.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'sale_header':sale_header, 'sale_detail':sale_detail, 'pk':pk, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
@@ -2807,8 +2863,8 @@ def sales_tax_invoice(request,pk):
                                 inner join customer_dcdetailcustomer DCD on DCD.dc_id_id = DC.id
                                 left join customer_poheadercustomer PO on PO.id = DCD.po_no
                                 group by DCD.po_no
-                                )as tblData where tblData.SaleId = '2'
-                                order by po_no''')
+                                )as tblData where tblData.SaleId = %s
+                                order by po_no''',[pk])
     cartage_amounts = cartage_amounts.fetchall()
     print(cartage_amounts)
     for c in cartage_amounts:
@@ -2828,41 +2884,6 @@ def sales_tax_invoice(request,pk):
     lines = lines + len(detail) + len(detail)
     total_lines = 36 - lines
     pdf = render_to_pdf('transaction/sales_tax_invoice_pdf_lines.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount_item':total_amount_item,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser, 'parent_company_name':parent_company_name, 'cartage_amounts':cartage_amounts,'tax_amount':tax_amount,'total_amount':total_amount,'hs_code':hs_code,'allow_report_roles':report_roles(request.user)})
-    # allow_customer_roles = customer_roles(request.user)
-    # allow_supplier_roles = supplier_roles(request.user)
-    # allow_transaction_roles = transaction_roles(request.user)
-    # allow_inventory_roles = inventory_roles(request.user)
-    # cursor = connection.cursor()
-    # lines = 0
-    # total_amount = 0
-    # company_info = Company_info.objects.filter(id=1)
-    # image = Company_info.objects.filter(company_name = "Hamza Enterprises").first()
-    # header = SaleHeader.objects.filter(id = pk).first()
-    # # print(header.footer_remarks)
-    # detail = cursor.execute('''Select SaleId,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax from(
-    #                         select SD.sale_id_id as SaleID, PS.id,PS.product_name as product_name, PS.product_desc as product_desc, PS.unit as unit,
-    #                         SD.quantity as quantity, SD.cost_price as cost_price, SD.sales_tax as sales_tax,
-    #                         DC.dc_no as DcNo, PO.PO_no  as po_no
-    #                         from transaction_saledetail SD
-    #                         inner join inventory_add_products PS on PS.id = SD.item_id_id
-    #                         inner join customer_dcheadercustomer DC on SD.dc_ref = DC.id
-    #                         inner join customer_dcdetailcustomer DCD on DCD.dc_id_id = DC.id
-    #                         left join customer_poheadercustomer PO on PO.id = DCD.po_no
-    #                         group by SD.id
-    #                         )as tblData where tblData.SaleId = %s ''',[pk])
-    # detail = detail.fetchall()
-    # print(detail)
-    # for value in detail:
-    #     lines = lines + len(value[4].split('\n'))
-    #     amount = float(value[7] * value[6])
-    #     total_amount = total_amount + amount
-    #     sales_tax_amount = total_amount * 17 / 100
-    #     total_amount = total_amount + sales_tax_amount
-    #     print(total_amount)
-    #     total_amount = round(total_amount)
-    # lines = lines + len(detail) + len(detail)
-    # total_lines = 36 - lines
-    # pdf = render_to_pdf('transaction/sales_tax_invoice_pdf_lines.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "SaleTaxInvoice%s.pdf" %(header.sale_no)
@@ -2912,10 +2933,8 @@ def commercial_invoice(request,pk):
                                 )as tblData where tblData.SaleId = '2'
                                 order by po_no''')
     cartage_amounts = cartage_amounts.fetchall()
-    print(cartage_amounts)
     for c in cartage_amounts:
         ca = ca + c[1]
-        print(ca)
     for value in detail:
         lines = lines + len(value[4].split('\n'))
         amount = float(value[7] * value[6])

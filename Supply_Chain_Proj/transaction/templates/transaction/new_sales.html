@@ -93,32 +93,46 @@
       </table>
     </div>
     </li>
-    <li class="list-group-item">
+    <br>
       <input type="hidden" name="" value="" id="hidden">
-      <div class="float-right">
-        <div class="form-inline">
-          <div class="form-group">
-            <label for="text" style="font-size:14px;" >Cartage Amount:</label>
-              <input type="text" class="form-control form-control-sm" id="cartage_amount" style="border-top: 0px; border-right:0px; border-left:0px;" required value="0.00">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="col-md-6" style="margin-left:-120px;">
+            <div>
+                <button type="button" class="btn btn-info add-cartage"><i class="fa fa-plus"></i>Insert Cartage</button>
+            </div>
           </div>
+          <br>
+          <br>
+          <table id="cartage-table">
+            <thead>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
         </div>
-        <div class="form-inline">
-          <div class="form-group">
-            <label for="text" style="font-size:14px;">Additional Tax: &nbsp;&nbsp;&nbsp;</label>
-            <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="additional_tax" required value="0.00">
-          </div>
-        </div>
-        <div class="form-inline">
-          <div class="form-group">
-            <label for="text" style="font-size:14px;">Sales Tax:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-            <input type="text" readonly class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="total_sales_tax" required value="0.00">
-          </div>
-        </div>
-        <div class="form-inline">
-          <div class="form-group">
-            <label for="text" style="font-size:14px;"><b>Grand Total:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-            <input type="text" readonly class="form-control form-control-sm" id="last_grand_total" style="border-top: 0px; border-right:0px; border-left:0px;">
-          </div>
+        <div class="col-md-6">
+            <br>
+            <div class="col-md-6" style="margin-left:200px;">
+              <div class="form-inline">
+                <div class="form-group">
+                  <label for="text" style="font-size:14px;">Additional Tax: &nbsp;&nbsp;&nbsp;</label>
+                  <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="additional_tax" required value="0.00">
+                </div>
+              </div>
+              <div class="form-inline">
+                <div class="form-group">
+                  <label for="text" style="font-size:14px;">Sales Tax:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                  <input type="text" readonly class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="total_sales_tax" required value="0.00">
+                </div>
+              </div>
+              <div class="form-inline">
+                <div class="form-group">
+                  <label for="text" style="font-size:14px;"><b>Grand Total:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                  <input type="text" readonly class="form-control form-control-sm" id="last_grand_total" style="border-top: 0px; border-right:0px; border-left:0px;">
+                </div>
+              </div>
+            </div>
         </div>
       </div>
       <br>
@@ -126,7 +140,7 @@
       <br>
       <br>
       <br>
-      </li>
+      <br>
       <br>
     <div class="text-center">
       <button type="submit" class="btn btn-outline-primary">Submit <small>(Sale)</small></button>
