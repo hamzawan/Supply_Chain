@@ -14,38 +14,22 @@
     <div class="input-group">
       <div class="col-md-12">
         {% if permission.add == 1 %}
-        <a role="button" href="{% url 'new-sale' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
+          {% if gst.company_type == 1 %}
+            <a role="button" href="{% url 'new-sale' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
+          {% else %}
+            <a role="button" href="{% url 'new-sale-ngst' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
+          {% endif %}
         {% else %}
-        <a role="button" href="#" style="float:right;" class="btn btn-outline-secondary disabled" name="button"><i class="fas fa-plus"></i> Add New</a>
+        {% if gst.company_type == 0 %}
+        <a role="button" href="{% url 'new-sale-ngst' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
+        {% else %}
+        <a role="button" href="{% url 'new-sale-ngst' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
+        {% endif %}
         {% endif %}
 
       </div>
     </div>
     <br>
-
-    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
-      Launch demo modal
-    </button>
-    
-    <!-- Modal -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Modal title</h4>
-          </div>
-          <div class="modal-body">
-            ...
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
 
     <div class="table table-responsive content-loader">
       <table class="table table-bordered sort" id="dataTable">
@@ -64,24 +48,25 @@
                 <td>{{ value.sale_no }}</td>
                 <td>{{ value.date }}</td>
                 <td>{{ value.account_id.account_title }}</td>
-                <td>user1</td>
+                <td>{{ value.user_id.username }}</td>
                 <td>
-                  
-                  {% if permission.edit == 1 %}  
+
+                  {% if permission.edit == 1 %}
                   <a class="edit_list" href="{% url 'edit-sale' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
                   {% endif %}
 
-
-                  <a href="#" style="color:black;"><i class="fas fa-coins"></i></a>
-                  
                   {% if permission.r_print == 1 %}
-                  <a data-toggle="modal" href="#"  class="has_id" id="{{value.id}}" data-target="#invoiceType"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a>
+                  {% if gst.company_type == 1 %}
+                    <a data-toggle="modal" href="#"  class="has_id" id="{{value.id}}" data-target="#invoiceType"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a>
+                  {% else %}
+                    <a href="{% url 'commercial-invoice-ngst' pk=value.id %}" target="_blank"  class="has_id" id="{{value.id}}" ><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a>
+                  {% endif %}
                   {% endif %}
 
                   {% if permission.r_return == 1 %}
                   <a class="return" href="{% url 'new-sale-return' pk=value.id %}" data-toggle=""><i class="fas fa-undo"></i></a>
                   {% endif %}
-                  
+
                   {% if permission.delete == 1 %}
                   <a class="delete" href="{% url 'delete-sale' pk=value.id %}"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
                   {% endif %}

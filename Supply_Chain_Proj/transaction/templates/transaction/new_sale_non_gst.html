@@ -4,10 +4,10 @@
 
 <div class="card" style="width: 100%;">
 <div class="card-header">
-  <h4>Sales Invoice</h4>
+  <h4>Sales Invoice Non GST</h4>
 </div>
 <ul class="list-group list-group-flush">
-<form  action="" id="new-sale-submit" autocomplete="off" method="post">
+<form  action="" id="new-sale-submit-ngst" autocomplete="off" method="post">
   {% csrf_token %}
   <li class="list-group-item">
       <div class="form-row">
@@ -48,42 +48,28 @@
     <li class="list-group-item">
     <div class="table-title">
         <div class="row">
-          <!-- <div class="form-group col-md-3">
-            <input type="text" list="item" placeholder="Enter Item Code here..." class="form-control form-control-sm" id="item_code_sale">
-          </div>
-          <datalist id="item">
-            {% for value in dc_detail %}
-            <option value="{{value.1}}">{{value.1}} | {{value.2}} | {{value.3}}</option>
-            {% endfor %}
-          </datalist>
-            <div style="margin-left:20px;">
-                <button type="button" class="btn btn-info add-item-sale"><i class="fa fa-plus"></i>Insert Item</button>
-            </div> -->
             <div class="form-group col-md-3">
               <input type="text" list="dc" placeholder="Enter Dc No here..." class="form-control form-control-sm" id="dc_code_sale">
             </div>
             <datalist id="dc">
             </datalist>
               <div style="margin-left:20px;">
-                  <button type="button" class="btn btn-info add-item-sale"><i class="fa fa-plus"></i>Insert Delivery Challan</button>
+                  <button type="button" class="btn btn-info add-item-sale-ngst"><i class="fa fa-plus"></i>Insert Delivery Challan</button>
               </div>
         </div>
     </div>
     <div class="table table-responsive">
-      <table class="table table-bordered" id="new-sale-table">
+      <table class="table table-bordered" id="new-sale-table-ngst">
           <thead>
               <tr>
                   <th width="40px" style="font-size:10px;">S No.</th>
                   <th width="100px">Item Code</th>
-                  <th width="70px">HS Code</th>
                   <th width="70px">Item Name</th>
                   <th width="70px">Desc.</th>
                   <th width="60px">Qty</th>
                   <th width="60px">Unit</th>
                   <th width="70px">Price</th>
                   <th width="90px">VOG</th>
-                  <th width="90px">ST in % </th>
-                  <th width="110px">ST Amount</th>
                   <th width="90px">Total</th>
                   <th>Action</th>
               </tr>
@@ -99,7 +85,7 @@
         <div class="col-md-6">
           <div class="col-md-6" style="margin-left:-120px;">
             <div>
-                <button type="button" class="btn btn-info add-cartage"><i class="fa fa-plus"></i>Insert Cartage</button>
+                <button type="button" class="btn btn-info add-cartage-ngst"><i class="fa fa-plus"></i>Insert Cartage</button>
             </div>
           </div>
           <br>
@@ -116,18 +102,6 @@
         <div class="col-md-6">
             <br>
             <div class="col-md-6" style="margin-left:200px;">
-              <div class="form-inline">
-                <div class="form-group">
-                  <label for="text" style="font-size:14px;">Additional Tax: &nbsp;&nbsp;&nbsp;</label>
-                  <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="additional_tax" required value="0.00">
-                </div>
-              </div>
-              <div class="form-inline">
-                <div class="form-group">
-                  <label for="text" style="font-size:14px;">Sales Tax:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
-                  <input type="text" readonly class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="total_sales_tax" required value="0.00">
-                </div>
-              </div>
               <div class="form-inline">
                 <div class="form-group">
                   <label for="text" style="font-size:14px;"><b>Grand Total:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
@@ -151,6 +125,4 @@
 </form>
 </ul>
 </div>
-
-
 {% endblock body %}

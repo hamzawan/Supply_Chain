@@ -51,7 +51,11 @@
 
                   {% for i in is_dc %}
                     {% if value.dc_no == i.1  %}
-                      <a href="{% url 'direct-sale' pk=value.id %} " style="color:black;" target="_blank"><i class="fas fa-file-invoice"></i></a>
+                      {% if gst.company_type == 1 %}
+                        <a href="{% url 'direct-sale' pk=value.id %} " style="color:black;" target="_blank"><i class="fas fa-file-invoice"></i></a>
+                      {% else %}
+                        <a href="{% url 'direct-sale-ngst' pk=value.id %} " style="color:black;" target="_blank"><i class="fas fa-file-invoice"></i></a>
+                      {% endif %}
                     {% endif %}
                   {% endfor %}
                   {% else %}

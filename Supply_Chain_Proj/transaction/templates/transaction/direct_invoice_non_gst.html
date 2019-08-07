@@ -1,0 +1,125 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Sales Invoice No GST</h4>
+</div>
+<ul class="list-group list-group-flush">
+<form  action="" id="new-sale-submit-direct" autocomplete="off" method="post">
+  {% csrf_token %}
+  <li class="list-group-item">
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label for="">Sales ID</label>
+          <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_sale_no }}" id="sale_id">
+        </div>
+        <div class="form-group col-md-2">
+          <label>Customer Name</label>
+          <input list="account" id="customer_name_sale" class="form-control form-control-sm" readonly value="{{dc_header.account_id.account_title}}" required >
+          <datalist id="account">
+            {% for value in all_accounts %}
+            <option value="{{value.account_title}}">{{value.account_title}}</option>
+            {% endfor %}
+        </datalist>
+        </div>
+        <div class="form-group col-md-2">
+         <label for="sel1">Payment Term:</label>
+         <select class="form-control form-control-sm" id="payment_method">
+           <option>Cash</option>
+           <option>Credit</option>
+         </select>
+        </div>
+        <div class="form-group">
+          <label for="exampleFormControlTextarea2">Description</label>
+          <textarea class="form-control rounded-0" rows="3" id="footer_desc"></textarea>
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item">
+    <div class="table table-responsive">
+      <table class="table table-bordered" id="new-sale-table-direct-ngst">
+          <thead>
+              <tr>
+                  <th width="40px" style="font-size:10px;">S No.</th>
+                  <th width="100px">Item Code</th>
+                  <th width="70px">Item Name</th>
+                  <th width="70px">Desc.</th>
+                  <th width="90px">Qty</th>
+                  <th width="60px">Unit</th>
+                  <th width="100px">Price</th>
+                  <th width="90px">VOG</th>
+                  <th>Action</th>
+              </tr>
+          </thead>
+          <tbody>
+            {% for value in dc_detail %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td style="display:none;">{{value.1}}</td>
+              <td>{{ value.2 }}</td>
+              <td>{{ value.3 }}</td>
+              <td><pre>{{ value.4 }}</pre></td>
+              <td id="quantity"><input type="text" name="" style="width:70px;" class="form-control form-control-sm" value="{{ value.8 }}"></td>
+              <td>{{ value.5 }}</td>
+              <td id="price"><input type="text" style="width:70px;" class="form-control form-control-sm" name="" value=""></td>
+              <td id="value_of_goods">0.00</td>
+              <td style="display:none;">{{ value.0 }}</td>
+              <td><a class="edit-transaction-sale-ngst" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="add-transaction-sale" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="delete-transaction-sale" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+    </div>
+    </li>
+    <li class="list-group-item">
+      <br>
+        <input type="hidden" name="" value="" id="hidden">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="col-md-6" style="margin-left:-120px;">
+              <div>
+                  <button type="button" class="btn btn-info add-cartage-ngst"><i class="fa fa-plus"></i>Insert Cartage</button>
+              </div>
+            </div>
+            <br>
+            <br>
+            <table id="cartage-table">
+              <thead>
+                <th style="width:150px;"></th>
+                <th style="width:150px;"></th>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-md-6">
+              <br>
+              <div class="col-md-6" style="margin-left:200px;">
+                <div class="form-inline">
+                  <div class="form-group">
+                    <label for="text" style="font-size:14px;"><b>Grand Total:</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                    <input type="text" readonly class="form-control form-control-sm" id="last_grand_total" style="border-top: 0px; border-right:0px; border-left:0px;">
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+    <div class="text-center">
+      <button type="submit" class="btn btn-outline-primary has_id" id="{{pk}}">Submit <small>(Sale)</small></button>
+    </div>
+    <br>
+</form>
+</ul>
+</div>
+
+
+{% endblock body %}

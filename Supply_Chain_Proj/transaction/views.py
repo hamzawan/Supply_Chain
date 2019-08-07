@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from .models import (PurchaseHeader, PurchaseDetail, SaleHeader, SaleDetail, ChartOfAccount,
                     PurchaseReturnHeader, PurchaseReturnDetail, SaleReturnHeader, SaleReturnDetail,
-                    Transactions, VoucherHeader, VoucherDetail)
+                    Transactions, VoucherHeader, VoucherDetail, Cartage_and_Po)
 from supplier.models import Company_info
 from .forms import CompanyUpdateForm
 from inventory.models import Add_products
@@ -21,6 +21,8 @@ from supplier.views import customer_roles,supplier_roles,transaction_roles,inven
 from django.contrib import messages
 from num2words import num2words
 from supplier.models import Company_info
+from collections import defaultdict
+
 
 def allow_coa_display(user):
     user_id = Q(user_id = user.id)
@@ -1005,8 +1007,10 @@ def sale(request):
     allow_inventory_roles = inventory_roles(request.user)
     permission = sale_roles(request.user)
     all_sales = SaleHeader.objects.filter(company).all()
-    return render(request, 'transaction/sale.html',{'all_sales': all_sales,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
-
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    gst = Company_info.objects.filter(id = company.id).first()
+    return render(request, 'transaction/sale.html',{'all_sales': all_sales,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser,'gst':gst})
 
 
 @user_passes_test(allow_sale_add)
@@ -1021,6 +1025,7 @@ def new_sale(request):
     total_amount = 0
     get_account = ''
     ca = 0
+    cartage_sum = 0
     cursor = connection.cursor()
 
     # dc_detail = cursor.execute('''Select Distinct id,item_code, item_name, item_description From (
@@ -1162,10 +1167,14 @@ def new_sale(request):
             follow_up = '2010-06-10'
 
         sale_header = SaleHeader(sale_no = sale_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = withholding_tax, account_id = account_id, follow_up = follow_up, credit_days = credit_days, company_id = company, user_id = request.user)
-
+        cart = json.loads(request.POST.get('cartage'))
         items = json.loads(request.POST.get('items'))
         sale_header.save()
         header_id = SaleHeader.objects.get(sale_no = sale_id)
+        for value in cart:
+            cartage_ = Cartage_and_Po(cartage = value["cartage_amount"], po_no = value["po_no"], invoice_id = header_id.id)
+            cartage_.save()
+            cartage_sum = cartage_sum + float(value["cartage_amount"])
         for value in items:
             item_id = Add_products.objects.get(id = value["id"])
             sale_detail = SaleDetail(item_id = item_id,  quantity = value["quantity"],cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], dc_ref = value["dc_no"], sale_id = header_id, hs_code = value["hs_code"])
@@ -1193,11 +1202,7 @@ def new_sale(request):
                                     )as tblData where tblData.SaleId = %s
                                     order by po_no''',[header_id])
         cartage_amounts = cartage_amounts.fetchall()
-        print(cartage_amounts)
-        for c in cartage_amounts:
-            ca = ca + c[1]
-            print(ca)
-        total_amount = total_amount + ca
+        total_amount = total_amount + cartage_sum
         cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
         if payment_method == 'Cash':
             tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit",  ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
@@ -1324,6 +1329,7 @@ def direct_sale(request, pk):
 @user_passes_test(allow_sale_edit)
 def edit_sale(request,pk):
     ca = 0
+    cartage_sum = 0
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
     company = Q(company_id = company)
@@ -1336,6 +1342,7 @@ def edit_sale(request,pk):
     cursor = connection.cursor()
     all_item_code = Add_products.objects.all()
     sale_header = SaleHeader.objects.filter(company, id = pk).first()
+    cartages = Cartage_and_Po.objects.filter(invoice_id = sale_header.id).all()
     sale_detail = SaleDetail.objects.filter(sale_id = sale_header.id).all()
     all_accounts = ChartOfAccount.objects.all()
     customer_name_sale = request.POST.get('customer_name_sale')
@@ -1434,14 +1441,322 @@ def edit_sale(request,pk):
 
         sale_header.save()
 
+        cart = json.loads(request.POST.get('cartage'))
         items = json.loads(request.POST.get('items'))
         sale_header.save()
         header_id = SaleHeader.objects.get(sale_no = sale_id)
+        Cartage_and_Po.objects.filter(invoice_id = header_id.id).all().delete()
+        for value in cart:
+            cartage_ = Cartage_and_Po(cartage = value["cartage_amount"], po_no = value["po_no"], invoice_id = header_id.id)
+            cartage_.save()
+            cartage_sum = cartage_sum + float(value["cartage_amount"])
         for value in items:
             company =  request.session['company']
             company = Company_info.objects.get(id = company)
             item_id = Add_products.objects.get(id = value["id"])
             sale_detail = SaleDetail(item_id = item_id, quantity = value["quantity"], cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], sale_id = header_id, dc_ref = value["dc_no"], hs_code = value["hs_code"])
+            sale_detail.save()
+            quantity = float(value["quantity"])
+            price =  float((value["price"]))
+            sales_tax = float(value["sales_tax"])
+            amount = (((quantity * price) * sales_tax) / 100)
+            amount = ((quantity * price ) + amount)
+            item_amount = item_amount + amount
+        item_amount = item_amount + float(cartage_amount) + float(additional_tax)
+        total_amount = item_amount
+        header_id = header_id.id
+        total_amount = total_amount + cartage_sum
+        cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
+        if sale_header.payment_method == 'Cash':
+            refrence_id = Q(refrence_id = header_id)
+            tran_type = Q(tran_type = "Sale Invoice")
+            delete = Transactions.objects.filter(refrence_id, tran_type)
+            delete.delete()
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, ref_inv_tran_id = 0, ref_inv_tran_type = "" ,remarks = "Amount Debit", company_id = company, user_id = request.user)
+            tran1.save()
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit",  ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
+            tran2.save()
+        else:
+            refrence_id = Q(refrence_id = header_id)
+            tran_type = Q(tran_type = "Sale Invoice")
+            delete = Transactions.objects.filter(refrence_id, tran_type)
+            delete.delete()
+            sale_account = ChartOfAccount.objects.get(account_title = 'Sales')
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit", ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
+            tran1.save()
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_account, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit", ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
+            tran2.save()
+        return JsonResponse({'result':'success'})
+    return render(request, 'transaction/edit_sale.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'sale_header':sale_header, 'sale_detail':sale_detail, 'pk':pk, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser,'cartages':cartages})
+
+
+@user_passes_test(allow_sale_delete)
+def delete_sale(request,pk):
+    sale = SaleHeader.objects.get(id= pk)
+    if sale.payment_method == 'Cash':
+        Transactions.objects.filter(refrence_id= sale.id,tran_type= "Sale Invoice").all().delete()
+        SaleDetail.objects.filter(sale_id_id= pk).all().delete()
+        SaleHeader.objects.filter(id= pk).all().delete()
+
+    elif sale.payment_method == "Credit":
+        Transactions.objects.filter(ref_inv_tran_id= sale.id,ref_inv_tran_type= "Sale BRV").all().delete()
+        Transactions.objects.filter(ref_inv_tran_id= sale.id,ref_inv_tran_type= "Sale CRV").all().delete()
+        SaleDetail.objects.filter(sale_id_id= pk).all().delete()
+        SaleHeader.objects.filter(id= pk).all().delete()
+
+    messages.add_message(request, messages.SUCCESS, "Sale Deleted")
+    return redirect('sale')
+
+
+@user_passes_test(allow_sale_add)
+def new_sale_non_gst(request):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
+    item_amount = 0
+    total_amount = 0
+    get_account = ''
+    ca = 0
+    cartage_sum = 0
+    cursor = connection.cursor()
+
+    # dc_detail = cursor.execute('''Select Distinct id,item_code, item_name, item_description From (
+    #                             Select distinct dc_id_id,DC.item_code,DC.Item_name,DC.Item_description,
+    #                             DC.Quantity As DcQuantity,
+    #                             ifnull(sum(SD.Quantity),0) As SaleQuantity,
+    #                             (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
+    #                             from customer_dcdetailcustomer DC
+    #                             Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+    #                             And SD.item_code = DC.item_code
+    #                             group by dc_id_id,dc.item_code,dc.Item_name
+    #                             ) As tblData
+    #                             Inner Join customer_dcheadercustomer  HD on  HD.id = tblData.dc_id_id
+    #                             Where RemainingQuantity > 0
+    #                             group by tblData.item_code''')
+    # dc_detail = dc_detail.fetchall()
+
+    customer_name_sale = request.POST.get('customer_name_sale')
+    if customer_name_sale:
+        try:
+            get_account = ChartOfAccount.objects.get(account_title = customer_name_sale)
+            if get_account:
+                customer_dc = cursor.execute('''Select Distinct id,dc_no,accountid,account_title From (
+                                            Select distinct dc_id_id,COA.id As accountid,COA.account_title,IP.product_code,IP.product_name,
+                                            DC.Quantity As DcQuantity,ifnull(sum(SD.Quantity),0) As SaleQuantity,
+                                            (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
+                                            from customer_dcdetailcustomer DC
+                                            inner join customer_dcHeadercustomer HDDC on DC.dc_id_id = HDDC.id
+                                            inner join transaction_chartofaccount COA on HDDC.account_id_id = COA.id
+                                            inner join inventory_add_products IP on DC.item_id_id = IP.id
+                                            Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+                                            And SD.item_id_id = IP.id
+                                            group by dc_id_id,COA.id,COA.account_title,IP.product_code,IP.product_name
+                                            ) As tblData
+                                            Inner Join customer_dcheadercustomer HD on  HD.id = tblData.dc_id_id
+                                            Where RemainingQuantity > 0 AND accountid = %s AND HD.company_id_id = %s ''',[get_account.id, company.id])
+                customer_dc = customer_dc.fetchall()
+                return JsonResponse({'customer_dc':customer_dc})
+        except ObjectDoesNotExist:
+            return JsonResponse({'customer_dc':'False'})
+
+    all_dc = request.POST.get('all_dc')
+    if all_dc:
+        all_dc = cursor.execute('''Select Distinct id,dc_no,accountid,account_title From (
+                                Select distinct dc_id_id,COA.id As accountid,COA.account_title,IP.product_code,IP.product_name,
+                                DC.Quantity As DcQuantity,ifnull(sum(SD.Quantity),0) As SaleQuantity,
+                                (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
+                                from customer_dcdetailcustomer DC
+                                inner join customer_dcHeadercustomer HDDC on DC.dc_id_id = HDDC.id
+                                inner join transaction_chartofaccount COA on HDDC.account_id_id = COA.id
+                                inner join inventory_add_products IP on DC.item_id_id = IP.id
+                                Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+                                And SD.item_id_id = IP.id
+                                group by dc_id_id,COA.id,COA.account_title,IP.product_code,IP.product_name
+                                ) As tblData
+                                Inner Join customer_dcheadercustomer HD on  HD.id = tblData.dc_id_id
+                                Where RemainingQuantity > 0 AND HD.company_id_id = %s ''',[company.id])
+        all_dc = all_dc.fetchall()
+        return JsonResponse({'all_dc':all_dc})
+
+    all_accounts = ChartOfAccount.objects.all()
+    get_last_sale_no = SaleHeader.objects.last()
+    if get_last_sale_no:
+        get_last_sale_no = get_last_sale_no.sale_no
+        get_last_sale_no = get_last_sale_no[-3:]
+        num = int(get_last_sale_no)
+        num = num + 1
+        get_last_sale_no = 'SAL/' + str(num)
+    else:
+        get_last_sale_no = 'SAL/101'
+    dc_code_sale = request.POST.get('dc_code_sale',False)
+    if dc_code_sale:
+
+        header_id = DcHeaderCustomer.objects.get(dc_no = dc_code_sale)
+        data = cursor.execute('''Select * From (
+                            Select distinct dc_id_id,IP.id,IP.product_code,IP.product_name, IP.product_desc, IP.unit,
+                            DC.Quantity As DcQuantity,
+                            ifnull(sum(SD.Quantity),0) As SaleQuantity,
+                            (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
+                            from customer_dcdetailcustomer DC
+                            inner join inventory_add_products IP on IP.id = DC.item_id_id
+                            Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+                            And SD.item_id_id = IP.id
+                            group by dc_id_id,IP.product_code,IP.product_name
+                            ) As tblData
+                            Where RemainingQuantity > 0 And dc_id_id = %s
+                            ''',[header_id.id])
+        row = data.fetchall()
+        hs_code = cursor.execute('''select hs_code from transaction_saledetail group by hs_code''')
+        hs_code = hs_code.fetchall()
+        # hs_code = serializers.serialize('json',hs_code)
+        return JsonResponse({"row":row,'dc_ref':header_id.id, 'hs_code':hs_code})
+    # get_item_code = request.POST.get('item_code', False)
+    # quantity = request.POST.get('quantity', False)
+    # if get_item_code:
+    #     cursor = connection.cursor()
+    #     cursor.execute('''Select item_code, item_name,Item_description,Unit,SUM(quantity) As qty From (
+    #                     Select 'Opening Stock' As TranType,Product_Code As Item_Code,Product_Name As Item_name,Product_desc As Item_description,Unit As unit,Opening_Stock as Quantity From inventory_add_products
+    #                     where product_code = %s
+    #                     union All
+    #                     Select 'Purchase' As TranType,Item_Code,Item_name,Item_description,unit,Quantity From transaction_purchasedetail
+    #                     where item_code = %s
+    #                     union All
+    #                     Select 'Purchase Return' As TranType,Item_Code,Item_name,Item_description,unit,Quantity * -1 From transaction_purchasereturndetail
+    #                     where item_code = %s
+    #                     union All
+    #                     Select 'Sale' As TranType,Item_Code,Item_name,Item_description,unit,Quantity * -1 From transaction_saledetail
+    #                     where item_code = %s
+    #                     union All
+    #                     Select 'Sale Return' As TranType,Item_Code,Item_name,Item_description,unit,Quantity  From transaction_salereturndetail
+    #                     where item_code = %s
+    #                     ) As tblTemp
+    #                     Group by Item_Code''',[get_item_code,get_item_code,get_item_code,get_item_code,get_item_code])
+    #     row = cursor.fetchall()
+    #     a = row[0][4]
+    #     b = quantity
+    #     if str(a) > str(b):
+    #         print(quantity)
+    #         print(row[0][4])
+    #         return JsonResponse({"message":"True"})
+    #     else:
+    #         return JsonResponse({"message":"False"})
+    if request.method == 'POST':
+        sale_id = request.POST.get('sale_id',False)
+        customer = request.POST.get('customer',False)
+        follow_up = request.POST.get('follow_up',False)
+        credit_days = request.POST.get('credit_days',False)
+        payment_method = request.POST.get('payment_method',False)
+        footer_desc = request.POST.get('footer_desc',False)
+        account_id = ChartOfAccount.objects.get(account_title = customer)
+        date = datetime.date.today()
+
+        if follow_up:
+            follow_up = follow_up
+        else:
+            follow_up = '2010-06-10'
+
+        sale_header = SaleHeader(sale_no = sale_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = 0.00, additional_tax = 0.00, withholding_tax = 0.00, account_id = account_id, follow_up = follow_up, credit_days = credit_days, company_id = company, user_id = request.user)
+        cart = json.loads(request.POST.get('cartage'))
+        items = json.loads(request.POST.get('items'))
+        sale_header.save()
+        header_id = SaleHeader.objects.get(sale_no = sale_id)
+        print(cart)
+        for value in cart:
+            cartage_ = Cartage_and_Po(cartage = value["cartage_amount"], po_no = value["po_no"], invoice_id = header_id.id)
+            cartage_.save()
+            cartage_sum = cartage_sum + float(value["cartage_amount"])
+            print(cartage_sum)
+        for value in items:
+            item_id = Add_products.objects.get(id = value["id"])
+            sale_detail = SaleDetail(item_id = item_id,  quantity = value["quantity"],cost_price = value["price"], retail_price = 0, sales_tax = 0, dc_ref = value["dc_no"], sale_id = header_id, hs_code = "")
+            sale_detail.save()
+            quantity = float(value["quantity"])
+            price =  float((value["price"]))
+            amount = quantity * price
+            item_amount = item_amount + amount
+        total_amount = item_amount
+        header_id = header_id.id
+        total_amount = total_amount + cartage_sum
+        cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
+        if payment_method == 'Cash':
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit",  ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
+            tran1.save()
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit",   ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
+            tran2.save()
+        else:
+            sale_account = ChartOfAccount.objects.get(account_title = 'Sales')
+            tran1 = Transactions(refrence_id = 0, refrence_date = date, account_id = account_id, tran_type = "", amount = total_amount, date = date, remarks = "Amount Debit",  ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice" ,company_id = company, user_id = request.user)
+            tran1.save()
+            tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = sale_account, tran_type = "", amount = -abs(total_amount), date = date, remarks = "Amount Debit",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice", company_id = company, user_id = request.user)
+            tran2.save()
+        return JsonResponse({'result':'success'})
+    return render(request, 'transaction/new_sale_non_gst.html',{'get_last_sale_no':get_last_sale_no, 'all_accounts':all_accounts, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+
+
+def direct_sale_non_gst(request, pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
+    dc_header = DcHeaderCustomer.objects.filter(id = pk).first()
+    header_id = DcHeaderCustomer.objects.get(id = pk)
+    cursor = connection.cursor()
+    dc_detail = cursor.execute('''Select * From (
+                                Select distinct dc_id_id,IP.id,IP.product_code,IP.product_name, IP.product_desc, IP.unit,
+                                DC.Quantity As DcQuantity,
+                                ifnull(sum(SD.Quantity),0) As SaleQuantity,
+                                (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
+                                from customer_dcdetailcustomer DC
+                                inner join inventory_add_products IP on IP.id = DC.item_id_id
+                                Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+                                And SD.item_id_id = IP.id
+                                group by dc_id_id,ip.product_code,ip.product_name
+                                ) As tblData
+                                Where RemainingQuantity > 0 And dc_id_id = %s ''',[header_id.id])
+    dc_detail = dc_detail.fetchall()
+    item_amount = 0
+    total_amount = 0
+    all_item_code = Add_products.objects.all()
+    all_accounts = ChartOfAccount.objects.all()
+    get_last_sale_no = SaleHeader.objects.last()
+    if get_last_sale_no:
+        get_last_sale_no = get_last_sale_no.sale_no
+        get_last_sale_no = get_last_sale_no[-3:]
+        num = int(get_last_sale_no)
+        num = num + 1
+        get_last_sale_no = 'SAL/' + str(num)
+    else:
+        get_last_sale_no = 'SAL/101'
+    item_code = request.POST.get('item_code_sale',False)
+    if item_code:
+        data = Add_products.objects.filter(product_code = item_code)
+        row = serializers.serialize('json',data)
+        return HttpResponse(json.dumps({'row':row}))
+    if request.method == 'POST':
+        sale_id = request.POST.get('sale_id',False)
+        customer = request.POST.get('customer',False)
+        payment_method = request.POST.get('payment_method',False)
+        footer_desc = request.POST.get('footer_desc',False)
+        cartage_amount = request.POST.get('cartage_amount',False)
+        additional_tax = request.POST.get('additional_tax',False)
+        withholding_tax = request.POST.get('withholding_tax',False)
+        account_id = ChartOfAccount.objects.get(account_title = customer)
+        date = datetime.date.today()
+
+        sale_header = SaleHeader(sale_no = sale_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = withholding_tax, account_id = account_id, follow_up = '2010-06-10', company_id = company, user_id = request.user)
+
+        items = json.loads(request.POST.get('items'))
+        cart = json.loads(request.POST.get('cartage'))
+        sale_header.save()
+        header_id = SaleHeader.objects.get(sale_no = sale_id)
+        for value in items:
+            item_id = Add_products.objects.get(id = value["id"])
+            sale_detail = SaleDetail(item_id = item_id,  quantity = value["quantity"], cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], dc_ref = value["dc_no"] ,sale_id = header_id, hs_code = value["hs_code"])
             sale_detail.save()
             quantity = float(value["quantity"])
             price =  float((value["price"]))
@@ -1469,7 +1784,154 @@ def edit_sale(request,pk):
         for c in cartage_amounts:
             ca = ca + c[1]
             print(ca)
-        total_amount = total_amount + ca
+        cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
+        if payment_method == 'Cash':
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit",ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
+            tran1.save()
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit",ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
+            tran2.save()
+        else:
+            sale_account = ChartOfAccount.objects.get(account_title = 'Sales')
+            tran1 = Transactions(refrence_id = 0, refrence_date = date, account_id = account_id, tran_type = "", amount = total_amount, date = date, remarks = "Amount Debit",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice", company_id = company, user_id = request.user)
+            tran1.save()
+            tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = sale_account, tran_type = "", amount = -abs(total_amount), date = date, remarks = "Amount Debit",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice", company_id = company, user_id = request.user)
+            tran2.save()
+        return JsonResponse({'result':'success'})
+    return render(request, 'transaction/direct_invoice_non_gst.html',{'all_item_code':all_item_code,'get_last_sale_no':get_last_sale_no, 'all_accounts':all_accounts, 'dc_header':dc_header, 'dc_detail':dc_detail, 'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+
+
+
+@user_passes_test(allow_sale_edit)
+def edit_sale_non_gst(request,pk):
+    ca = 0
+    cartage_sum = 0
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
+    item_amount = 0
+    total_amount = 0
+    cursor = connection.cursor()
+    all_item_code = Add_products.objects.all()
+    sale_header = SaleHeader.objects.filter(company, id = pk).first()
+    cartages = Cartage_and_Po.objects.filter(invoice_id = sale_header.id).all()
+    sale_detail = SaleDetail.objects.filter(sale_id = sale_header.id).all()
+    all_accounts = ChartOfAccount.objects.all()
+    customer_name_sale = request.POST.get('customer_name_sale')
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    if customer_name_sale:
+        try:
+            get_account = ChartOfAccount.objects.get(account_title = customer_name_sale)
+            if get_account:
+                customer_dc = cursor.execute('''Select Distinct id,dc_no,accountid,account_title From (
+                                            Select distinct dc_id_id,COA.id As accountid,COA.account_title,IP.product_code,IP.product_name,
+                                            DC.Quantity As DcQuantity,ifnull(sum(SD.Quantity),0) As SaleQuantity,
+                                            (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
+                                            from customer_dcdetailcustomer DC
+                                            inner join customer_dcHeadercustomer HDDC on DC.dc_id_id = HDDC.id
+                                            inner join transaction_chartofaccount COA on HDDC.account_id_id = COA.id
+                                            inner join inventory_add_products IP on DC.item_id_id = IP.id
+                                            Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+                                            And SD.item_id_id = IP.id
+                                            group by dc_id_id,COA.id,COA.account_title,IP.product_code,IP.product_name
+                                            ) As tblData
+                                            Inner Join customer_dcheadercustomer HD on  HD.id = tblData.dc_id_id
+                                            Where RemainingQuantity > 0 AND accountid = %s AND HD.company_id_id = %s ''',[get_account.id, company.id])
+                customer_dc = customer_dc.fetchall()
+                return JsonResponse({'customer_dc':customer_dc})
+        except ObjectDoesNotExist:
+            return JsonResponse({'customer_dc':'False'})
+
+    all_dc = request.POST.get('all_dc')
+    if all_dc:
+        all_dc = cursor.execute('''Select Distinct id,dc_no,accountid,account_title From (
+                                Select distinct dc_id_id,COA.id As accountid,COA.account_title,IP.product_code,IP.product_name,
+                                DC.Quantity As DcQuantity,ifnull(sum(SD.Quantity),0) As SaleQuantity,
+                                (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
+                                from customer_dcdetailcustomer DC
+                                inner join customer_dcHeadercustomer HDDC on DC.dc_id_id = HDDC.id
+                                inner join transaction_chartofaccount COA on HDDC.account_id_id = COA.id
+                                inner join inventory_add_products IP on DC.item_id_id = IP.id
+                                Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+                                And SD.item_id_id = IP.id
+                                group by dc_id_id,COA.id,COA.account_title,IP.product_code,IP.product_name
+                                ) As tblData
+                                Inner Join customer_dcheadercustomer HD on  HD.id = tblData.dc_id_id
+                                Where RemainingQuantity > 0 AND HD.company_id_id = %s ''',[company.id])
+        all_dc = all_dc.fetchall()
+        return JsonResponse({'all_dc':all_dc})
+    dc_code_sale = request.POST.get('dc_code_sale')
+    if dc_code_sale:
+
+        header_id = DcHeaderCustomer.objects.get(dc_no = dc_code_sale)
+        data = cursor.execute('''Select * From (
+                            Select distinct dc_id_id,IP.id,IP.product_code,IP.product_name, IP.product_desc, IP.unit,
+                            DC.Quantity As DcQuantity,
+                            ifnull(sum(SD.Quantity),0) As SaleQuantity,
+                            (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
+                            from customer_dcdetailcustomer DC
+                            inner join inventory_add_products IP on IP.id = DC.item_id_id
+                            Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+                            And SD.item_id_id = IP.id
+                            group by dc_id_id,IP.product_code,IP.product_name
+                            ) As tblData
+                            Where RemainingQuantity > 0 And dc_id_id = %s
+                            ''',[header_id.id])
+        row = data.fetchall()
+        hs_code = cursor.execute('''select hs_code from transaction_saledetail group by hs_code''')
+        hs_code = hs_code.fetchall()
+        return JsonResponse({"row":row,'dc_ref':header_id.id, 'hs_code':hs_code})
+    if request.method == 'POST':
+        sale_detail.delete()
+
+        sale_id = request.POST.get('sale_id',False)
+        customer = request.POST.get('customer',False)
+        credit_days = request.POST.get('credit_days',False)
+        follow_up = request.POST.get('follow_up',False)
+        payment_method = request.POST.get('payment_method',False)
+        footer_desc = request.POST.get('footer_desc',False)
+        account_id = ChartOfAccount.objects.get(account_title = customer)
+        date = datetime.date.today()
+
+        if follow_up:
+            follow_up = follow_up
+        else:
+            follow_up = '2010-06-10'
+
+        sale_header.follow_up = follow_up
+        sale_header.credit_days = credit_days
+        sale_header.payment_method = payment_method
+        sale_header.footer_description = footer_desc
+        sale_header.account_id = account_id
+
+        sale_header.save()
+
+        cart = json.loads(request.POST.get('cartage'))
+        items = json.loads(request.POST.get('items'))
+        sale_header.save()
+        header_id = SaleHeader.objects.get(sale_no = sale_id)
+        Cartage_and_Po.objects.filter(invoice_id = header_id.id).all().delete()
+        for value in cart:
+            cartage_ = Cartage_and_Po(cartage = value["cartage_amount"], po_no = value["po_no"], invoice_id = header_id.id)
+            cartage_.save()
+            cartage_sum = cartage_sum + float(value["cartage_amount"])
+        for value in items:
+            company =  request.session['company']
+            company = Company_info.objects.get(id = company)
+            item_id = Add_products.objects.get(id = value["id"])
+            sale_detail = SaleDetail(item_id = item_id, quantity = value["quantity"], cost_price = value["price"], retail_price = 0, sales_tax = 0, sale_id = header_id, dc_ref = value["dc_no"], hs_code = "")
+            sale_detail.save()
+            quantity = float(value["quantity"])
+            price =  float((value["price"]))
+            amount = quantity * price
+            item_amount = item_amount + amount
+        total_amount = item_amount
+        header_id = header_id.id
+        total_amount = total_amount + cartage_sum
         cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
         if sale_header.payment_method == 'Cash':
             refrence_id = Q(refrence_id = header_id)
@@ -1491,11 +1953,11 @@ def edit_sale(request,pk):
             tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_account, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit", ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/edit_sale.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'sale_header':sale_header, 'sale_detail':sale_detail, 'pk':pk, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/edit_sale_ngst.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'sale_header':sale_header, 'sale_detail':sale_detail, 'pk':pk, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser,'cartages':cartages})
 
 
 @user_passes_test(allow_sale_delete)
-def delete_sale(request,pk):
+def delete_sale_non_gst(request,pk):
     sale = SaleHeader.objects.get(id= pk)
     if sale.payment_method == 'Cash':
         Transactions.objects.filter(refrence_id= sale,tran_type= "Sale Invoice").all().delete()
@@ -1727,7 +2189,7 @@ def edit_chart_of_account(request,pk):
             opening_balance = 0
         if op_type == "credit":
             opening_balance = -abs(int(opening_balance))
-        
+
         coa.opening_balance = opening_balance
         coa.save()
         return redirect('chart-of-account')
@@ -2105,6 +2567,7 @@ def new_bank_receiving_voucher(request):
     # all_bank = ChartOfAccount.objects.all()
     all_invoices = SaleHeader.objects.filter(company).all()
     user = request.user
+    company =  request.session['company']
     if account_name:
         if check == "1":
             account_id = ChartOfAccount.objects.filter(account_title = bank_account).first()
@@ -2153,7 +2616,7 @@ def new_bank_receiving_voucher(request):
                                 Group By HD.ID,HD.account_id_id,account_title
                                 Having InvAmount > RcvAmount
                                 ) As tblPendingInvoice
-                                Order By ID''',[id.id,company.id,id.id,id.id,company.id])
+                                Order By ID''',[id,company.id,id.id,id.id,company.id])
             pi = pi.fetchall()
             return JsonResponse({'pi':pi,'bank_account':bank_account,'account_id':account_id.account_id})
     if request.method == "POST":
@@ -2656,8 +3119,6 @@ def brv_pdf(request, pk):
 
 def account_ledger(request):
     company =  request.session['company']
-    company = Company_info.objects.get(id = company)
-    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -2668,29 +3129,47 @@ def account_ledger(request):
         pk = request.POST.get('account_title')
         from_date = request.POST.get('from_date')
         to_date = request.POST.get('to_date')
-        company_info = Company_info.objects.all()
+        company_info = Company_info.objects.filter(id = company).all()
         image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
         cursor = connection.cursor()
-        cursor.execute('''Select tran_type,refrence_id,refrence_date,remarks,
+        cursor.execute('''Select Distinct account_id_id,tran_type,refrence_id,refrence_date,remarks,
                         Case When amount > -1 Then  amount Else 0 End As Debit,
-                        Case When amount < -1 Then  amount Else 0 End As Credit
-                        From transaction_transactions
-                        Where transaction_transactions.date Between %s And %s and transaction_transactions.account_id_id = %s
-                        Order By refrence_date Asc
-                    ''',[from_date, to_date, pk])
+                        Case When amount < -1 Then  amount Else 0 End As Credit from (
+                        Select * From transaction_transactions
+                        where account_id_id in (
+                        Case When (Select id from transaction_chartofaccount Where Parent_ID = %s)
+                        <> '' Then (Select id from transaction_chartofaccount Where Parent_ID = %s)
+                        Else (%s) END)
+                        Union all
+                        Select * From transaction_transactions
+                        where account_id_id in (%s)
+                        ) tblData
+                        Where refrence_date Between %s And %s
+                        Order By account_id_id,refrence_date Asc
+                    ''',[pk,pk,pk,pk,from_date, to_date])
         row = cursor.fetchall()
-        print(row)
-        for value in row:
-            print(value)
+        ledger_list = []
+        balance = 0
+        for i,value in enumerate(row):
+            balance = balance + float(value[5]) + float(value[6])
+            info = {
+            "date": value[3],
+            "voucher_no": value[2],
+            "debit":value[5],
+            "credit":value[6],
+            "balance": balance,
+            }
+            ledger_list.append(info)
+            print(balance)
         if row:
             for v in row:
-                if v[4] >= 0:
-                    debit_amount = debit_amount + v[4]
-                if v[5] <= 0:
-                    credit_amount = credit_amount + v[5]
+                if v[5] >= 0:
+                    debit_amount = debit_amount + v[5]
+                if v[6] <= 0:
+                    credit_amount = credit_amount + v[6]
         account_id = ChartOfAccount.objects.filter(id = pk).first()
         account_title = account_id.account_title
-        pdf = render_to_pdf('transaction/account_ledger_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount, 'account_title':account_title, 'from_date':from_date,'to_date':to_date,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+        pdf = render_to_pdf('transaction/account_ledger_pdf.html', {'ledger_list':ledger_list,'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount, 'account_title':account_title, 'from_date':from_date,'to_date':to_date,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "TrialBalance%s.pdf" %("000")
@@ -2877,6 +3356,7 @@ def sale_summary_item_wise(request):
 
 
 def sales_tax_invoice(request,pk):
+    company = request.session["company"]
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -2886,8 +3366,7 @@ def sales_tax_invoice(request,pk):
     total_amount_item = 0
     tax_amount = 0
     ca = 0
-    company_info = Company_info.objects.filter(id=1)
-    image = Company_info.objects.filter(company_name = "Hamza Enterprises").first()
+    company_info = Company_info.objects.filter(id=company)
     header = SaleHeader.objects.filter(id = pk).first()
     detail = cursor.execute('''Select SaleId,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax from(
                             select SD.sale_id_id as SaleID, PS.id,PS.product_name as product_name, PS.product_desc as product_desc, PS.unit as unit,
@@ -2902,24 +3381,11 @@ def sales_tax_invoice(request,pk):
                             )as tblData where tblData.SaleId = %s ''',[pk])
     detail = detail.fetchall()
     hs_code = SaleDetail.objects.filter(sale_id = pk).first()
-    parent_company_name = ChartOfAccount.objects.filter(id = 19).first()
-    cartage_amounts = cursor.execute('''Select SaleId,Cartage_amount ,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax from(
-                                select SD.sale_id_id as SaleID, sum(DC.cartage_amount) as Cartage_amount, PS.id,PS.product_name as product_name, PS.product_desc as product_desc, PS.unit as unit,
-                                SD.quantity as quantity, SD.cost_price as cost_price, SD.sales_tax as sales_tax,
-                                DC.dc_no as DcNo, DCD.po_no  as po_no
-                                from transaction_saledetail SD
-                                inner join inventory_add_products PS on PS.id = SD.item_id_id
-                                inner join customer_dcheadercustomer DC on SD.dc_ref = DC.id
-                                inner join customer_dcdetailcustomer DCD on DCD.dc_id_id = DC.id
-                                left join customer_poheadercustomer PO on PO.id = DCD.po_no
-                                group by DCD.po_no
-                                )as tblData where tblData.SaleId = %s
-                                order by po_no''',[pk])
-    cartage_amounts = cartage_amounts.fetchall()
-    print(cartage_amounts)
-    for c in cartage_amounts:
-        ca = ca + c[1]
-        print(ca)
+    if header.account_id.parent_id == 5:
+        parent_company_name = header.account_id
+    else:
+        parent_company_name = ChartOfAccount.objects.filter(id = header.account_id.parent_id).first()
+    print(parent_company_name)
     for value in detail:
         lines = lines + len(value[4].split('\n'))
         amount = float(value[7] * value[6])
@@ -2929,11 +3395,11 @@ def sales_tax_invoice(request,pk):
         tax_amount = round(tax_amount)
         total_amount_item = total_amount_item + sales_tax_amount
         total_amount_item = round(total_amount_item)
-    total_amount = total_amount_item + ca + header.additional_tax
+    total_amount = total_amount_item
     total_amount = round(total_amount)
     lines = lines + len(detail) + len(detail)
     total_lines = 36 - lines
-    pdf = render_to_pdf('transaction/sales_tax_invoice_pdf_lines.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount_item':total_amount_item,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser, 'parent_company_name':parent_company_name, 'cartage_amounts':cartage_amounts,'tax_amount':tax_amount,'total_amount':total_amount,'hs_code':hs_code,'allow_report_roles':report_roles(request.user)})
+    pdf = render_to_pdf('transaction/sales_tax_invoice_pdf_lines.html', {'company_info':company_info,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount_item':total_amount_item,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser, 'parent_company_name':parent_company_name,'tax_amount':tax_amount,'total_amount':total_amount,'hs_code':hs_code,'allow_report_roles':report_roles(request.user)})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "SaleTaxInvoice%s.pdf" %(header.sale_no)
@@ -2944,6 +3410,7 @@ def sales_tax_invoice(request,pk):
 
 
 def commercial_invoice(request,pk):
+    company = request.session["company"]
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -2952,9 +3419,8 @@ def commercial_invoice(request,pk):
     lines = 0
     total_amount_item = 0
     tax_amount = 0
-    ca = 0
-    company_info = Company_info.objects.filter(id=1)
-    image = Company_info.objects.filter(company_name = "Hamza Enterprises").first()
+    cartage = 0
+    company_info = Company_info.objects.filter(id=company)
     header = SaleHeader.objects.filter(id = pk).first()
     detail = cursor.execute('''Select SaleId,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax from(
                             select SD.sale_id_id as SaleID, PS.id,PS.product_name as product_name, PS.product_desc as product_desc, PS.unit as unit,
@@ -2969,22 +3435,14 @@ def commercial_invoice(request,pk):
                             )as tblData where tblData.SaleId = %s ''',[pk])
     detail = detail.fetchall()
     hs_code = SaleDetail.objects.filter(sale_id = pk).first()
-    parent_company_name = ChartOfAccount.objects.filter(id = 19).first()
-    cartage_amounts = cursor.execute('''Select SaleId,Cartage_amount ,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax from(
-                                select SD.sale_id_id as SaleID, sum(DC.cartage_amount) as Cartage_amount, PS.id,PS.product_name as product_name, PS.product_desc as product_desc, PS.unit as unit,
-                                SD.quantity as quantity, SD.cost_price as cost_price, SD.sales_tax as sales_tax,
-                                DC.dc_no as DcNo, DCD.po_no  as po_no
-                                from transaction_saledetail SD
-                                inner join inventory_add_products PS on PS.id = SD.item_id_id
-                                inner join customer_dcheadercustomer DC on SD.dc_ref = DC.id
-                                inner join customer_dcdetailcustomer DCD on DCD.dc_id_id = DC.id
-                                left join customer_poheadercustomer PO on PO.id = DCD.po_no
-                                group by DCD.po_no
-                                )as tblData where tblData.SaleId = '2'
-                                order by po_no''')
-    cartage_amounts = cartage_amounts.fetchall()
-    for c in cartage_amounts:
-        ca = ca + c[1]
+    if header.account_id.parent_id == 5 or header.account_id.parent_id == 13:
+        parent_company_name = header.account_id
+    else:
+        parent_company_name = ChartOfAccount.objects.filter(id = header.account_id.parent_id).first()
+    print(parent_company_name)
+    cartage_amounts = Cartage_and_Po.objects.filter(invoice_id = pk).all()
+    for value in cartage_amounts:
+        cartage = cartage + value.cartage
     for value in detail:
         lines = lines + len(value[4].split('\n'))
         amount = float(value[7] * value[6])
@@ -2994,11 +3452,64 @@ def commercial_invoice(request,pk):
         tax_amount = round(tax_amount)
         total_amount_item = total_amount_item + sales_tax_amount
         total_amount_item = round(total_amount_item)
-    total_amount = total_amount_item + ca + header.additional_tax
+    total_amount = total_amount_item + cartage + header.additional_tax
     total_amount = round(total_amount)
     lines = lines + len(detail) + len(detail)
     total_lines = 36 - lines
-    pdf = render_to_pdf('transaction/commercial_invoice_pdf_lines.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount_item':total_amount_item,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser, 'parent_company_name':parent_company_name, 'cartage_amounts':cartage_amounts,'tax_amount':tax_amount,'total_amount':total_amount,'hs_code':hs_code,'allow_report_roles':report_roles(request.user)})
+    pdf = render_to_pdf('transaction/commercial_invoice_pdf_lines.html', {'company_info':company_info,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount_item':total_amount_item,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser, 'parent_company_name':parent_company_name, 'cartage_amounts':cartage_amounts,'tax_amount':tax_amount,'total_amount':total_amount,'hs_code':hs_code,'allow_report_roles':report_roles(request.user)})
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "SaleTaxInvoice%s.pdf" %(header.sale_no)
+        content = "inline; filename='%s'" %(filename)
+        response['Content-Disposition'] = content
+        return response
+    return HttpResponse("Not found")
+
+
+def commercial_invoice_non_gst(request,pk):
+    company = request.session["company"]
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
+    cursor = connection.cursor()
+    lines = 0
+    total_amount_item = 0
+    tax_amount = 0
+    cartage = 0
+    company_info = Company_info.objects.filter(id=company)
+    header = SaleHeader.objects.filter(id = pk).first()
+    detail = cursor.execute('''Select SaleId,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax from(
+                            select SD.sale_id_id as SaleID, PS.id,PS.product_name as product_name, PS.product_desc as product_desc, PS.unit as unit,
+                            SD.quantity as quantity, SD.cost_price as cost_price, SD.sales_tax as sales_tax,
+                            DC.dc_no as DcNo, DCD.PO_no  as po_no
+                            from transaction_saledetail SD
+                            inner join inventory_add_products PS on PS.id = SD.item_id_id
+                            inner join customer_dcheadercustomer DC on SD.dc_ref = DC.id
+                            inner join customer_dcdetailcustomer DCD on DCD.dc_id_id = DC.id
+                            left join customer_poheadercustomer PO on PO.id = DCD.po_no
+                            group by SD.id
+                            )as tblData where tblData.SaleId = %s ''',[pk])
+    detail = detail.fetchall()
+    hs_code = SaleDetail.objects.filter(sale_id = pk).first()
+    if header.account_id.parent_id == 5 or header.account_id.parent_id == 13:
+        parent_company_name = header.account_id
+    else:
+        parent_company_name = ChartOfAccount.objects.filter(id = header.account_id.parent_id).first()
+    print(parent_company_name)
+    cartage_amounts = Cartage_and_Po.objects.filter(invoice_id = pk).all()
+    for value in cartage_amounts:
+        cartage = cartage + value.cartage
+    for value in detail:
+        lines = lines + len(value[4].split('\n'))
+        amount = float(value[7] * value[6])
+        total_amount_item = total_amount_item + amount
+        total_amount_item = round(total_amount_item)
+    total_amount = total_amount_item + cartage
+    total_amount = round(total_amount)
+    lines = lines + len(detail) + len(detail)
+    total_lines = 36 - lines
+    pdf = render_to_pdf('transaction/commercial_invoice_pdf_non_gst.html', {'company_info':company_info,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount_item':total_amount_item,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser, 'parent_company_name':parent_company_name, 'cartage_amounts':cartage_amounts,'total_amount':total_amount,'allow_report_roles':report_roles(request.user)})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "SaleTaxInvoice%s.pdf" %(header.sale_no)
@@ -3029,6 +3540,7 @@ def new_multi_companies(request):
     if request.method == 'POST':
         company_name = request.POST.get('company_name')
         company_address = request.POST.get('company_address')
+        company_type = request.POST.get('company_type')
         phone_no = request.POST.get('phone_no')
         mobile_no = request.POST.get('mobile_no')
         email_address = request.POST.get('email_address')
@@ -3036,23 +3548,23 @@ def new_multi_companies(request):
         ntn = request.POST.get('ntn')
         stn = request.POST.get('stn')
         cnic = request.POST.get('cnic')
-        new_companies = Company_info(company_name = company_name, company_address = company_address, phone_no = phone_no, email = email_address,  website = web_site, ntn = ntn, stn = stn, cnic = cnic)
+        new_companies = Company_info(company_name = company_name, company_address = company_address, company_type = company_type ,phone_no = phone_no, email = email_address,  website = web_site, ntn = ntn, stn = stn, cnic = cnic)
         new_companies.save()
     return render(request,'transaction/new_multi_company.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(Is_superuser)
 def edit_multi_companies(request,pk):
-    company = Company_info.objects.get(id= pk)    
-    if request.method == 'POST':   
+    company = Company_info.objects.get(id= pk)
+    if request.method == 'POST':
         form = CompanyUpdateForm(request.POST,instance=company)
         if form.is_valid():
             form.save()
             messages.success(request, f'Company Profile has been updated!')
             return redirect('multi-companies')
     else:
-        form = CompanyUpdateForm(instance=company)    
-        
+        form = CompanyUpdateForm(instance=company)
+
     return render(request,'transaction/edit_multi_company.html',{'form':form})
 
 
@@ -3060,4 +3572,4 @@ def edit_multi_companies(request,pk):
 def delete_multi_companies(request,pk):
     Company_info.objects.filter(id= pk).all().delete()
     messages.add_message(request, messages.SUCCESS, "Company Deleted.")
-    return redirect('multi-companies')        
+    return redirect('multi-companies')

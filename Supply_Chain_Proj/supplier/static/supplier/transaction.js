@@ -42,10 +42,6 @@ $(document).ready(function(){
 
 	$(".has_id").click(function(){
 			 edit_id = this.id;
-			 console.log("HERE",edit_id);
-			 $.get("chart_of_account/edit/"+ edit_id, function(data, status){
-				alert("Data: " + data + "\nStatus: " + status);
-			});
 		});
 
 	function getCookie(c_name)
@@ -891,7 +887,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 						 })
 						 .done(function done(data){
 							 var type = JSON.parse(data.row);
-							 var index = $("table tbody tr:last-child").index();
+							 var index = $("#new-sale-table tbody tr:last-child").index();
 							 total_amount = (type[0].fields['unit_price'] * type[0].fields['quantity']);
 									 var row = '<tr>' +
 											 '<td>'+count+'</td>' +
@@ -911,7 +907,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 									 '</tr>';
 									 count++;
 								 $("table").append(row);
-							 $("table tbody tr").eq(index + 1).find(".edit-transaction-sale, .add-transaction-sale").toggle();
+							 $("#new-sale-table tbody tr").eq(index + 1).find(".edit-transaction-sale, .add-transaction-sale").toggle();
 									 $('[data-toggle="tooltip"]').tooltip();
 						 });
 					});
@@ -1006,7 +1002,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 						});
 
 
-					cartage_amount =	$('#cartage_amount').val();
+					cartage_amount =	0.00;
 					additional_tax = $('#additional_tax').val();
 					console.log(sum);
 					grand = parseFloat(cartage_amount) + parseFloat(additional_tax) +  sum;
@@ -1104,7 +1100,6 @@ $('#last_grand_total').val(amount.toFixed(2));
 				var additional_tax = parseFloat($('#additional_tax').val());
 				var grand_total = parseFloat(sum);
 				var a =  cartage_amount + additional_tax + grand_total;
-				console.log(a);
 				var withholding_tax =  a.toFixed(2) * i;
 				withholding_tax = withholding_tax / 100;
 				var amount =  withholding_tax + cartage_amount + additional_tax +  grand_total
@@ -1116,7 +1111,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 				var row = '<tr>' +
 						'<td><b>Cartage Amount:</b>&nbsp;&nbsp;&nbsp;</td>' +
 						'<td><input type="text" class="form-control form-control-sm" style="width:100px;" value="" id=""></td>' +
-						'<td>&nbsp;&nbsp;&nbsp;<b>PO No:</b>&nbsp;&nbsp;&nbsp;</td>' +
+						'<td>&nbsp;&nbsp;&nbsp;<b>Po No:</b>&nbsp;&nbsp;&nbsp;</td>' +
 						'<td><input type="text" class="form-control form-control-sm" style="width:100px;" value="" id=""></td>' +
 					 '<td><a class="add-cart" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-cartage" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-cartage" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 				'</tr>';
@@ -1203,7 +1198,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 						datax.push(rowx);
 					}
 				});
-
+				console.log(datax);
 					 req =	$.ajax({
 							headers: { "X-CSRFToken": getCookie("csrftoken") },
 							type: 'POST',
@@ -1232,50 +1227,58 @@ $('#last_grand_total').val(amount.toFixed(2));
 				e.preventDefault();
 				console.log("clicked");
 				var table = $('#new-sale-table-direct');
+				var table = $('#cartage-table');
 				var data = [];
+				var datax = [];
 				var sale_id = $('#sale_id').val();
 				var customer = $('#customer_name_sale').val();
 				var payment_method = $('#payment_method').val();
 				var footer_desc = $('#footer_desc').val();
-
-				var cartage_amount = $('#cartage_amount').val();
-				var additional_tax = $('#additional_tax').val();
-				var withholding_tax = $('#withholding_tax').val();
-
-
 				table.find('tr').each(function (i, el){
 					if(i != 0)
 					{
 						var $tds = $(this).find('td');
 						var row = {
 							'id' : "",
-							'hs_code': "",
 							'quantity' : "",
 							'price' : "",
-							'sales_tax' : "",
 							'dc_no': ""
 						};
 						$tds.each(function(i, el){
 							if (i === 1) {
 									row["id"] = ($(this).text());
 							}
-							if (i === 3) {
-									row["hs_code"] = ($(this).text());
-							}
-							else if (i === 6) {
+							else if (i === 5) {
 									row["quantity"] = ($(this).text());
 							}
-							else if (i === 8) {
+							else if (i === 7) {
 									row["price"] = ($(this).text());
 							}
 							else if (i === 10) {
-									row["sales_tax"] = ($(this).text());
-							}
-							else if (i === 13) {
 									row["dc_no"] = ($(this).text());
 							}
 						});
 						data.push(row);
+					}
+				});
+
+				cartage_table.find('tr').each(function (i, el){
+					if(i != 0)
+					{
+						var $tdc = $(this).find('td');
+						var rowx = {
+							'cartage_amount' : "",
+							'po_no': "",
+						};
+						$tdc.each(function(i, el){
+							if (i === 1) {
+									rowx["cartage_amount"] = ($(this).text());
+							}
+							if (i === 3) {
+									rowx["po_no"] = ($(this).text());
+							}
+						});
+						datax.push(rowx);
 					}
 				});
 
@@ -1292,6 +1295,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 								'additional_tax':additional_tax,
 								'withholding_tax':withholding_tax,
 								'items': JSON.stringify(data),
+								'cartage': JSON.stringify(datax),
 							},
 							dataType: 'json'
 						})
@@ -1303,6 +1307,532 @@ $('#last_grand_total').val(amount.toFixed(2));
 
 // // ==================================================================================================================================
 
+				var all_dc = 'all_dc';
+				req =	$.ajax({
+					 headers: { "X-CSRFToken": getCookie("csrftoken") },
+					 type: 'POST',
+					 url : '/transaction/sale/new/ngst',
+					 data:{
+						 'all_dc': all_dc,
+					 },
+					 dataType: 'json'
+				 })
+				 .done(function fun(data){
+					 $('#dc').html('');
+						 for (var j = 0; j < data.all_dc.length; j++) {
+							 console.log(data.all_dc[j][1]);
+								$("#dc").append($("<option>").attr('value',data.all_dc[j][1]).text(data.all_dc[j][1]));
+						 }
+				 });
+
+				$('#customer_name_sale').on('focusout', function(){
+					var customer_name_sale = $('#customer_name_sale').val();
+					if (customer_name_sale) {
+						req =	$.ajax({
+							 headers: { "X-CSRFToken": getCookie("csrftoken") },
+							 type: 'POST',
+							 url : '/transaction/sale/new/ngst',
+							 data:{
+								 'customer_name_sale': customer_name_sale,
+							 },
+							 dataType: 'json'
+						 })
+						 .done(function fun(data){
+							 $('#dc').html('');
+							 if (data.customer_dc === 'False') {
+								 alert("No Account found");
+							 }
+							 else {
+								 console.log(data.customer_dc);
+								 for (var j = 0; j < data.customer_dc.length; j++) {
+										$("#dc").append($("<option>").attr('value',data.customer_dc[j][1]).text(data.customer_dc[j][1]));
+								 }
+
+							 }
+						 });
+					}
+					else{
+						var all_dc = 'all_dc';
+						req =	$.ajax({
+							 headers: { "X-CSRFToken": getCookie("csrftoken") },
+							 type: 'POST',
+							 url : '/transaction/sale/new/ngst',
+							 data:{
+								 'all_dc': all_dc,
+							 },
+							 dataType: 'json'
+						 })
+						 .done(function fun(data){
+							 $('#dc').html('');
+								 for (var j = 0; j < data.all_dc.length; j++) {
+									 console.log(data.all_dc[j][1]);
+										$("#dc").append($("<option>").attr('value',data.all_dc[j][1]).text(data.all_dc[j][1]));
+								 }
+						 });
+					}
+				})
+
+
+				$(".add-item-sale-ngst").click(function(){
+					var item_code_sale = "";
+					var dc_code_sale = $('#dc_code_sale').val();
+					if (item_code_sale !== "") {
+						req =	$.ajax({
+							 headers: { "X-CSRFToken": getCookie("csrftoken") },
+							 type: 'POST',
+							 url : '/transaction/sale/new/ngst',
+							 data:{
+								 'item_code_sale': item_code_sale,
+							 },
+							 dataType: 'json'
+						 })
+						 .done(function done(data){
+							 var type = JSON.parse(data.row);
+							 console.log(type.length);
+							 var index = $("table tbody tr:last-child").index();
+									 var row = '<tr>' +
+											 '<td>'+count+'</td>' +
+											 '<td id="get_item_code">'+type[0].fields['item_code']+'</td>' +
+											 '<td>'+type[0].fields['item_name']+'</td>' +
+											 '<td id="desc" ><pre>'+type[0].fields['item_description']+'</pre></td>' +
+											 '<td width="160px" id="quantity"><input type="text" style="width:80px;" class="form-control" value=""></td>' +
+											 '<td>'+type[0].fields['unit']+'</td>' +
+											 '<td id="price" ><input type="text" style="width:80px;" class="form-control" value=""></td>' +
+											 '<td id="value_of_goods" >0.00</td>' +
+											 '<td id="total" style="font-weight:bold;" class="sum"><b>0.00</b></td>' +
+											 '<td style="display:none;">'+type[0].fields['dc_no']+'</td>' +
+								 '<td><a class="add-transaction-sale" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-transaction-sale" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="delete-transaction-sale" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+									 '</tr>';
+									 count++;
+								 $("#new-sale-table").append(row);
+							 $("table tbody tr").eq(index + 1).find(".edit-transaction-sale, .add-transaction-sale").toggle();
+									 $('[data-toggle="tooltip"]').tooltip();
+									 $('#item_code_sale').val("");
+						 });
+					}
+					else if (dc_code_sale !== "") {
+						req =	$.ajax({
+							 headers: { "X-CSRFToken": getCookie("csrftoken") },
+							 type: 'POST',
+							 url : '/transaction/sale/new/ngst',
+							 data:{
+								 'dc_code_sale': dc_code_sale,
+							 },
+							 dataType: 'json'
+						 })
+						 .done(function done(data){
+							 var index = $("#new-sale-table-ngst tbody tr:last-child").index();
+							 // total_amount = (type[0].fields['unit_price'] * type[0].fields['quantity']);
+							 for (var i = 0; i < data.row.length; i++) {
+								 console.log(data);
+								var row = '<tr>' +
+										'<td >'+count+'</td>'+
+										'<td style="display:none;">'+data.row[i][1]+'</td>'+
+										'<td id="get_item_code">'+data.row[i][2]+'</td>' +
+										'<td>'+data.row[i][3]+'</td>' +
+										'<td id="desc" ><pre>'+data.row[i][4]+'</pre></td>' +
+										'<td id="quantity"><input type="text" style="width:80px;" class="form-control" value="'+data.row[i][8]+'"></td>' +
+										'<td>'+data.row[i][5]+'</td>' +
+										'<td id="price" ><input type="text" style="width:80px;" class="form-control" value=""></td>' +
+										'<td id="value_of_goods" >0.00</td>' +
+										'<td id="total" style="font-weight:bold;" class="sum"><b>0.00</b></td>' +
+										'<td style="display:none;">'+data.dc_ref+'</td>' +
+							'<td><a class="add-transaction-sale-ngst" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-transaction-sale-ngst" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="delete-transaction-sale-ngst" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+								'</tr>';
+								count++;
+							$("#new-sale-table-ngst").append(row);
+						$("#new-sale-table-ngst tbody tr").eq(index + i+1).find(".edit-transaction-sale-ngst, .add-transaction-sale-ngst").toggle();
+								$('[data-toggle="tooltip"]').tooltip();
+							 }
+						 });
+					}
+				});
+
+				// FOR DIRECT SALE
+
+				$(".add-item-sale-direct").click(function(){
+					var item_code_sale = $('#item_code_sale').val();
+					req =	$.ajax({
+						 headers: { "X-CSRFToken": getCookie("csrftoken") },
+						 type: 'POST',
+						 url : `/transaction/dc/sale/new/ngst/${edit_id}`,
+						 data:{
+							 'item_code_sale': item_code_sale,
+						 },
+						 dataType: 'json'
+					 })
+					 .done(function done(data){
+						 var type = JSON.parse(data.row);
+						 var index = $("#new-sale-table-ngst tbody tr:last-child").index();
+						 total_amount = (type[0].fields['unit_price'] * type[0].fields['quantity']);
+								 var row = '<tr>' +
+										 '<td>'+count+'</td>' +
+										 '<td style="display:none;">'+type[0]['pk']+'</td>' +
+										 '<td id="get_item_code">'+ type[0].fields['product_code'] +'</td>' +
+										 '<td width="160px" id="hs_code"><input type="text" style="width:80px;" class="form-control" value=""></td>' +
+										 '<td>'+ type[0].fields['product_name'] +'</td>' +
+										 '<td id="desc" >'+ type[0].fields['product_desc'] +'</td>' +
+										 '<td id="quantity" width="100px" ><input type="text" class="form-control" value=""></td>' +
+										 '<td><input type="text" class="form-control" value=""></td>' +
+										 '<td id="price" ><input type="text" class="form-control" value=""></td>' +
+										 '<td id="value_of_goods" >0.00</td>' +
+										 '<td id="sales_tax"><input type="text" class="form-control" value=""></td>' +
+										 '<td id="sales_tax_amount">0.00</td>' +
+										 '<td id="total" style="font-weight:bold;" class="sum"><b>0.00</b></td>' +
+							 '<td><a class="add-transaction-sale-ngst" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-transaction-sale-ngst" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="delete-transaction-sale-ngst" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+								 '</tr>';
+								 count++;
+							 $("table").append(row);
+						 $("#new-sale-table-ngst tbody tr").eq(index + 1).find(".edit-transaction-sale, .add-transaction-sale").toggle();
+								 $('[data-toggle="tooltip"]').tooltip();
+					 });
+				});
+
+
+				// Add row on add button click
+				$(document).on("click", ".add-transaction-sale-ngst", function(){
+					console.log("clicked");
+					sum = 0;
+					tax = 0;
+				var get_item_code = $($(this).parents("tr").find("#get_item_code")).filter(function() {
+								item_code = $(this).text();
+								return item_code
+						}).closest("tr");
+
+						var empty = false;
+						var input = $(this).parents("tr").find('input[type="text"]');
+								input.each(function(){
+							if(!$(this).val()){
+								$(this).addClass("error");
+								empty = true;
+							}
+							else{
+									$(this).removeClass("error");
+									}
+						});
+
+						$(this).parents("tr").find(".error").first().focus();
+						if(!empty){
+							input.each(function(){
+								$(this).parent("td").html($(this).val());
+							});
+							$(this).parents("tr").find(".add-transaction-sale-ngst, .edit-transaction-sale-ngst").toggle();
+							$(".add-item-sale").removeAttr("disabled");
+						}
+
+				var get_price_edit = $($(this).parents("tr").find("#price")).filter(function() {
+								price = $(this).text();
+								return price
+						}).closest("tr");
+
+				var get_quantity = $($(this).parents("tr").find("#quantity")).filter(function() {
+								quantity = $(this).text();
+								return quantity
+						}).closest("tr");
+						console.log(quantity);
+				var set_valueOfGoods = $($(this).parents("tr").find("#value_of_goods")).filter(function() {
+								value_of_goods =  quantity * price
+								$(this).text(value_of_goods.toFixed(2))
+								return value_of_goods;
+						}).closest("tr");
+
+
+				var set_total = $($(this).parents("tr").find("#total")).filter(function() {
+								total = value_of_goods
+								$(this).text(total.toFixed(2));
+								return set_total;
+						}).closest("tr");
+
+						$($(this).parents("tr").find("#total")).each(function() {
+								var value = $(this).text();
+								// add only if the value is number
+								if(!isNaN(value) && value.length != 0) {
+										console.log(value);
+								}
+					});
+
+					$('#new-sale-table-ngst > tbody  > tr').each(function() {
+						 sum = sum + parseFloat($(this).find('td#total').text());
+					});
+
+					$('#new-sale-table-direct > tbody  > tr').each(function() {
+						 sum = sum + parseFloat($(this).find('td#total').text());
+					});
+
+
+				cartage_amount =	0.00;
+				additional_tax = 0.00;
+				console.log(sum);
+				grand = parseFloat(cartage_amount) + parseFloat(additional_tax) +  sum;
+				$('#last_grand_total').val(grand.toFixed(2));
+
+				});
+
+							// Edit row on edit button click
+				$(document).on("click", ".edit-transaction-sale-ngst", function(){
+					$(this).parents("tr").find("td:not(:last-child)").each(function(i){
+							if (i === 5) {
+								$(this).html('<input type="text" style="width:80px;" class="form-control" value="' + $(this).text() + '">');
+							}
+							if (i === 7) {
+								 $(this).html('<input type="text" style="width:80px;" class="form-control" value="' + $(this).text() + '">');
+							}
+
+				});
+				$(this).parents("tr").find(".add-transaction-sale, .edit-transaction-sale-ngst").toggle();
+				$(".add-item-sale").attr("disabled", "disabled");
+				});
+
+				// Delete row on delete button click
+				$(document).on("click", ".delete-transaction-sale-ngst", function(){
+					var row =  $(this).closest('tr');
+					var siblings = row.siblings();
+					siblings.each(function(index) {
+					$(this).children('td').first().text(index + 1);
+					});
+					$(this).parents("tr").remove();
+					$(".add-item-sale").removeAttr("disabled");
+				});
+
+				$('#cartage_amount').on('keyup',function(e){
+				var i = this.value;
+				var at = $('#additional_tax').val()
+				if(!isNaN(i) && i.length != 0){
+					if (!isNaN(at)) {
+							var a =  sum
+							var v =  parseFloat(a) + parseFloat(i) + parseFloat(at)
+							$('#last_grand_total').val(v.toFixed(2));
+					}
+					else {
+							var a =  sum
+							var v =  parseFloat(a) + parseFloat(i)
+							$('#last_grand_total').val(v.toFixed(2));
+					}
+				}
+				else {
+				if (!isNaN(at)) {
+					sum = parseFloat(at) + sum;
+					$('#last_grand_total').val(sum.toFixed(2));
+				}
+				else {
+					$('#last_grand_total').val(sum);
+				}
+				}
+				});
+
+				$('#additional_tax').on('keyup',function(){
+				var i = this.value;
+				var ac = $('#cartage_amount').val()
+				if(!isNaN(i) && i.length != 0){
+					if (!isNaN(ac)) {
+							var a =  sum
+							var v =  parseFloat(a) + parseFloat(i) + parseFloat(ac)
+							$('#last_grand_total').val(v.toFixed(2));
+					}
+					else {
+							var a =  sum
+							var v =  parseFloat(a) + parseFloat(i)
+							$('#last_grand_total').val(v.toFixed(2));
+					}
+				}
+				else {
+				if (!isNaN(ac)) {
+					sum = parseFloat(ac) + sum;
+					$('#last_grand_total').val(sum.toFixed(2));
+				}
+				else {
+					$('#last_grand_total').val(sum);
+				}
+				}
+
+				})
+
+
+				$('#withholding_tax').on('keyup',function(){
+				var i = this.value;
+				var cartage_amount = parseFloat($('#cartage_amount').val());
+				var additional_tax = parseFloat($('#additional_tax').val());
+				var grand_total = parseFloat(sum);
+				var a =  cartage_amount + additional_tax + grand_total;
+				var withholding_tax =  a.toFixed(2) * i;
+				withholding_tax = withholding_tax / 100;
+				var amount =  withholding_tax + cartage_amount + additional_tax +  grand_total
+				$('#last_grand_total').val(amount.toFixed(2));
+				})
+
+				$('.add-cartage-ngst').on('click', function(){
+					var index = $("#cartage-table tbody tr:last-child").index();
+				var row = '<tr>' +
+					'<td><b>Cartage Amount:</b>&nbsp;&nbsp;&nbsp;</td>' +
+					'<td><input type="text" class="form-control form-control-sm" style="width:100px;" value="" id=""></td>' +
+					'<td>&nbsp;&nbsp;&nbsp;<b>Po No:</b>&nbsp;&nbsp;&nbsp;</td>' +
+					'<td><input type="text" class="form-control form-control-sm" style="width:100px;" value="" id=""></td>' +
+				 '<td><a class="add-cart" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-cartage" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-cartage" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+				'</tr>';
+				$("#cartage-table").append(row);
+				$("#cartage-table tbody tr").eq(index + 1).find(".add-cart, .edit-cartage").toggle();
+				});
+
+				$('#new-sale-submit-ngst').on('submit',function(e){
+				e.preventDefault();
+				var table = $('#new-sale-table-ngst');
+				var cartage_table = $('#cartage-table');
+				var data = [];
+				var datax = [];
+				var sale_id = $('#sale_id').val();
+				var follow_up = $('#follow_up').val();
+				var credit_days = $('#credit_days').val();
+				var customer = $('#customer_name_sale').val();
+				var payment_method = $('#payment_method').val();
+				var footer_desc = $('#footer_desc').val();
+
+				console.log(cartage_table);
+				table.find('tr').each(function (i, el){
+				if(i != 0)
+				{
+					var $tds = $(this).find('td');
+					var row = {
+						'id' : "",
+						'quantity' : "",
+						'price' : "",
+						'dc_no': ""
+					};
+					$tds.each(function(i, el){
+						if (i === 1) {
+								row["id"] = ($(this).text());
+								console.log($(this).text());
+						}
+						else if (i === 5) {
+								row["quantity"] = ($(this).text());
+						}
+						else if (i === 7) {
+								row["price"] = ($(this).text());
+						}
+						else if (i === 10) {
+								row["dc_no"] = ($(this).text());
+								console.log($(this).text());
+						}
+					});
+					data.push(row);
+				}
+				});
+				cartage_table.find('tr').each(function (i, el){
+				if(i != 0)
+				{
+					var $tdc = $(this).find('td');
+					var rowx = {
+						'cartage_amount' : "",
+						'po_no': "",
+					};
+					$tdc.each(function(i, el){
+						if (i === 1) {
+								rowx["cartage_amount"] = ($(this).text());
+								console.log($(this).text());
+						}
+						if (i === 3) {
+								rowx["po_no"] = ($(this).text());
+								console.log($(this).text());
+						}
+					});
+					datax.push(rowx);
+				}
+				});
+				console.log(datax);
+				 req =	$.ajax({
+						headers: { "X-CSRFToken": getCookie("csrftoken") },
+						type: 'POST',
+						url : '/transaction/sale/new/ngst',
+						data:{
+							'sale_id': sale_id,
+							'customer': customer,
+							'follow_up': follow_up,
+							'credit_days': credit_days,
+							'payment_method': payment_method,
+							'footer_desc': footer_desc,
+							'items': JSON.stringify(data),
+							'cartage': JSON.stringify(datax),
+						},
+						dataType: 'json'
+					})
+					.done(function done(){
+						alert("Sales Created");
+						location.reload();
+					})
+				});
+				$('#new-sale-submit-direct').on('submit',function(e){
+				e.preventDefault();
+				console.log("clicked");
+				var table = $('#new-sale-table-direct');
+				var data = [];
+				var sale_id = $('#sale_id').val();
+				var customer = $('#customer_name_sale').val();
+				var payment_method = $('#payment_method').val();
+				var footer_desc = $('#footer_desc').val();
+
+				var cartage_amount = $('#cartage_amount').val();
+				var additional_tax = $('#additional_tax').val();
+				var withholding_tax = $('#withholding_tax').val();
+
+
+				table.find('tr').each(function (i, el){
+				if(i != 0)
+				{
+					var $tds = $(this).find('td');
+					var row = {
+						'id' : "",
+						'hs_code': "",
+						'quantity' : "",
+						'price' : "",
+						'sales_tax' : "",
+						'dc_no': ""
+					};
+					$tds.each(function(i, el){
+						if (i === 1) {
+								row["id"] = ($(this).text());
+						}
+						if (i === 3) {
+								row["hs_code"] = ($(this).text());
+						}
+						else if (i === 6) {
+								row["quantity"] = ($(this).text());
+						}
+						else if (i === 8) {
+								row["price"] = ($(this).text());
+						}
+						else if (i === 10) {
+								row["sales_tax"] = ($(this).text());
+						}
+						else if (i === 13) {
+								row["dc_no"] = ($(this).text());
+						}
+					});
+					data.push(row);
+				}
+				});
+
+				 req =	$.ajax({
+						headers: { "X-CSRFToken": getCookie("csrftoken") },
+						type: 'POST',
+						url : `/transaction/dc/sale/new/ngst/${edit_id}`,
+						data:{
+							'sale_id': sale_id,
+							'customer': customer,
+							'payment_method': payment_method,
+							'footer_desc': footer_desc,
+							'cartage_amount': cartage_amount,
+							'additional_tax':additional_tax,
+							'withholding_tax':withholding_tax,
+							'items': JSON.stringify(data),
+						},
+						dataType: 'json'
+					})
+					.done(function done(){
+						alert("Sales Created");
+						location.reload();
+					})
+				});
+
+				// // ==================================================================================================================================
 
 
 // // ==================================================================================================================================
@@ -1762,7 +2292,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 											sum_add += parseFloat(total_add);
 									}
 									additional_tax = $('#additional_tax_edit').val();
-									cartage_amount = $('#cartage_amount_edit').val();
+									cartage_amount = 0.00;
 									$('#last_grand_total').val((sum_add + parseFloat(additional_tax) + parseFloat(cartage_amount)).toFixed(2));
 									console.log(sum_add);
 							});
@@ -2021,8 +2551,12 @@ $('#last_grand_total').val(amount.toFixed(2));
 			if (!isNaN(total) && total.length !== 0) {
 					sum_add += parseFloat(total);
 			}
-			additional_tax = $('#additional_tax_edit').val();
-			cartage_amount = $('#cartage_amount_edit').val();
+			additional_tax = $('#additional_tax').val();
+			console.log(additional_tax);
+			cartage_amount = 0;
+			console.log(sum_add.toFixed(2));
+			amount = sum_add + parseFloat(additional_tax);
+			console.log("Here",Math.round(amount));
 			$('#last_grand_total').val((sum_add + parseFloat(additional_tax) + parseFloat(cartage_amount)).toFixed(2));
 		});
 
@@ -2091,8 +2625,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 					 dataType: 'json'
 				 })
 				 .done(function done(data){
-					 var index = $("table tbody tr:last-child").index();
-					 // total_amount = (type[0].fields['unit_price'] * type[0].fields['quantity']);
+					 var index = $("#edit-sale-table tbody tr:last-child").index();
 					 for (var i = 0; i < data.row.length; i++) {
 						var row = '<tr>' +
 								'<td style="display:none;">'+data.row[i][1]+'</td>'+
@@ -2111,8 +2644,8 @@ $('#last_grand_total').val(amount.toFixed(2));
 					'<td><a class="add-sale-edit" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-sale-edit" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="delete-sale-edit" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 						'</tr>';
 						count++;
-					$("table").append(row);
-					$("table tbody tr").eq(index + i+1).find(".add-sale-edit, .edit-sale-edit").toggle();
+					$("#edit-sale-table").append(row);
+					$("#edit-sale-table tbody tr").eq(index + i+1).find(".add-sale-edit, .edit-sale-edit").toggle();
 						$('[data-toggle="tooltip"]').tooltip();
 						$('#dc_code_sale').val("");
 						for (var j = 1; j < data.hs_code.length; j++) {
@@ -2150,11 +2683,11 @@ $('#last_grand_total').val(amount.toFixed(2));
 								price = $(this).text();
 								return price
 						}).closest("tr");
+
 				var get_quantity = $($(this).parents("tr").find("#quantity_edit")).filter(function() {
 								quantity = $(this).text();
 								return quantity
 						}).closest("tr");
-						console.log(quantity);
 				var set_valueOfGoods = $($(this).parents("tr").find("#value_of_goods_edit")).filter(function() {
 								value_of_goods =  quantity * price
 								$(this).text(value_of_goods.toFixed(2))
@@ -2171,13 +2704,14 @@ $('#last_grand_total').val(amount.toFixed(2));
 								$(this).text(sales_tax.toFixed(2));
 								return sales_tax;
 						}).closest("tr");
-
+						console.log(value_of_goods);
 				var set_total = $($(this).parents("tr").find("#total")).filter(function() {
 								total = value_of_goods + sales_tax
 								$(this).text(total.toFixed(2));
 								return sales_tax;
 						}).closest("tr");
-
+						console.log(value_of_goods.toFixed(2));
+						console.log(sales_tax.toFixed(2));
 						var total_amount = $($(this).parents("tr").find("#total_amount")).filter(function() {
 										total = value_of_goods + sales_tax
 										$(this).text(total.toFixed(2));
@@ -2193,9 +2727,9 @@ $('#last_grand_total').val(amount.toFixed(2));
 							if (!isNaN(total) && total.length !== 0) {
 									sum_add += parseFloat(total);
 							}
-							additional_tax = $('#additional_tax_edit').val();
-							cartage_amount = $('#cartage_amount_edit').val();
-							$('#last_grand_total').val((sum_add + parseFloat(additional_tax) + parseFloat(cartage_amount)).toFixed(2));
+							additional_tax = $('#additional_tax').val();
+							$('#last_grand_total').val((Math.round(sum_add + parseFloat(additional_tax))).toFixed(2));
+							console.log($('#last_grand_total'));
 						});
 
 						$('#edit-sale-table tbody tr').each(function() {
@@ -2312,7 +2846,9 @@ $('#last_grand_total').val(amount.toFixed(2));
 $('#edit-sale-submit').on('submit',function(e){
 	e.preventDefault();
 	var table = $('#edit-sale-table');
+	var cartage_table = $('#cartage-table');
 	var data = [];
+	var datax = [];
 	var sale_id = $('#sale_id').val();
 	var follow_up = $('#follow_up').val();
 	var credit_days = $('#credit_days').val();
@@ -2326,41 +2862,63 @@ $('#edit-sale-submit').on('submit',function(e){
 	var withholding_tax = $('#withholding_tax').val();
 
 
-	table.find('tr').each(function (i, el){
-		if(i != 0)
-		{
-			var $tds = $(this).find('td');
-			var row = {
-				'id' : "",
-				'quantity' : "",
-				'hs_code': "",
-				'price' : "",
-				'sales_tax' : "",
-				'dc_no': ""
-			};
-			$tds.each(function(i, el){
-				if (i === 0) {
-						row["id"] = ($(this).text());
-				}
-				if (i === 2) {
-						row["hs_code"] = ($(this).text());
-				}
-				else if (i === 5) {
-						row["quantity"] = ($(this).text());
-				}
-				else if (i === 7) {
-						row["price"] = ($(this).text());
-				}
-				else if (i === 9) {
-						row["sales_tax"] = ($(this).text());
-				}
-				else if (i === 12) {
-						row["dc_no"] = ($(this).text());
-				}
-			});
-			data.push(row);
-		}
-	});
+		table.find('tr').each(function (i, el){
+			if(i != 0)
+			{
+				var $tds = $(this).find('td');
+				var row = {
+					'id' : "",
+					'quantity' : "",
+					'hs_code': "",
+					'price' : "",
+					'sales_tax' : "",
+					'dc_no': ""
+				};
+				$tds.each(function(i, el){
+					if (i === 0) {
+							row["id"] = ($(this).text());
+					}
+					if (i === 2) {
+							row["hs_code"] = ($(this).text());
+					}
+					else if (i === 5) {
+							row["quantity"] = ($(this).text());
+					}
+					else if (i === 7) {
+							row["price"] = ($(this).text());
+					}
+					else if (i === 9) {
+							row["sales_tax"] = ($(this).text());
+					}
+					else if (i === 12) {
+							row["dc_no"] = ($(this).text());
+					}
+				});
+				data.push(row);
+			}
+		});
+
+		cartage_table.find('tr').each(function (i, el){
+			if(i != 0)
+			{
+				var $tdc = $(this).find('td');
+				var rowx = {
+					'cartage_amount' : "",
+					'po_no': "",
+				};
+				$tdc.each(function(i, el){
+					if (i === 1) {
+							rowx["cartage_amount"] = ($(this).text());
+							console.log($(this).text());
+					}
+					if (i === 3) {
+							rowx["po_no"] = ($(this).text());
+							console.log($(this).text());
+					}
+				});
+				datax.push(rowx);
+			}
+		});
 
 		 req =	$.ajax({
 				headers: { "X-CSRFToken": getCookie("csrftoken") },
@@ -2377,6 +2935,7 @@ $('#edit-sale-submit').on('submit',function(e){
 					'additional_tax':additional_tax,
 					'withholding_tax':withholding_tax,
 					'items': JSON.stringify(data),
+					'cartage': JSON.stringify(datax),
 				},
 				dataType: 'json'
 			})
@@ -2385,6 +2944,379 @@ $('#edit-sale-submit').on('submit',function(e){
 				location.reload();
 			})
 });
+
+
+//=======================================================================================
+
+		// $('#edit-sale-table-ngst tbody tr').each(function() {
+		// 	var tdObject = $(this).find('td:eq(11)');
+		// 	var total = tdObject.text()
+		// 	console.log(total);
+		// 	if (!isNaN(total) && total.length !== 0) {
+		// 			sum_add += parseFloat(total);
+		// 	}
+		// 	additional_tax = $('#additional_tax').val();
+		// 	console.log(additional_tax);
+		// 	cartage_amount = 0;
+		// 	console.log(sum_add.toFixed(2));
+		// 	amount = sum_add + parseFloat(additional_tax);
+		// 	console.log("Here",Math.round(amount));
+		// 	$('#last_grand_total').val((sum_add + parseFloat(additional_tax) + parseFloat(cartage_amount)).toFixed(2));
+		// });
+		//
+		// $('#edit-sale-table tbody tr').each(function() {
+		// var sales_tax = $(this).find('td:eq(10)');
+		// var total_sales_tax = sales_tax.text()
+		// if (!isNaN(total_sales_tax) && total_sales_tax.length !== 0) {
+		// 		sum_st += parseFloat(total_sales_tax);
+		// }
+		// $('#total_sales_tax').val(sum_st.toFixed(2));
+		// });
+
+		$(".add-item-sale-edit-ngst").click(function(){
+			var item_code_sale = "";
+			var dc_code_sale = $('#dc_code_sale').val();
+
+			if (item_code_sale !== "") {
+				//
+				// req =	$.ajax({
+				// 	 headers: { "X-CSRFToken": getCookie("csrftoken") },
+				// 	 type: 'POST',
+				// 	 url : '/transaction/sale/new/',
+				// 	 data:{
+				// 		 'item_code_sale': item_code_sale,
+				// 	 },
+				// 	 dataType: 'json'
+				//  })
+				//  .done(function done(data){
+				// 	 console.log(data.row);
+				// 	 var type = JSON.parse(data.row);
+				// 	 console.log(type.length);
+				// 	 var index = $("table tbody tr:last-child").index();
+				// 	 // total_amount = (type[0].fields['unit_price'] * type[0].fields['quantity']);
+				// 			 var row = '<tr>' +
+				// 					 '<td>'+count+'</td>' +
+				// 					 '<td id="get_item_code">'+type[0].fields['item_code']+'</td>' +
+				// 					 '<td width="160px" id="hs_code"><input type="text" style="width:80px;" class="form-control" value=""></td>' +
+				//
+				// 					 '<td>'+type[0].fields['item_name']+'</td>' +
+				// 					 '<td id="desc" ><pre>'+type[0].fields['item_description']+'</pre></td>' +
+				// 					 '<td width="160px" id="quantity"><input type="text" style="width:80px;" class="form-control" value=""></td>' +
+				// 					 '<td>'+type[0].fields['unit']+'</td>' +
+				// 					 '<td id="price" ><input type="text" style="width:80px;" class="form-control" value=""></td>' +
+				// 					 '<td id="value_of_goods" >0.00</td>' +
+				// 					 '<td id="sales_tax"><input type="text" class="form-control" value=""></td>' +
+				// 					 '<td id="sales_tax_amount">0.00</td>' +
+				// 					 '<td id="total" style="font-weight:bold;" class="sum"><b>0.00</b></td>' +
+				// 					 '<td style="display:none;">'+type[0].fields['dc_no']+'</td>' +
+				// 		 '<td><a class="add-transaction-sale" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-transaction-sale" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="delete-transaction-sale" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+				// 			 '</tr>';
+				// 			 count++;
+				// 		 $("table").append(row);
+				// 	 $("table tbody tr").eq(index + 1).find(".edit-transaction-sale, .add-transaction-sale").toggle();
+				// 			 $('[data-toggle="tooltip"]').tooltip();
+				// 			 $('#item_code_sale').val("");
+				//  });
+			}
+			else if (dc_code_sale !== "") {
+				req =	$.ajax({
+					 headers: { "X-CSRFToken": getCookie("csrftoken") },
+					 type: 'POST',
+					 url : `/transaction/sale/edit/ngst/${edit_id}`,
+					 data:{
+						 'dc_code_sale': dc_code_sale,
+					 },
+					 dataType: 'json'
+				 })
+				 .done(function done(data){
+					 var index = $("#edit-sale-table-ngst tbody tr:last-child").index();
+					 // total_amount = (type[0].fields['unit_price'] * type[0].fields['quantity']);
+					 for (var i = 0; i < data.row.length; i++) {
+						var row = '<tr>' +
+								'<td style="display:none;">'+data.row[i][1]+'</td>'+
+								'<td id="get_item_code">'+data.row[i][2]+'</td>' +
+								'<td>'+data.row[i][3]+'</td>' +
+								'<td id="desc" ><pre>'+data.row[i][4]+'</pre></td>' +
+								'<td id="quantity_edit"><input type="text" style="width:80px;" class="form-control" value="'+data.row[i][8]+'"></td>' +
+								'<td>'+data.row[i][5]+'</td>' +
+								'<td id="price_edit" ><input type="text" style="width:80px;" class="form-control" value=""></td>' +
+								'<td id="value_of_goods_edit" >0.00</td>' +
+								'<td style="display:none;">'+data.dc_ref+'</td>' +
+					'<td><a class="add-sale-edit-ngst" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-sale-edit-ngst" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="delete-sale-edit-ngst" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+						'</tr>';
+						count++;
+					$("#edit-sale-table-ngst").append(row);
+					$("#edit-sale-table-ngst tbody tr").eq(index + i+1).find(".add-sale-edit-ngst, .edit-sale-edit-ngst").toggle();
+						$('[data-toggle="tooltip"]').tooltip();
+						$('#dc_code_sale').val("");
+						for (var j = 1; j < data.hs_code.length; j++) {
+							 $("#hs_code").append($("<option>").attr('value', data.hs_code[j]).text(data.hs_code[j]));
+						}
+					 }
+				 });
+			}
+		});
+
+// Add row on add button click
+				$(document).on("click", ".add-sale-edit-ngst", function(){
+				sum = 0;
+				var empty = false;
+				var input = $(this).parents("tr").find('input[type="text"]');
+						input.each(function(){
+					if(!$(this).val()){
+						$(this).addClass("error");
+						empty = true;
+					}
+					else{
+							$(this).removeClass("error");
+							}
+				});
+				$(this).parents("tr").find(".error").first().focus();
+				if(!empty){
+					input.each(function(){
+						$(this).parent("td").html($(this).val());
+					});
+					$(this).parents("tr").find(".add-sale-edit-ngst, .edit-sale-edit-ngst").toggle();
+					$(".add-item-sale").removeAttr("disabled");
+				}
+
+				var get_price = $($(this).parents("tr").find("#price_edit")).filter(function() {
+								price = $(this).text();
+								return price
+						}).closest("tr");
+				var get_quantity = $($(this).parents("tr").find("#quantity_edit")).filter(function() {
+								quantity = $(this).text();
+								return quantity
+						}).closest("tr");
+						console.log(quantity);
+				var set_valueOfGoods = $($(this).parents("tr").find("#value_of_goods_edit")).filter(function() {
+								value_of_goods =  quantity * price
+								$(this).text(value_of_goods.toFixed(2))
+								return value_of_goods;
+						}).closest("tr");
+
+
+				var set_total = $($(this).parents("tr").find("#total")).filter(function() {
+								total = value_of_goods + sales_tax
+								$(this).text(total.toFixed(2));
+								return sales_tax;
+						}).closest("tr");
+
+
+						var total_amount = $($(this).parents("tr").find("#total_amount")).filter(function() {
+										total = value_of_goods + sales_tax
+										$(this).text(total.toFixed(2));
+										return total_amount;
+								}).closest("tr");
+
+
+						sum_add = 0;
+						sum_st = 0;
+						$('#edit-sale-table tbody tr').each(function() {
+							var tdObject = $(this).find('td:eq(11)');
+							var total = tdObject.text()
+							if (!isNaN(total) && total.length !== 0) {
+									sum_add += parseFloat(total);
+							}
+							additional_tax = $('#additional_tax').val();
+							// cartage_amount = 0.00;
+							$('#last_grand_total').val((Math.round(sum_add + parseFloat(additional_tax))).toFixed(2));
+						});
+
+						$('#edit-sale-table-ngst tbody tr').each(function() {
+						var sales_tax = $(this).find('td:eq(10)');
+						var total_sales_tax = sales_tax.text()
+						if (!isNaN(total_sales_tax) && total_sales_tax.length !== 0) {
+								sum_st += parseFloat(total_sales_tax);
+						}
+						$('#total_sales_tax').val(sum_st.toFixed(2));
+						});
+
+
+});
+
+			// Edit row on edit button click
+$(document).on("click", ".edit-sale-edit-ngst", function(){
+	$(this).parents("tr").find("td:not(:last-child)").each(function(i){
+			if (i === 4) {
+				$(this).html('<input type="text" style="width:80px;" class="form-control" value="' + $(this).text() + '">');
+			}
+			if (i === 6) {
+				$(this).html('<input type="text" style="width:80px;" class="form-control" value="' + $(this).text() + '">');
+			}
+});
+$(this).parents("tr").find(".add-sale-edit-ngst, .edit-sale-edit-ngst").toggle();
+$(".add-item-sale").attr("disabled", "disabled");
+});
+
+// Delete row on delete button click
+$(document).on("click", ".delete-sale-edit-ngst", function(){
+	var row =  $(this).closest('tr');
+	var siblings = row.siblings();
+	siblings.each(function(index) {
+	$(this).children('td').first().text(index + 1);
+	});
+	$(this).parents("tr").remove();
+	$(".add-item-sale").removeAttr("disabled");
+});
+
+$('#cartage_amount').on('keyup',function(e){
+var i = this.value;
+var at = $('#additional_tax').val()
+if(!isNaN(i) && i.length != 0){
+	if (!isNaN(at)) {
+			var a =  sum
+			var v =  parseFloat(a) + parseFloat(i) + parseFloat(at)
+			$('#last_grand_total').val(v.toFixed(2));
+	}
+	else {
+			var a =  sum
+			var v =  parseFloat(a) + parseFloat(i)
+			$('#last_grand_total').val(v.toFixed(2));
+	}
+}
+else {
+if (!isNaN(at)) {
+	sum = parseFloat(at) + sum;
+	$('#last_grand_total').val(sum.toFixed(2));
+}
+else {
+	$('#last_grand_total').val(sum);
+}
+}
+});
+
+$('#additional_tax').on('keyup',function(){
+var i = this.value;
+var ac = $('#cartage_amount').val()
+if(!isNaN(i) && i.length != 0){
+	if (!isNaN(ac)) {
+			var a =  sum
+			var v =  parseFloat(a) + parseFloat(i) + parseFloat(ac)
+			$('#last_grand_total').val(v.toFixed(2));
+	}
+	else {
+			var a =  sum
+			var v =  parseFloat(a) + parseFloat(i)
+			$('#last_grand_total').val(v.toFixed(2));
+	}
+}
+else {
+if (!isNaN(ac)) {
+	sum = parseFloat(ac) + sum;
+	$('#last_grand_total').val(sum.toFixed(2));
+}
+else {
+	$('#last_grand_total').val(sum);
+}
+}
+
+})
+
+
+$('#withholding_tax').on('keyup',function(){
+var i = this.value;
+var cartage_amount = parseFloat($('#cartage_amount').val());
+var additional_tax = parseFloat($('#additional_tax').val());
+var grand_total = parseFloat(sum);
+var a =  cartage_amount + additional_tax + grand_total;
+console.log(a);
+var withholding_tax =  a.toFixed(2) * i;
+withholding_tax = withholding_tax / 100;
+var amount =  withholding_tax + cartage_amount + additional_tax +  grand_total
+$('#last_grand_total').val(amount.toFixed(2));
+})
+
+
+	//EDIT PURCHASE END
+
+$('#edit-sale-submit-ngst').on('submit',function(e){
+	e.preventDefault();
+	var table = $('#edit-sale-table-ngst');
+	var cartage_table = $('#cartage-table');
+	var data = [];
+	var datax = [];
+	var sale_id = $('#sale_id').val();
+	var follow_up = $('#follow_up').val();
+	var credit_days = $('#credit_days').val();
+	var customer = $('#customer_name_sale').val();
+	var payment_method = $('#payment_method').val();
+	var footer_desc = $('#footer_desc').val();
+
+
+
+		table.find('tr').each(function (i, el){
+			if(i != 0)
+			{
+				var $tds = $(this).find('td');
+				var row = {
+					'id' : "",
+					'quantity' : "",
+					'price' : "",
+					'dc_no': ""
+				};
+				$tds.each(function(i, el){
+					if (i === 0) {
+							row["id"] = ($(this).text());
+					}
+					else if (i === 4) {
+							row["quantity"] = ($(this).text());
+					}
+					else if (i === 6) {
+							row["price"] = ($(this).text());
+							console.log($(this).text());
+					}
+					else if (i === 8) {
+							row["dc_no"] = ($(this).text());
+							console.log($(this).text());
+					}
+				});
+				data.push(row);
+			}
+		});
+
+		cartage_table.find('tr').each(function (i, el){
+			if(i != 0)
+			{
+				var $tdc = $(this).find('td');
+				var rowx = {
+					'cartage_amount' : "",
+					'po_no': "",
+				};
+				$tdc.each(function(i, el){
+					if (i === 1) {
+							rowx["cartage_amount"] = ($(this).text());
+					}
+					if (i === 3) {
+							rowx["po_no"] = ($(this).text());
+					}
+				});
+				datax.push(rowx);
+			}
+		});
+
+		 req =	$.ajax({
+				headers: { "X-CSRFToken": getCookie("csrftoken") },
+				type: 'POST',
+				url : `/transaction/sale/edit/ngst/${edit_id}`,
+				data:{
+					'sale_id': sale_id,
+					'customer': customer,
+					'follow_up': follow_up,
+					'credit_days': credit_days,
+					'payment_method': payment_method,
+					'footer_desc': footer_desc,
+					'items': JSON.stringify(data),
+					'cartage': JSON.stringify(datax),
+				},
+				dataType: 'json'
+			})
+			.done(function done(){
+				alert("Sale Updated");
+				location.reload();
+			})
+});
+
 
 // ================================================================================
 
@@ -3381,8 +4313,8 @@ $.fn.extend({
 			$(this).parents("tr").remove();
 		});
 
-		document.getElementById('box').onchange = function() {
-		document.getElementById('invoice_no').disabled = !this.checked;
-		};
+		// document.getElementById('box').onchange = function() {
+		// document.getElementById('invoice_no').disabled = !this.checked;
+		// };
 
 });

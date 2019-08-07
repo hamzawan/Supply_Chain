@@ -23,6 +23,7 @@ class FiscalYear(models.Model):
 class Company_info(models.Model):
     company_name = models.CharField(max_length = 100)
     company_address = models.TextField()
+    company_type = models.IntegerField()
     company_logo = models.TextField()
     phone_no = models.CharField(max_length = 100)
     mobile_no = models.CharField(max_length = 100)

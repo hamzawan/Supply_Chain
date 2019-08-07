@@ -56,8 +56,7 @@
          <img style="width:150px; height:100px;" src="{{image.company_logo}}" align="right"/>
          {% for value in company_info %}
          <font size="25px" color="#0a012c" ><b>{{value.company_name}}</b></font></br>
-         <font size="11px" color="#0a012c" >33 Amina Mansion, Belasis Street,</font><br>
-         <font size="11px" color="#0a012c" >New Chali Karachi Pakistan</font><br>
+         <font size="11px" color="#0a012c" >{{value.address}}</font><br>
          <font size="11px" color="#0a012c" >{{ value.phone_no }}</font></br>
          <font size="11px" color="#0a012c" >{{ value.mobile_no }}</font></br>
          <font size="11px" color="#0a012c" >{{ value.email }}</font></br>
@@ -90,16 +89,16 @@
         </tr>
       </thead>
       <tbody>
-    {% for value in row %}
+    {% for value in ledger_list %}
       <tr class="">
-        <td style="width: 150px; height:30px;"><font size="12px">{{value.2}}</font></td>
-        <td style="width: 300px;"><font size="12px">{{ value.0 }} {{value.3}}</font></td>
-        <td style="width: 500px; text-align:center;"><font size="12px">Invoice No: {{value.3}} / Refrence Date: {{value.2}}</font></td>
-        <td style="width: 200px; text-align:center;"><font size="12px">{{value.5|abs|floatformat:2}}</font></td>
-        <td style="width: 200px; text-align:center;"><font size="12px">{{value.6|abs|floatformat:2}}</font></td>
-        <td style="width: 200px; text-align:center;"><font size="12px"></font></td>
-    {% endfor %}
+        <td style="width: 150px; height:30px;"><font size="12px">{{value.date}}</font></td>
+        <td style="width: 300px;"><font size="12px">{{value.voucher_no}}</font></td>
+        <td style="width: 500px; text-align:center;"><font size="12px">Invoice No: {{value.voucher_no}} / Refrence Date: {{value.date}}</font></td>
+        <td style="width: 200px; text-align:center;"><font size="12px">{{value.debit|abs|floatformat:2}}</font></td>
+        <td style="width: 200px; text-align:center;"><font size="12px">{{value.credit|abs|floatformat:2}}</font></td>
+        <td style="width: 200px; text-align:center;"><font size="12px"></font>{{value.balance|abs|floatformat:2}}</td>
   </tr>
+    {% endfor %}
   <tr class="">
     <td style="width: 150px; height:30px;"></td>
     <td style="width:700px; text-align:center;" colspan="2"><font size="14px"> <b>Grand Total</b> </font></td>

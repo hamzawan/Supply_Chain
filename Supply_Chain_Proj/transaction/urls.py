@@ -26,6 +26,12 @@ urlpatterns = [
     path('dc/sale/new/<pk>', views.direct_sale, name = 'direct-sale'),
 
 
+    path('sale/new/ngst', views.new_sale_non_gst, name = 'new-sale-ngst'),
+    path('sale/edit/ngst/<pk>', views.edit_sale_non_gst, name = 'edit-sale-ngst'),
+    path('sale/delete/ngst/<pk>', views.delete_sale_non_gst, name = 'delete-sale-ngst'),
+    path('dc/sale/new/ngst/<pk>', views.direct_sale_non_gst, name = 'direct-sale-ngst'),
+
+
     path('sale_return_summary/', views.sale_return_summary, name = 'sale-return-summary'),
     path('sale/return/<pk>', views.new_sale_return, name = 'new-sale-return'),
     path('sale/return/edit/<pk>', views.edit_sale_return, name = 'edit-sale-return'),
@@ -69,6 +75,8 @@ urlpatterns = [
 
     path('sales_tax_invoice/pdf/<pk>', views.sales_tax_invoice, name = 'sales-tax-invoice'),
     path('commercial_invoice/pdf/<pk>', views.commercial_invoice, name = 'commercial-invoice'),
+    path('commercial_invoice/pdf/ngst/<pk>', views.commercial_invoice_non_gst, name = 'commercial-invoice-ngst'),
+
 
     path('companies/', views.multi_companies, name = 'multi-companies'),
     path('companies/new', views.new_multi_companies, name = 'new-multi-companies'),

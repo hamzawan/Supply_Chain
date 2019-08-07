@@ -12,6 +12,7 @@ $(document).ready(function(){
 			 edit_id = this.id;
 		});
 
+
 		$('#account').on('focusout', function(){
 			txtSearch = $(this).val();
 			var objList = document.getElementById("account_title")  ;
@@ -1697,12 +1698,7 @@ $(document).ready(function(){
 								})
 					});
 
-
-
-
-
-
 				$(document).ready(function() {
 						$('.sort').DataTable();
-				} );
+					});
 });

@@ -57,7 +57,7 @@
   <br>
   <div class="body">
       <div>
-         <img style="width:150px; height:100px;" src="{{image.company_logo}}" align="right"/>
+         <img style="width:150px; height:100px;"  align="right"/>
          {% for value in company_info %}
          <font size="25px" color="#0a012c" ><b>{{value.company_name}}</b></font> <br>
          <font size="11px" color="#0a012c" ><b>Address:</b> {{ value.company_address }}</font><br>
@@ -76,9 +76,15 @@
        <thead>
          <tr>
            <th align="left" style="width: 180px;"><font size="12px" color="#0a012c">Buyer's Name</font></th>
-           <td align="left" style="padding-top:4px;">
-             <font size="12px" color="#0a012c">{{parent_company_name.account_title}} ( {{header.account_id.account_title}} )</font>
-           </td>
+           {% if parent_company_name.id == header.account_id.id %}
+             <td align="left" style="padding-top:4px;">
+               <font size="12px" color="#0a012c">{{parent_company_name.account_title}}</font>
+             </td>
+            {% else %}
+            <td align="left" style="padding-top:4px;">
+              <font size="12px" color="#0a012c">{{parent_company_name.account_title}} ( {{header.account_id.account_title}} ) </font>
+            </td>
+           {% endif %}
            <th align="left" style="width: 180px;"><font size="13px" color="#0a012c">Invoice No.</font</th>
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.sale_no}}</font></td>
          </tr>
@@ -125,8 +131,8 @@
       <tbody>
         {% for detail in detail %}
         {% with quantity=detail.6 unit=detail.5 price=detail.7 sales_tax=detail.8 value_of_goods=detail.7|mul:detail.6 tax=detail.7|mul:detail.6|mul:detail.8|div:100 %}
-        {% with value_of_goods_tax=value_of_goods|floatformat:"0"|add:tax|floatformat:"0"|floatformat:2 %}
-        <h1>{{value_of_goods|floatformat:"0"|add:tax|floatformat:"0"|floatformat:2}}</h1>
+        {% with value_of_goods_tax=tax|floatformat:"0"|add:value_of_goods|floatformat:"0"|floatformat:2%}
+
         {% ifchanged detail.1 and detail.2 %}
         <tr>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
@@ -175,8 +181,8 @@
         <td></td>
         <td></td>
         <td></td>
-        <td style=" text-align: center; padding-top:10px;  width:700px;" ><b>Cartage Amount : {{forloop.counter}} Po No : {{v.3}}</b></td>
-        <td style="text-align:center;  border-bottom:1px solid black; width:200px;" >{{v.1|floatformat:2}}</td>
+        <td style=" text-align: center; padding-top:10px;  width:700px;" ><b>Cartage Amount : {{forloop.counter}} Po No : {{v.po_no}}</b></td>
+        <td style="text-align:center;  border-bottom:1px solid black; width:200px;" >{{v.cartage|floatformat:2}}</td>
       </tr>
       {% endfor %}
     </tbody>

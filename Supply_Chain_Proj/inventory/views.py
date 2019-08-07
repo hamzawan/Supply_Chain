@@ -171,17 +171,15 @@ def edit_item(request,pk):
         size = request.POST.get('size')
         product_name = request.POST.get('product_name')
         product_desc = request.POST.get('product_desc')
-        select_unit = request.POST.get('select_unit')
+        select_unit = request.POST['unit']
         opening_stock = request.POST.get('opening_stock')
-
         all_detail.type = type
         all_detail.size = size
         all_detail.product_name = product_name
         all_detail.product_desc = product_desc
-        all_detail.select_unit = select_unit
+        all_detail.unit = select_unit
         all_detail.opening_stock = opening_stock
         all_detail.save()
-        return JsonResponse({"result":"success"})
     return render(request, 'inventory/edit_item.html', {'all_detail':all_detail,'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 

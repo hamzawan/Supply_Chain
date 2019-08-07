@@ -60,8 +60,7 @@
          <img style="width:150px; height:100px;" src="{{image.company_logo}}" align="right"/>
          {% for value in company_info %}
          <font size="25px" color="#0a012c" ><b>{{value.company_name}}</b></font></br>
-         <font size="11px" color="#0a012c" >33 Amina Mansion, Belasis Street,</font><br>
-         <font size="11px" color="#0a012c" >New Chali Karachi Pakistan</font><br>
+         <font size="11px" color="#0a012c" >{{value.address}}</font><br>
          <font size="11px" color="#0a012c" >{{ value.phone_no }}</font></br>
          <font size="11px" color="#0a012c" >{{ value.mobile_no }}</font></br>
          <font size="11px" color="#0a012c" >{{ value.email }}</font></br>
@@ -84,6 +83,8 @@
          <tr>
            <th align="left"><font size="14px" color="#0a012c">Date:</font</th>
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.date}}</font></td>
+           <th align="left"><font size="14px" color="#0a012c">Po No:</font</th>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.po_no}}</font></td>
          </tr>
        </thead>
        </table>
@@ -93,7 +94,7 @@
     <table cellpadding="3" id="item_table" repeat="1">
       <thead>
         <tr class="heading_row">
-          <th align="center" style="width: 70px;"><font size="14px">S No.</font></th>
+          <th align="center" style="width: 70px;"><font size="13px">S No.</font></th>
           <th style="width:700px;"><font size="14px">Part Name & Description</font></th>
           <th style="width:200px;"><font size="14px">Qty</font></th>
           <th style="width:200px;"><font size="14px">Unit</font></th>
@@ -102,23 +103,13 @@
       <tbody>
         {% for detail in detail %}
         <tr>
-          <td style="padding:10px; width: 70px; text-align: center; border-left:1px solid black; border-right:1px solid black;"><font style="margin-top:-100px;">{{forloop.counter}}</font></td>
-          <td style="border-left:1px solid black; width: 700px; border-right:1px solid black;"><font>{{detail.item_name}}<font>
-              <pre style="padding:0px;  margin-top:-100px;">{{detail.item_description}}</pre>
-          </td>
-          <td style="border-left:1px solid black; width: 200px; text-align: center; border-right:1px solid black;">{{detail.quantity}}</td>
-          <td style="border-left:1px solid black; width: 200px;  text-align: center; border-right:1px solid black;">{{detail.unit}}</td>
+          <td style="width: 70px; text-align: center; border-left:1px solid black; border-right:1px solid black;"><font style="margin-top:-100px;" size="13px">{{forloop.counter}}</font></td>
+          <td style="border-left:1px solid black; width: 700px; border-right:1px solid black;"><font size="13px">{{detail.item_id.product_name}} {{detail.item_id.size}} {{detail.item_id.product_desc}}<font></td>
+          <td style="border-left:1px solid black; width: 200px; text-align: center; border-right:1px solid black;"><font size="13px">{{detail.quantity}}</font></td>
+          <td style="border-left:1px solid black; width: 200px;  text-align: center; border-right:1px solid black;"><font size="13px">{{detail.item_id.unit}}</font></td>
         </tr>
         {% endfor %}
 
-        {% for i in i|rjust:total_lines %}
-        <tr style="height:6px;">
-            <td style="border-left:1px solid black; width: 70px; text-align: center; border-right:1px solid black;"></td>
-            <td style="border-left:1px solid black; width: 700px; text-align: center; border-right:1px solid black;"></td>
-            <td style="border-left:1px solid black; width: 200px; text-align: center; border-right:1px solid black;"></td>
-            <td style="border-left:1px solid black; width: 200px; text-align: center; border-right:1px solid black;"></td>
-        </tr>
-        {% endfor %}
       <tr class="heading_row">
         <td style="width: 70px; height:30px;"></td>
         <td style="width: 700px;"></td>

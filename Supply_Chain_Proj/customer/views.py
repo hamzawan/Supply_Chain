@@ -859,7 +859,10 @@ def delivery_challan_customer(request):
                         Where RemainingQuantity > 0 AND Company_id_id = %s
                         ''',[company.id])
     is_dc = is_dc.fetchall()
-    return render(request, 'customer/delivery_challan_customer.html',{'all_dc':all_dc,'is_dc':is_dc,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    gst = Company_info.objects.filter(id = company.id).first()
+    return render(request, 'customer/delivery_challan_customer.html',{'gst':gst,'all_dc':all_dc,'is_dc':is_dc,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_delivery_challan_add)
@@ -1021,23 +1024,20 @@ def edit_delivery_challan_customer(request,pk):
 
 @user_passes_test(allow_delivery_challan_print)
 def print_dc_customer(request,pk):
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     lines = 0
     total_amount = 0
-    company_info = Company_info.objects.all()
+    company_info = Company_info.objects.filter(id = 1).all()
     image = Company_info.objects.filter(id = 1).first()
     header = DcHeaderCustomer.objects.filter(company, id = pk).first()
     detail = DcDetailCustomer.objects.filter(dc_id = header.id).all()
-    for value in detail:
-        lines = lines + len(value.item_description.split('\n'))
-        amount = float(value.unit_price * value.quantity)
-        total_amount = total_amount + amount
-    lines = lines + len(detail) + len(detail)
-    total_lines = 36 - lines
-    pdf = render_to_pdf('customer/dc_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+    pdf = render_to_pdf('customer/dc_customer_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "DC_Customer_%s.pdf" %(header.dc_no)

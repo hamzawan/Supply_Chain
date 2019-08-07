@@ -5,10 +5,10 @@
 
 <div class="card" style="width: 100%;">
 <div class="card-header">
-  <h4>Edit Sales</h4>
+  <h4>Edit Sales Non GST</h4>
 </div>
 <ul class="list-group list-group-flush">
-<form  action="" id="edit-sale-submit" autocomplete="off" method="post">
+<form  action="" id="edit-sale-submit-ngst" autocomplete="off" method="post">
   {% csrf_token %}
   <li class="list-group-item">
       <div class="form-row">
@@ -70,25 +70,21 @@
               <datalist id="dc">
               </datalist>
                 <div style="margin-left:20px;">
-                    <button type="button" class="btn btn-info add-item-sale-edit has_id" id={{pk}}><i class="fa fa-plus"></i>Insert Delivery Challan</button>
+                    <button type="button" class="btn btn-info add-item-sale-edit-ngst has_id" id={{pk}}><i class="fa fa-plus"></i>Insert Delivery Challan</button>
                 </div>
           </div>
       </div>
     <div class="table table-responsive">
-      <table class="table table-bordered" id="edit-sale-table">
+      <table class="table table-bordered" id="edit-sale-table-ngst">
           <thead>
               <tr>
                   <th width="100px">Item Code</th>
-                  <th width="70px">HS Code</th>
-                  <th width="70px">Item Name</th>
-                  <th width="70px">Desc.</th>
+                  <th width="14px">Item Name</th>
+                  <th width="140px">Desc.</th>
                   <th width="140px">Qty</th>
                   <th width="70px">Unit</th>
-                  <th width="140px">Price</th>
+                  <th width="70px">Price</th>
                   <th width="70px">VOG</th>
-                  <th width="90px">ST in % </th>
-                  <th width="90px">ST Amount</th>
-                  <th width="90px">Total Amount</th>
                   <th>Action</th>
               </tr>
           </thead>
@@ -98,18 +94,14 @@
               <tr>
                 <td style="display:none;">{{value.item_id.id}}</td>
                 <td>{{value.item_id.product_code}}</td>
-                <td>{{value.hs_code}}</td>
                 <td>{{value.item_id.product_name}}</td>
                 <td><pre>{{value.item_id.product_desc}}</pre></td>
                 <td id="quantity_edit"> {{value.quantity}} </td>
                 <td> {{value.item_id.unit}} </td>
                 <td id="price_edit">{{value.cost_price}}</td>
                 <td id="value_of_goods_edit">{{vog|floatformat:2}}</td>
-                <td id="sales_tax_edit">{{value.sales_tax}}</td>
-                <td id="sales_tax_amount_edit">{{sales_tax_amount|floatformat:2}}</td>
-                <td id="total_amount">{{sales_tax_amount|floatformat:"0"|add:vog|floatformat:2}}</td>
                 <td style="display:none;">{{value.dc_ref}}</td>
-                <td><a class="add-sale-edit" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-sale-edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-sale-edit" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+                <td><a class="add-sale-edit-ngst" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-sale-edit-ngst" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-sale-edit-ngst" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
               </tr>
               {% endwith %}
             {% endfor %}
@@ -168,7 +160,40 @@
           </div>
       </div>
     </div>
-
+    <!-- <li class="list-group-item">
+      <input type="hidden" name="" value="" id="hidden">
+      <div class="float-right">
+        <div class="form-inline">
+          <div class="form-group">
+            <label for="text" style="font-size:14px;" >Cartage Amount:</label>
+              <input type="text" class="form-control form-control-sm" id="cartage_amount_edit" value="{{sale_header.cartage_amount}}" style="border-top: 0px; border-right:0px; border-left:0px;" >
+          </div>
+        </div>
+        <div class="form-inline">
+          <div class="form-group">
+            <label for="text" style="font-size:14px;">Additional Tax: &nbsp;&nbsp;&nbsp;</label>
+            <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="additional_tax_edit" value="{{sale_header.additional_tax}}" >
+          </div>
+        </div>
+        <div class="form-inline">
+          <div class="form-group">
+            <label for="text" style="font-size:14px;">Sales Tax:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <input type="text" readonly class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="total_sales_tax">
+          </div>
+        </div>
+        <div class="form-inline">
+          <div class="form-group">
+            <label for="text" style="font-size:14px;">Grand Total:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+            <input type="text" readonly class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="last_grand_total"  value="0">
+          </div>
+        </div>
+      </div>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      </li> -->
       <br>
     <div class="text-center">
       <button type="submit" class="btn btn-outline-primary has_id" id="{{pk}}">Update <small>(Sale)</small></button>
