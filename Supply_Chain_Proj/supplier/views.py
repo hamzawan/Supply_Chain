@@ -423,7 +423,9 @@ def new_rfq_supplier(request):
         get_last_rfq_no = 'RFQ/SP/' + str(num)
     else:
         get_last_rfq_no = 'RFQ/SP/101'
-    all_accounts = ChartOfAccount.objects.all()
+    customer = Q(account_id = '100')
+    supplier = Q(account_id = '200')
+    all_accounts = ChartOfAccount.objects.filter(customer|supplier).all()
     item_code = request.POST.get('item_code',False)
     if item_code:
         data = Add_products.objects.filter(product_code = item_code)
@@ -470,7 +472,9 @@ def edit_rfq_supplier(request,pk):
     rfq_header = RfqSupplierHeader.objects.filter(company,id = pk).first()
     rfq_detail = RfqSupplierDetail.objects.filter(rfq_id = rfq_header.id).all()
     all_item_code = list(Add_products.objects.values('product_code'))
-    all_accounts = ChartOfAccount.objects.all()
+    customer = Q(account_id = '100')
+    supplier = Q(account_id = '200')
+    all_accounts = ChartOfAccount.objects.filter(customer|supplier).all()
     try:
         item_code = request.POST.get('item_code',False)
         if item_code:
@@ -505,7 +509,7 @@ def edit_rfq_supplier(request,pk):
             for value in items:
                 id = value["id"]
                 id = Add_products.objects.get(id = id)
-                rfq_detail = RfqSupplierDetail(item_id = id, quantity = value["quantity"], unit = value["unit"], rfq_id = header_id, company_id = company, user_id = request.user)
+                rfq_detail = RfqSupplierDetail(item_id = id, quantity = value["quantity"], unit = value["unit"], rfq_id = header_id)
                 rfq_detail.save()
             return JsonResponse({"result":"success"})
     except IntegrityError:
@@ -545,7 +549,9 @@ def new_quotation_supplier(request):
     allow_inventory_roles = inventory_roles(request.user)
     get_last_quotation_no = QuotationHeaderSupplier.objects.last()
     all_item_code = Add_products.objects.all()
-    all_accounts = ChartOfAccount.objects.all()
+    customer = Q(account_id = '100')
+    supplier = Q(account_id = '200')
+    all_accounts = ChartOfAccount.objects.filter(customer|supplier).all()
     if get_last_quotation_no:
         get_last_quotation_no = get_last_quotation_no.quotation_no
         get_last_quotation_no = get_last_quotation_no[-3:]
@@ -665,26 +671,23 @@ def edit_quotation_supplier(request,pk):
 @user_passes_test(allow_quotation_print)
 def print_quotation_supplier(request,pk):
     company =  request.session['company']
-    company = Company_info.objects.get(id = company)
-    company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     lines = 0
     total_amount = 0
-    company_info = Company_info.objects.all()
-    image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+    company_info = Company_info.objects.filter(id = company).all()
+    company =  request.session['company']
+    company = Company_info.objects.get(id = company)
+    company = Q(company_id = company)
     header = QuotationHeaderSupplier.objects.filter(company,id = pk).first()
     detail = QuotationDetailSupplier.objects.filter(quotation_id = header.id).all()
     for value in detail:
-        lines = lines + len(value.item_description.split('\n'))
         amount = float(value.unit_price * value.quantity)
         total_amount = total_amount + amount
-    print(total_amount)
-    lines = lines + len(detail) + len(detail)
-    total_lines = 36 - lines
-    pdf = render_to_pdf('supplier/quotation_supplier_pdf.html', {'company_info':company_info,'image':image,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+        total_amount = total_amount * float(header.exchange_rate)
+    pdf = render_to_pdf('supplier/quotation_supplier_pdf.html', {'company_info':company_info,'header':header, 'detail':detail,'total_amount':total_amount,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "Quotation_Supplier_%s.pdf" %("123")

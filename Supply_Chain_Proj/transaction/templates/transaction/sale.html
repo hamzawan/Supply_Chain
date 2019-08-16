@@ -8,6 +8,18 @@
 </div>
 <ul class="list-group list-group-flush">
   <li class="list-group-item">
+    <br>
+    <ul style="list-style-type:none;" class="messages">
+      {% if messages %}
+        {% for msg in messages %}
+          <li>
+            <div class="alert {{msg.level_tag}}">
+              {{msg.message}}
+            </div>
+          </li>
+        {% endfor %}
+      {% endif %}
+    </ul>
     <!-- <div class="form-row">
       <input type="text" name=""class="form-control col-md-2" value="">
     </div> -->

@@ -3,6 +3,6 @@ from user.models import Company_info
 
 
 def company_name_processor(request):
-    company = request.session['company']
+    company = "1"
     names = Company_info.objects.filter(id=company).first()
     return {'names':names}

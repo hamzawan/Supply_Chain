@@ -60,7 +60,7 @@
          <img style="width:150px; height:100px;" src="{{image.company_logo}}" align="right"/>
          {% for value in company_info %}
          <font size="25px" color="#0a012c" ><b>{{value.company_name}}</b></font></br>
-         <font size="11px" color="#0a012c" >{{value.address}}</font><br>
+         <font size="11px" color="#0a012c" >{{value.company_address}}</font><br>
          <font size="11px" color="#0a012c" >{{ value.phone_no }}</font></br>
          <font size="11px" color="#0a012c" >{{ value.mobile_no }}</font></br>
          <font size="11px" color="#0a012c" >{{ value.email }}</font></br>
@@ -104,7 +104,7 @@
         {% for detail in detail %}
         <tr>
           <td style="width: 70px; text-align: center; border-left:1px solid black; border-right:1px solid black;"><font style="margin-top:-100px;" size="13px">{{forloop.counter}}</font></td>
-          <td style="border-left:1px solid black; width: 700px; border-right:1px solid black;"><font size="13px">{{detail.item_id.product_name}} {{detail.item_id.size}} {{detail.item_id.product_desc}}<font></td>
+          <td style="border-left:1px solid black; width: 700px; border-right:1px solid black;"><font size="13px">{{detail.item_id.product_name}}<font></td>
           <td style="border-left:1px solid black; width: 200px; text-align: center; border-right:1px solid black;"><font size="13px">{{detail.quantity}}</font></td>
           <td style="border-left:1px solid black; width: 200px;  text-align: center; border-right:1px solid black;"><font size="13px">{{detail.item_id.unit}}</font></td>
         </tr>

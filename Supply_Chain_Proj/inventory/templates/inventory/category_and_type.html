@@ -1,0 +1,259 @@
+{% extends "supplier/base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+
+<div class="card" style="width: 100%;">
+<div class="card-header">
+  <h4>Item Stock</h4>
+</div>
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">
+    <br>
+    <ul style="list-style-type:none;" class="messages">
+      {% if messages %}
+        {% for msg in messages %}
+          <li>
+            <div class="alert {{msg.level_tag}}">
+              {{msg.message}}
+            </div>
+          </li>
+        {% endfor %}
+      {% endif %}
+    </ul>
+    <div class="input-group">
+      <div class="col-md-12">
+        <a role="button" href="" style="float:right;" class="btn btn-outline-secondary" name="button" data-toggle="modal" data-target="#addCategoryModal"><i class="fas fa-plus"></i> Add New</a>
+      </div>
+    </div>
+    <h4>Main Category</h4>
+
+  <div class="table table-responsive">
+    <table class="table table-bordered sort" id="dataTable">
+        <thead>
+            <tr>
+                <th width="40px">S NO.</th>
+                <th>Main Category Code</th>
+                <th >Main Category Name</th>
+                <td>Action</td>
+            </tr>
+        </thead>
+        <tbody>
+          {% for value in main_categories %}
+          <tr>
+              <td>{{forloop.counter}}</td>
+              <td style="display:none;">{{value.id}}</td>
+              <td>{{value.category_code}}</td>
+              <td>{{value.main}}</td>
+  			      <td>
+                <a class="edit_list" data-toggle="modal" data-target="#editCategoryModal"><i class="material-icons">&#xE254;</i></a>
+                <a class="delete_item_row" href="{% url 'delete-categories' pk=value.id %}" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+              </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+  </div>
+  </li>
+</ul>
+
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">
+    <div class="input-group">
+      <div class="col-md-12">
+        <a role="button" href="" style="float:right;" class="btn btn-outline-secondary" name="button" data-toggle="modal" data-target="#addCategoryModalSub"><i class="fas fa-plus"></i> Add New</a>
+      </div>
+    </div>
+    <h4>Sub Category</h4>
+    <div class="table table-responsive">
+    <table class="table table-bordered sort" id="dataTable">
+        <thead>
+            <tr>
+                <th width="40px">S NO.</th>
+                <th width="60px">Main Category Name</th>
+                <th >Sub Category Code</th>
+                <th>Sub Category Name</th>
+                <td>Action</td>
+            </tr>
+        </thead>
+        <tbody>
+          {% for value in sub_categories %}
+          <tr>
+              <td>{{forloop.counter}}</td>
+              <td style="display:none;">{{value.id}}</td>
+              <td>{{value.main_category_id.main}}</td>
+              <td>{{value.sub_category_code}}</td>
+              <td>{{value.sub}}</td>
+              <td>
+                <a class="edit_list" data-toggle="modal" data-target="#editCategoryModalSub"><i class="material-icons">&#xE254;</i></a>
+                <a class="delete_item_row" href="{% url 'delete-sub-categories' pk=value.id %}" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+              </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+  </div>
+  </li>
+</ul>
+</div>
+
+      <div class="modal fade" id="addCategoryModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title">Add Main Category</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+           <form action="{% url 'main-categories' %}" method="post"  autocomplete="off">
+             {% csrf_token %}
+            <div class="modal-body">
+                <div class="form-row">
+                  <div class="form-group col-md-12">
+                    <label for="">Main Category Name</label>
+                    <!-- <input type="text" style="display:none;" class="form-control form-control-sm" required name="edit" id="id_edit"> -->
+                    <input type="text" class="form-control form-control-sm" required name="main_category_name" id="">
+                  </div>
+                 </div>
+            </div>
+            <!-- Modal footer -->
+            <div class="modal-footer">
+              <input type="submit" class="btn btn-success" value="Submit"/>
+            </div>
+          </form>
+          <!-- <form class="" action="index.html" method="post">
+          </form> -->
+          </div>
+        </div>
+      </div>
+
+
+     <div class="modal fade" id="editCategoryModal">
+       <div class="modal-dialog">
+         <div class="modal-content">
+
+           <!-- Modal Header -->
+           <div class="modal-header">
+             <h4 class="modal-title">Edit Main Category</h4>
+             <button type="button" class="close" data-dismiss="modal">&times;</button>
+           </div>
+
+           <!-- Modal body -->
+          <form action="{% url 'edit-main-categories' %}" method="post"  autocomplete="off">
+            {% csrf_token %}
+           <div class="modal-body">
+               <div class="form-row">
+                 <div class="form-group col-md-12">
+                   <label for="">Main Category Code</label>
+                   <input type="text" readonly class="form-control form-control-sm" name="main_category_code" id="main_category_code">
+                   <br>
+                    <label for="">Main Category Name</label>
+                   <input type="text" class="form-control form-control-sm" required name="main_category_name_edit" id="main_category_name_edit">
+                 </div>
+                </div>
+           </div>
+           <!-- Modal footer -->
+           <div class="modal-footer">
+             <input type="submit" class="btn btn-success" value="Submit"/>
+           </div>
+         </form>
+         <!-- <form class="" action="index.html" method="post">
+         </form> -->
+         </div>
+       </div>
+     </div>
+
+
+     <div class="modal fade" id="addCategoryModalSub">
+       <div class="modal-dialog">
+         <div class="modal-content">
+
+           <!-- Modal Header -->
+           <div class="modal-header">
+             <h4 class="modal-title">Add Sub Category</h4>
+             <button type="button" class="close" data-dismiss="modal">&times;</button>
+           </div>
+
+           <!-- Modal body -->
+          <form action="{% url 'sub-categories' %}" method="post"  autocomplete="off">
+            {% csrf_token %}
+           <div class="modal-body">
+             <div class="form-row">
+               <div class="form-group col-md-12">
+                 <label for="">Select Main Category</label>
+                 <select class="form-control" name="main_category">
+                   {% for value in main_categories %}
+                   <option value="{{value.id}}">{{value.main}}</option>
+                   {% endfor %}
+                 </select>
+               </div>
+              </div>
+               <div class="form-row">
+                 <div class="form-group col-md-12">
+                   <label for="">Sub Category Name</label>
+                   <!-- <input type="text" style="display:none;" class="form-control form-control-sm" required name="edit" id="id_edit"> -->
+                   <input type="text" class="form-control form-control-sm" required name="sub_category_name" id="">
+                 </div>
+                </div>
+           </div>
+           <!-- Modal footer -->
+           <div class="modal-footer">
+             <input type="submit" class="btn btn-success" value="Submit"/>
+           </div>
+         </form>
+         <!-- <form class="" action="index.html" method="post">
+         </form> -->
+         </div>
+       </div>
+     </div>
+
+
+    <div class="modal fade" id="editCategoryModalSub">
+      <div class="modal-dialog">
+        <div class="modal-content">
+
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">Edit Sub Category</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+
+          <!-- Modal body -->
+         <form action="{% url 'edit-sub-categories' %}" method="post"  autocomplete="off">
+           {% csrf_token %}
+          <div class="modal-body">
+              <div class="form-row">
+                <div class="form-group col-md-12">
+                  <label for="">Sub Category Code</label>
+                  <input type="text" readonly class="form-control form-control-sm" name="sub_category_code" id="sub_category_code">
+                </div>
+                  <div class="form-group col-md-12">
+                    <label for="">Select Main Category</label>
+                    <select class="form-control" name="main_category">
+                      {% for value in main_categories %}
+                      <option value="{{value.id}}">{{value.main}}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                <div class="form-group col-md-12">
+                   <label for="">Sub Category Name</label>
+                  <input type="text" class="form-control form-control-sm" required name="sub_category_name_edit" id="sub_category_name_edit">
+                </div>
+               </div>
+          </div>
+          <!-- Modal footer -->
+          <div class="modal-footer">
+            <input type="submit" class="btn btn-success" value="Submit"/>
+          </div>
+        </form>
+        <!-- <form class="" action="index.html" method="post">
+        </form> -->
+        </div>
+      </div>
+    </div>
+
+
+
+{% endblock body %}

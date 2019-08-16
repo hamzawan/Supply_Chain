@@ -89,7 +89,7 @@ class DcHeaderCustomer(models.Model):
     show_notification = models.BooleanField(default = True)
     follow_up = models.DateField(blank = True)
     cartage_amount = models.DecimalField(max_digits = 8, decimal_places = 2)
-    comments = models.CharField(max_length = 100)
+    po_no = models.CharField(max_length = 100)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True)
     user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
     company_id = models.ForeignKey(Company_info, models.SET_NULL, blank = True, null = True)

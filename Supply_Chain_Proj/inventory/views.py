@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
-from .models import (Add_products)
+from .models import (Add_products, Category, SubCategory)
 from transaction.models import (PurchaseDetail, SaleDetail)
 from itertools import chain
 import json
@@ -120,43 +120,47 @@ def new_item_stock(request):
 
 @user_passes_test(allow_inventory_add)
 def add_product(request):
+    serial_no = 0
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     get_item_code = Add_products.objects.last()
+    main_categories = Category.objects.all()
+    sub_categories = SubCategory.objects.all()
     if get_item_code:
         get_item_code = get_item_code.product_code
-        serial_no = get_item_code[-4:]
-        serial_no = int(serial_no) + 1
+        # serial_no = get_item_code[-4:]
+        serial_no = int(get_item_code) + 1
     else:
-        inc = 1
-        serial_no = int('1001')
+        serial_no = '1001'
     product_name = request.POST.get('product_name',False)
     product_desc = request.POST.get('product_desc',False)
     type = request.POST.get('type',False)
     size = request.POST.get('size',False)
     if product_name and product_desc and type and size:
+        type = request.POST.get('type',False)
+        size = request.POST.get('size',False)
         product_name = request.POST.get('product_name',False)
         product_desc = request.POST.get('product_desc',False)
         opening_stock = request.POST.get('opening_stock',False)
         unit = request.POST.get('unit',False)
-        print(unit)
-        type = request.POST.get('type',False)
-        size = request.POST.get('size',False)
-        return JsonResponse({"product_name":product_name,"type":type,"size":size,"product_desc": product_desc,'unit':unit,'opening_stock':opening_stock})
+        main_category_id = Category.objects.filter(main = type).first()
+        sub_category_id = SubCategory.objects.filter(sub = size).first()
+        return JsonResponse({"product_name":product_name,"type":type,"size":size,"product_desc": product_desc,'unit':unit,'opening_stock':opening_stock,'main_category_id':main_category_id.id, 'sub_category_id':sub_category_id.id})
     if request.method == 'POST':
         items = json.loads(request.POST.get('items'))
         for value in items:
-            type = value["type"][:3]
-            size = value["size"][:3]
-            item_code = type+"-"+size+"-"+str(serial_no)
-
-            new_products = Add_products(product_code = item_code, product_name = value["item_name"], product_desc = value["item_desc"],unit = value["unit"], size = value["size"], type = value["type"] ,opening_stock = value["opening_stock"])
+            # type = value["type"][:3]
+            # size = value["size"][:3]
+            item_code = str(serial_no)
+            main_category_id = Category.objects.get(id = value["main_category_id"])
+            sub_category_id = SubCategory.objects.get(id = value["sub_category_id"])
+            new_products = Add_products(product_code = item_code, product_name = value["item_name"], product_desc = value["item_description"],unit = value["unit"], size = value["size"], type = "" ,opening_stock = value["opening_stock"], user_id = request.user ,main_category_id = main_category_id, sub_category_id = sub_category_id)
             new_products.save()
-            serial_no = serial_no + 1
+            serial_no = int(serial_no) + 1
         return JsonResponse({"result":"success"})
-    return render(request, 'inventory/add_product.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+    return render(request, 'inventory/add_product.html',{'main_categories':main_categories,'sub_categories':sub_categories,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
 @user_passes_test(allow_inventory_edit)
@@ -217,3 +221,124 @@ def delete_item(request, pk):
     else:
         messages.add_message(request, messages.ERROR, "You cannot delete this item, it is refrenced")
         return redirect('item-stock')
+
+
+def categories(request):
+    permission = inventory_form_roles(request.user)
+    allow_customer_roles = customer_roles(request.user)
+    allow_supplier_roles = supplier_roles(request.user)
+    allow_transaction_roles = transaction_roles(request.user)
+    allow_inventory_roles = inventory_roles(request.user)
+    main_categories = Category.objects.all()
+    sub_categories = SubCategory.objects.all()
+    return render(request,'inventory/category_and_type.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser, 'main_categories':main_categories,'sub_categories':sub_categories})
+
+
+def main_categories(request):
+    last_code = Category.objects.last()
+    if last_code:
+        last_code = int(last_code.category_code) + 1
+    else:
+        last_code = 101
+    if request.method == "POST":
+        main_category_name = request.POST.get('main_category_name')
+        add_main_category = Category(category_code = last_code, main = main_category_name)
+        add_main_category.save()
+    return redirect('categories')
+
+
+def edit_main_categories(request):
+    if request.method == "POST":
+        main_category_code = request.POST.get('main_category_code')
+        main_category_name_edit = request.POST.get('main_category_name_edit')
+        cat = Category.objects.filter(category_code = main_category_code).first()
+        cat.main = main_category_name_edit
+        cat.save()
+    return redirect('categories')
+
+
+def sub_categories(request):
+    if request.method == "POST":
+        main_category_id = request.POST.get('main_category')
+        sub_category_name = request.POST.get('sub_category_name')
+        main_category_code = Category.objects.filter(id = main_category_id).first()
+        last_code = SubCategory.objects.filter(main_category_id = main_category_id).last()
+        if last_code:
+            last_code = int(last_code.sub_category_code) + 1
+        else:
+            last_code = int(str(main_category_code.category_code) + str(1))
+        add_sub_category = SubCategory(sub_category_code = last_code, sub = sub_category_name, main_category_id = main_category_code)
+        add_sub_category.save()
+    return redirect('categories')
+
+
+def edit_sub_categories(request):
+    if request.method == "POST":
+        sub_category_code = request.POST.get('sub_category_code')
+        sub_category_name_edit = request.POST.get('sub_category_name_edit')
+        main_category = request.POST.get('main_category')
+        main_category_code = Category.objects.filter(id = main_category).first()
+        cat = SubCategory.objects.filter(sub_category_code = sub_category_code).first()
+        last_code = SubCategory.objects.filter(main_category_id = main_category).last()
+        if last_code:
+            last_code = int(last_code.sub_category_code) + 1
+        else:
+            last_code = int(str(main_category_code.category_code) + str(1))
+        cat.sub = sub_category_name_edit
+        cat.main_category_id = main_category_code
+        cat.sub_category_code = last_code
+        cat.save()
+    return redirect('categories')
+
+
+def main_category_avaliable(pk):
+    cusror = connection.cursor()
+    row = cusror.execute('''select case
+                                when exists (select id from inventory_subcategory  where main_category_id_id = %s)
+                                then 'y'
+                                else 'n'
+                                end''',[pk])
+    row = row.fetchall()
+    res_list = [x[0] for x in row]
+    if res_list[0] == "n":
+        Category.objects.filter(id = pk).delete()
+        return True
+    else:
+        return False
+
+
+def delete_categories(request,pk):
+    category = main_category_avaliable(pk)
+    if category == True:
+        messages.add_message(request, messages.SUCCESS, "Main Category Deleted")
+        return redirect('categories')
+    else:
+        messages.add_message(request, messages.ERROR, "You cannot delete this Category, it is refrenced")
+    return redirect('categories')
+
+
+def sub_category_avaliable(pk):
+    cusror = connection.cursor()
+    row = cusror.execute('''select case
+                            when exists (select id from inventory_add_products  where sub_category_id_id = %s)
+                            then 'y'
+                            else 'n'
+                            end
+                            ''',[pk])
+    row = row.fetchall()
+    res_list = [x[0] for x in row]
+    if res_list[0] == "n":
+        SubCategory.objects.filter(id = pk).delete()
+        return True
+    else:
+        return False
+
+
+def delete_sub_categories(request,pk):
+    category = sub_category_avaliable(pk)
+    if category == True:
+        messages.add_message(request, messages.SUCCESS, "Sub Category Deleted")
+        return redirect('categories')
+    else:
+        messages.add_message(request, messages.ERROR, "You cannot delete this Category, it is refrenced")
+    return redirect('categories')

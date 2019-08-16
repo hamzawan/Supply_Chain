@@ -11,26 +11,33 @@
   <li class="list-group-item">
       {% csrf_token %}
       <div class="form-row">
-        <div class="form-group col-md-1">
-          <label for="">Type</label>
-          <input type="text" class="form-control form-control-sm"  id="type">
+        <div class="form-group col-md-2">
+          <label for="">Select Main Category</label>
+          <select class="form-control form-control-sm" id="main_category">
+            {% for value in main_categories %}
+            <option value="{{value.id}}">{{value.main}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group col-md-2">
+          <label for="">Select Sub Category</label>
+          <select class="form-control form-control-sm" id="sub_category">
+            {% for value in sub_categories %}
+            <option value="{{value.id}}">{{value.sub}}</option>
+            {% endfor %}
+          </select>
         </div>
         <div class="form-group col-md-1">
           <label for="">Size</label>
           <input type="text" class="form-control form-control-sm"  id="size">
         </div>
-        <div class="form-group col-md-2">
-          <label for="">Item Name</label>
-          <input type="text" class="form-control form-control-sm"  id="product_name">
-        </div>
         <div class="form-group col-md-3">
-          <label for="">Item Description</label>
-          <textarea name="name" rows="" cols="25" id="product_desc" style="height:30px; width:275px;"></textarea>
+          <label for="">Description</label>
+          <textarea name="name" class="form-control form-control-sm" rows="" cols="25" id="product_desc" style="height:30px; width:275px;"></textarea>
         </div>
         <div class="form-group col-md-2">
           <label for="">Unit</label>
           <select class="form-control form-control-sm" id="select_unit" >
-            <option value="">Select:</option>
             <option value="">FT</option>
             <option value="">MTR</option>
             <option value="">EA.length</option>
@@ -57,11 +64,11 @@
     <table class="table table-bordered" id="add-item-table">
           <thead>
               <tr>
-                  <th width="120px">S No.</th>
-                  <th width="130px">Type</th>
-                  <th width="130px">Size</th>
+                  <th width="130px">Main Category</th>
+                  <th width="130px">Sub Category</th>
                   <th width="200px">Item Name</th>
                   <th width="250px">Item Description</th>
+                  <th width="100px">Size</th>
                   <th width="100px">Unit</th>
                   <th width="100px">Opening Stock</th>
                   <th>Action</th>

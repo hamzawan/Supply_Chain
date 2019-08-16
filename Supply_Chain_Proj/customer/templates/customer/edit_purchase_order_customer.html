@@ -7,7 +7,7 @@
   <h4>Edit Purchase Order Customer</h4>
 </div>
 <ul class="list-group list-group-flush">
-  <form  action="" method="post" id="edit-customer-po-form">
+  <form  action="" method="post" id="edit-customer-po-form" autocomplete="off">
     {% csrf_token %}
     <li class="list-group-item">
         <div class="form-row">
@@ -59,15 +59,15 @@
           </div>
           <div class="form-group col-md-2">
             <label for="">Currency Rate</label>
-            <input type="text" class="form-control form-control-sm" value="{{ po_header.currency }}" id="edit_po_currency_rate">
+            <input type="text" readonly class="form-control form-control-sm" value="{{ po_header.currency }}" id="edit_po_currency_rate">
           </div>
           <div class="form-group col-md-2">
             <label for="">Exchange Rate</label>
-            <input type="text" class="form-control form-control-sm" value="{{ po_header.exchange_rate }}" id="edit_po_exchange_rate">
+            <input type="text" readonly class="form-control form-control-sm" value="{{ po_header.exchange_rate }}" id="edit_po_exchange_rate">
           </div>
           <div class="form-group col-md-2">
             <label for="">Follow Up</label>
-            <input type="date" class="form-control form-control-sm" value="{{ po_header.follow_up|date:"Y-m-d" }}" id="edit_po_follow_up">
+            <input type="date"  class="form-control form-control-sm" value="{{ po_header.follow_up|date:"Y-m-d" }}" id="edit_po_follow_up">
           </div>
         </div>
         <div class="form-row">

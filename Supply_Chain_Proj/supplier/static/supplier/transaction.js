@@ -165,9 +165,8 @@ $(document).ready(function(){
 						 sum = sum + parseFloat($(this).find('td#total').text());
 					});
 
-				cartage_amount =	$('#cartage_amount').val();
-				additional_tax = $('#additional_tax').val();
-				console.log(sum);
+				cartage_amount =	$('#cartage_amount_purchase').val();
+				additional_tax = $('#additional_tax_purchase').val();
 				grand = parseFloat(cartage_amount) + parseFloat(additional_tax) + sum;
 				$('#last_grand_total').val(grand.toFixed(2));
 
@@ -202,9 +201,9 @@ $(document).ready(function(){
 					$(".add-new-rfq-customer").removeAttr("disabled");
 				});
 
-		$('#cartage_amount').on('keyup',function(e){
+		$('#cartage_amount_purchase').on('keyup',function(e){
 			var i = this.value;
-			var at = $('#additional_tax').val()
+			var at = $('#additional_tax_purchase').val()
 			if(!isNaN(i) && i.length != 0){
 					if (!isNaN(at)) {
 							var a =  sum
@@ -228,9 +227,9 @@ $(document).ready(function(){
 			}
 		});
 
-		$('#additional_tax').on('keyup',function(){
+		$('#additional_tax_purchase').on('keyup',function(){
 			var i = this.value;
-			var ac = $('#cartage_amount').val()
+			var ac = $('#cartage_amount_purchase').val()
 			if(!isNaN(i) && i.length != 0){
 					if (!isNaN(ac)) {
 							var a =  sum
@@ -254,23 +253,6 @@ $(document).ready(function(){
 			}
 
 		})
-
-
-		$('#withholding_tax').on('keyup',function(){
-			var i = this.value;
-			var cartage_amount = parseFloat($('#cartage_amount').val());
-			var additional_tax = parseFloat($('#additional_tax').val());
-			var grand_total = parseFloat(sum);
-			var a =  cartage_amount + additional_tax + grand_total;
-			console.log(a);
-			var withholding_tax =  a.toFixed(2) * i;
-			withholding_tax = withholding_tax / 100;
-			var amount =  withholding_tax + cartage_amount + additional_tax +  grand_total
-			$('#last_grand_total').val(amount.toFixed(2));
-		})
-
-
-					//NEW PURCHASE END
 
 				$('#new-purchase-submit').on('submit',function(e){
 					e.preventDefault();
@@ -515,72 +497,6 @@ $(document).on("click", ".edit-transaction-edit", function(){
 		$(".add-new-rfq-customer").removeAttr("disabled");
 	});
 
-$('#cartage_amount').on('keyup',function(e){
-var i = this.value;
-var at = $('#additional_tax').val()
-if(!isNaN(i) && i.length != 0){
-		if (!isNaN(at)) {
-				var a =  sum
-				var v =  parseFloat(a) + parseFloat(i) + parseFloat(at)
-				$('#last_grand_total').val(v.toFixed(2));
-		}
-		else {
-				var a =  sum
-				var v =  parseFloat(a) + parseFloat(i)
-				$('#last_grand_total').val(v.toFixed(2));
-		}
-}
-else {
-	if (!isNaN(at)) {
-		sum = parseFloat(at) + sum;
-		$('#last_grand_total').val(sum.toFixed(2));
-	}
-	else {
-		$('#last_grand_total').val(sum);
-	}
-}
-});
-
-$('#additional_tax').on('keyup',function(){
-var i = this.value;
-var ac = $('#cartage_amount').val()
-if(!isNaN(i) && i.length != 0){
-		if (!isNaN(ac)) {
-				var a =  sum
-				var v =  parseFloat(a) + parseFloat(i) + parseFloat(ac)
-				$('#last_grand_total').val(v.toFixed(2));
-		}
-		else {
-				var a =  sum
-				var v =  parseFloat(a) + parseFloat(i)
-				$('#last_grand_total').val(v.toFixed(2));
-		}
-}
-else {
-	if (!isNaN(ac)) {
-		sum = parseFloat(ac) + sum;
-		$('#last_grand_total').val(sum.toFixed(2));
-	}
-	else {
-		$('#last_grand_total').val(sum);
-	}
-}
-
-})
-
-
-$('#withholding_tax').on('keyup',function(){
-var i = this.value;
-var cartage_amount = parseFloat($('#cartage_amount').val());
-var additional_tax = parseFloat($('#additional_tax').val());
-var grand_total = parseFloat(sum);
-var a =  cartage_amount + additional_tax + grand_total;
-console.log(a);
-var withholding_tax =  a.toFixed(2) * i;
-withholding_tax = withholding_tax / 100;
-var amount =  withholding_tax + cartage_amount + additional_tax +  grand_total
-$('#last_grand_total').val(amount.toFixed(2));
-})
 
 
 		//EDIT PURCHASE END
@@ -846,7 +762,6 @@ $('#last_grand_total').val(amount.toFixed(2));
 											'<td >'+count+'</td>'+
 											'<td style="display:none;">'+data.row[i][1]+'</td>'+
 											'<td id="get_item_code">'+data.row[i][2]+'</td>' +
-											'<td><input type="text" list="hs_code" style="width:100px;" class="form-control" ></input><datalist id="hs_code"></datalist></td>' +
 											'<td>'+data.row[i][3]+'</td>' +
 											'<td id="desc" ><pre>'+data.row[i][4]+'</pre></td>' +
 											'<td id="quantity"><input type="text" style="width:80px;" class="form-control" value="'+data.row[i][8]+'"></td>' +
@@ -864,9 +779,6 @@ $('#last_grand_total').val(amount.toFixed(2));
 							$("table tbody tr").eq(index + i+1).find(".edit-transaction-sale, .add-transaction-sale").toggle();
 									$('[data-toggle="tooltip"]').tooltip();
 									$('#dc_code_sale').val("");
-									for (var j = 1; j < data.hs_code.length; j++) {
-										 $("#hs_code").append($("<option>").attr('value', data.hs_code[j]).text(data.hs_code[j]));
-									}
 								 }
 							 });
 						}
@@ -893,7 +805,6 @@ $('#last_grand_total').val(amount.toFixed(2));
 											 '<td>'+count+'</td>' +
 											 '<td style="display:none;">'+type[0]['pk']+'</td>' +
 											 '<td id="get_item_code">'+ type[0].fields['product_code'] +'</td>' +
-											 '<td width="160px" id="hs_code"><input type="text" style="width:80px;" class="form-control" value=""></td>' +
 											 '<td>'+ type[0].fields['product_name'] +'</td>' +
 											 '<td id="desc" >'+ type[0].fields['product_desc'] +'</td>' +
 											 '<td id="quantity" width="100px" ><input type="text" class="form-control" value=""></td>' +
@@ -1040,72 +951,6 @@ $('#last_grand_total').val(amount.toFixed(2));
 						$(".add-item-sale").removeAttr("disabled");
 					});
 
-				$('#cartage_amount').on('keyup',function(e){
-				var i = this.value;
-				var at = $('#additional_tax').val()
-				if(!isNaN(i) && i.length != 0){
-						if (!isNaN(at)) {
-								var a =  sum
-								var v =  parseFloat(a) + parseFloat(i) + parseFloat(at)
-								$('#last_grand_total').val(v.toFixed(2));
-						}
-						else {
-								var a =  sum
-								var v =  parseFloat(a) + parseFloat(i)
-								$('#last_grand_total').val(v.toFixed(2));
-						}
-				}
-				else {
-					if (!isNaN(at)) {
-						sum = parseFloat(at) + sum;
-						$('#last_grand_total').val(sum.toFixed(2));
-					}
-					else {
-						$('#last_grand_total').val(sum);
-					}
-				}
-				});
-
-				$('#additional_tax').on('keyup',function(){
-				var i = this.value;
-				var ac = $('#cartage_amount').val()
-				if(!isNaN(i) && i.length != 0){
-						if (!isNaN(ac)) {
-								var a =  sum
-								var v =  parseFloat(a) + parseFloat(i) + parseFloat(ac)
-								$('#last_grand_total').val(v.toFixed(2));
-						}
-						else {
-								var a =  sum
-								var v =  parseFloat(a) + parseFloat(i)
-								$('#last_grand_total').val(v.toFixed(2));
-						}
-				}
-				else {
-					if (!isNaN(ac)) {
-						sum = parseFloat(ac) + sum;
-						$('#last_grand_total').val(sum.toFixed(2));
-					}
-					else {
-						$('#last_grand_total').val(sum);
-					}
-				}
-
-				})
-
-
-				$('#withholding_tax').on('keyup',function(){
-				var i = this.value;
-				var cartage_amount = parseFloat($('#cartage_amount').val());
-				var additional_tax = parseFloat($('#additional_tax').val());
-				var grand_total = parseFloat(sum);
-				var a =  cartage_amount + additional_tax + grand_total;
-				var withholding_tax =  a.toFixed(2) * i;
-				withholding_tax = withholding_tax / 100;
-				var amount =  withholding_tax + cartage_amount + additional_tax +  grand_total
-				$('#last_grand_total').val(amount.toFixed(2));
-				})
-
 			$('.add-cartage').on('click', function(){
 						var index = $("#cartage-table tbody tr:last-child").index();
 				var row = '<tr>' +
@@ -1130,6 +975,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 				var credit_days = $('#credit_days').val();
 				var customer = $('#customer_name_sale').val();
 				var payment_method = $('#payment_method').val();
+				var hs_code = $('#hs_code').val();
 				var footer_desc = $('#footer_desc').val();
 
 				var cartage_amount = $('#cartage_amount').val();
@@ -1143,7 +989,6 @@ $('#last_grand_total').val(amount.toFixed(2));
 						var $tds = $(this).find('td');
 						var row = {
 							'id' : "",
-							'hs_code': "",
 							'quantity' : "",
 							'price' : "",
 							'sales_tax' : "",
@@ -1154,20 +999,16 @@ $('#last_grand_total').val(amount.toFixed(2));
 									row["id"] = ($(this).text());
 									console.log($(this).text());
 							}
-							if (i === 3) {
-									row["hs_code"] = ($(this).text());
-									console.log($(this).text());
-							}
-							else if (i === 6) {
+							else if (i === 5) {
 									row["quantity"] = ($(this).text());
 							}
-							else if (i === 8) {
+							else if (i === 7) {
 									row["price"] = ($(this).text());
 							}
-							else if (i === 10) {
+							else if (i === 9) {
 									row["sales_tax"] = ($(this).text());
 							}
-							else if (i === 13) {
+							else if (i === 12) {
 									row["dc_no"] = ($(this).text());
 									console.log($(this).text());
 							}
@@ -1209,6 +1050,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 								'follow_up': follow_up,
 								'credit_days': credit_days,
 								'payment_method': payment_method,
+								'hs_code': hs_code,
 								'footer_desc': footer_desc,
 								'cartage_amount': cartage_amount,
 								'additional_tax':additional_tax,
@@ -1225,14 +1067,14 @@ $('#last_grand_total').val(amount.toFixed(2));
 			});
 			$('#new-sale-submit-direct').on('submit',function(e){
 				e.preventDefault();
-				console.log("clicked");
 				var table = $('#new-sale-table-direct');
-				var table = $('#cartage-table');
+				var cartage_table = $('#cartage-table');
 				var data = [];
 				var datax = [];
 				var sale_id = $('#sale_id').val();
 				var customer = $('#customer_name_sale').val();
 				var payment_method = $('#payment_method').val();
+				var hs_code = $('#hs_code').val();
 				var footer_desc = $('#footer_desc').val();
 				table.find('tr').each(function (i, el){
 					if(i != 0)
@@ -1242,6 +1084,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 							'id' : "",
 							'quantity' : "",
 							'price' : "",
+							'sales_tax': "",
 							'dc_no': ""
 						};
 						$tds.each(function(i, el){
@@ -1254,7 +1097,10 @@ $('#last_grand_total').val(amount.toFixed(2));
 							else if (i === 7) {
 									row["price"] = ($(this).text());
 							}
-							else if (i === 10) {
+							else if (i === 9) {
+									row["sales_tax"] = ($(this).text());
+							}
+							else if (i === 12) {
 									row["dc_no"] = ($(this).text());
 							}
 						});
@@ -1281,7 +1127,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 						datax.push(rowx);
 					}
 				});
-
+									console.log(datax)
 					 req =	$.ajax({
 							headers: { "X-CSRFToken": getCookie("csrftoken") },
 							type: 'POST',
@@ -1290,10 +1136,9 @@ $('#last_grand_total').val(amount.toFixed(2));
 								'sale_id': sale_id,
 								'customer': customer,
 								'payment_method': payment_method,
+								'hs_code':hs_code,
 								'footer_desc': footer_desc,
-								'cartage_amount': cartage_amount,
 								'additional_tax':additional_tax,
-								'withholding_tax':withholding_tax,
 								'items': JSON.stringify(data),
 								'cartage': JSON.stringify(datax),
 							},
@@ -1594,71 +1439,6 @@ $('#last_grand_total').val(amount.toFixed(2));
 					$(".add-item-sale").removeAttr("disabled");
 				});
 
-				$('#cartage_amount').on('keyup',function(e){
-				var i = this.value;
-				var at = $('#additional_tax').val()
-				if(!isNaN(i) && i.length != 0){
-					if (!isNaN(at)) {
-							var a =  sum
-							var v =  parseFloat(a) + parseFloat(i) + parseFloat(at)
-							$('#last_grand_total').val(v.toFixed(2));
-					}
-					else {
-							var a =  sum
-							var v =  parseFloat(a) + parseFloat(i)
-							$('#last_grand_total').val(v.toFixed(2));
-					}
-				}
-				else {
-				if (!isNaN(at)) {
-					sum = parseFloat(at) + sum;
-					$('#last_grand_total').val(sum.toFixed(2));
-				}
-				else {
-					$('#last_grand_total').val(sum);
-				}
-				}
-				});
-
-				$('#additional_tax').on('keyup',function(){
-				var i = this.value;
-				var ac = $('#cartage_amount').val()
-				if(!isNaN(i) && i.length != 0){
-					if (!isNaN(ac)) {
-							var a =  sum
-							var v =  parseFloat(a) + parseFloat(i) + parseFloat(ac)
-							$('#last_grand_total').val(v.toFixed(2));
-					}
-					else {
-							var a =  sum
-							var v =  parseFloat(a) + parseFloat(i)
-							$('#last_grand_total').val(v.toFixed(2));
-					}
-				}
-				else {
-				if (!isNaN(ac)) {
-					sum = parseFloat(ac) + sum;
-					$('#last_grand_total').val(sum.toFixed(2));
-				}
-				else {
-					$('#last_grand_total').val(sum);
-				}
-				}
-
-				})
-
-
-				$('#withholding_tax').on('keyup',function(){
-				var i = this.value;
-				var cartage_amount = parseFloat($('#cartage_amount').val());
-				var additional_tax = parseFloat($('#additional_tax').val());
-				var grand_total = parseFloat(sum);
-				var a =  cartage_amount + additional_tax + grand_total;
-				var withholding_tax =  a.toFixed(2) * i;
-				withholding_tax = withholding_tax / 100;
-				var amount =  withholding_tax + cartage_amount + additional_tax +  grand_total
-				$('#last_grand_total').val(amount.toFixed(2));
-				})
 
 				$('.add-cartage-ngst').on('click', function(){
 					var index = $("#cartage-table tbody tr:last-child").index();
@@ -2545,7 +2325,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 //=======================================================================================
 
 		$('#edit-sale-table tbody tr').each(function() {
-			var tdObject = $(this).find('td:eq(11)');
+			var tdObject = $(this).find('td:eq(10)');
 			var total = tdObject.text()
 			console.log(total);
 			if (!isNaN(total) && total.length !== 0) {
@@ -2561,7 +2341,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 		});
 
 		$('#edit-sale-table tbody tr').each(function() {
-		var sales_tax = $(this).find('td:eq(10)');
+		var sales_tax = $(this).find('td:eq(9)');
 		var total_sales_tax = sales_tax.text()
 		if (!isNaN(total_sales_tax) && total_sales_tax.length !== 0) {
 				sum_st += parseFloat(total_sales_tax);
@@ -2630,7 +2410,6 @@ $('#last_grand_total').val(amount.toFixed(2));
 						var row = '<tr>' +
 								'<td style="display:none;">'+data.row[i][1]+'</td>'+
 								'<td id="get_item_code">'+data.row[i][2]+'</td>' +
-								'<td><input type="text" list="hs_code" style="width:100px;" class="form-control" ></input><datalist id="hs_code"></datalist></td>' +
 								'<td>'+data.row[i][3]+'</td>' +
 								'<td id="desc" ><pre>'+data.row[i][4]+'</pre></td>' +
 								'<td id="quantity_edit"><input type="text" style="width:80px;" class="form-control" value="'+data.row[i][8]+'"></td>' +
@@ -2648,9 +2427,6 @@ $('#last_grand_total').val(amount.toFixed(2));
 					$("#edit-sale-table tbody tr").eq(index + i+1).find(".add-sale-edit, .edit-sale-edit").toggle();
 						$('[data-toggle="tooltip"]').tooltip();
 						$('#dc_code_sale').val("");
-						for (var j = 1; j < data.hs_code.length; j++) {
-							 $("#hs_code").append($("<option>").attr('value', data.hs_code[j]).text(data.hs_code[j]));
-						}
 					 }
 				 });
 			}
@@ -2722,7 +2498,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 						sum_add = 0;
 						sum_st = 0;
 						$('#edit-sale-table tbody tr').each(function() {
-							var tdObject = $(this).find('td:eq(11)');
+							var tdObject = $(this).find('td:eq(10)');
 							var total = tdObject.text()
 							if (!isNaN(total) && total.length !== 0) {
 									sum_add += parseFloat(total);
@@ -2733,7 +2509,7 @@ $('#last_grand_total').val(amount.toFixed(2));
 						});
 
 						$('#edit-sale-table tbody tr').each(function() {
-						var sales_tax = $(this).find('td:eq(10)');
+						var sales_tax = $(this).find('td:eq(9)');
 						var total_sales_tax = sales_tax.text()
 						if (!isNaN(total_sales_tax) && total_sales_tax.length !== 0) {
 								sum_st += parseFloat(total_sales_tax);
@@ -2747,13 +2523,13 @@ $('#last_grand_total').val(amount.toFixed(2));
 			// Edit row on edit button click
 $(document).on("click", ".edit-sale-edit", function(){
 	$(this).parents("tr").find("td:not(:last-child)").each(function(i){
-			if (i === 5) {
+			if (i === 4) {
 				$(this).html('<input type="text" style="width:80px;" class="form-control" value="' + $(this).text() + '">');
 			}
-			if (i === 7) {
+			if (i === 6) {
 				$(this).html('<input type="text" style="width:80px;" class="form-control" value="' + $(this).text() + '">');
 			}
-			if (i === 9) {
+			if (i === 8) {
 				 $(this).html('<input type="text" style="width:80px;" class="form-control" value="' + $(this).text() + '">');
 			}
 
@@ -2773,74 +2549,6 @@ $(document).on("click", ".delete-sale-edit", function(){
 	$(".add-item-sale").removeAttr("disabled");
 });
 
-$('#cartage_amount').on('keyup',function(e){
-var i = this.value;
-var at = $('#additional_tax').val()
-if(!isNaN(i) && i.length != 0){
-	if (!isNaN(at)) {
-			var a =  sum
-			var v =  parseFloat(a) + parseFloat(i) + parseFloat(at)
-			$('#last_grand_total').val(v.toFixed(2));
-	}
-	else {
-			var a =  sum
-			var v =  parseFloat(a) + parseFloat(i)
-			$('#last_grand_total').val(v.toFixed(2));
-	}
-}
-else {
-if (!isNaN(at)) {
-	sum = parseFloat(at) + sum;
-	$('#last_grand_total').val(sum.toFixed(2));
-}
-else {
-	$('#last_grand_total').val(sum);
-}
-}
-});
-
-$('#additional_tax').on('keyup',function(){
-var i = this.value;
-var ac = $('#cartage_amount').val()
-if(!isNaN(i) && i.length != 0){
-	if (!isNaN(ac)) {
-			var a =  sum
-			var v =  parseFloat(a) + parseFloat(i) + parseFloat(ac)
-			$('#last_grand_total').val(v.toFixed(2));
-	}
-	else {
-			var a =  sum
-			var v =  parseFloat(a) + parseFloat(i)
-			$('#last_grand_total').val(v.toFixed(2));
-	}
-}
-else {
-if (!isNaN(ac)) {
-	sum = parseFloat(ac) + sum;
-	$('#last_grand_total').val(sum.toFixed(2));
-}
-else {
-	$('#last_grand_total').val(sum);
-}
-}
-
-})
-
-
-$('#withholding_tax').on('keyup',function(){
-var i = this.value;
-var cartage_amount = parseFloat($('#cartage_amount').val());
-var additional_tax = parseFloat($('#additional_tax').val());
-var grand_total = parseFloat(sum);
-var a =  cartage_amount + additional_tax + grand_total;
-console.log(a);
-var withholding_tax =  a.toFixed(2) * i;
-withholding_tax = withholding_tax / 100;
-var amount =  withholding_tax + cartage_amount + additional_tax +  grand_total
-$('#last_grand_total').val(amount.toFixed(2));
-})
-
-
 	//EDIT PURCHASE END
 
 $('#edit-sale-submit').on('submit',function(e){
@@ -2855,7 +2563,8 @@ $('#edit-sale-submit').on('submit',function(e){
 	var customer = $('#customer_name_sale').val();
 	var payment_method = $('#payment_method').val();
 	var footer_desc = $('#footer_desc').val();
-	console.log(footer_desc);
+	var hs_code = $('#hs_code').val();
+
 
 	var cartage_amount = $('#cartage_amount_edit').val();
 	var additional_tax = $('#additional_tax_edit').val();
@@ -2869,7 +2578,6 @@ $('#edit-sale-submit').on('submit',function(e){
 				var row = {
 					'id' : "",
 					'quantity' : "",
-					'hs_code': "",
 					'price' : "",
 					'sales_tax' : "",
 					'dc_no': ""
@@ -2878,19 +2586,16 @@ $('#edit-sale-submit').on('submit',function(e){
 					if (i === 0) {
 							row["id"] = ($(this).text());
 					}
-					if (i === 2) {
-							row["hs_code"] = ($(this).text());
-					}
-					else if (i === 5) {
+					else if (i === 4) {
 							row["quantity"] = ($(this).text());
 					}
-					else if (i === 7) {
+					else if (i === 6) {
 							row["price"] = ($(this).text());
 					}
-					else if (i === 9) {
+					else if (i === 8) {
 							row["sales_tax"] = ($(this).text());
 					}
-					else if (i === 12) {
+					else if (i === 11) {
 							row["dc_no"] = ($(this).text());
 					}
 				});
@@ -2929,6 +2634,7 @@ $('#edit-sale-submit').on('submit',function(e){
 					'customer': customer,
 					'follow_up': follow_up,
 					'credit_days': credit_days,
+					'hs_code': hs_code,
 					'payment_method': payment_method,
 					'footer_desc': footer_desc,
 					'cartage_amount': cartage_amount,
@@ -3160,72 +2866,32 @@ $(document).on("click", ".delete-sale-edit-ngst", function(){
 	$(".add-item-sale").removeAttr("disabled");
 });
 
-$('#cartage_amount').on('keyup',function(e){
-var i = this.value;
-var at = $('#additional_tax').val()
-if(!isNaN(i) && i.length != 0){
-	if (!isNaN(at)) {
-			var a =  sum
-			var v =  parseFloat(a) + parseFloat(i) + parseFloat(at)
-			$('#last_grand_total').val(v.toFixed(2));
-	}
-	else {
-			var a =  sum
-			var v =  parseFloat(a) + parseFloat(i)
-			$('#last_grand_total').val(v.toFixed(2));
-	}
-}
-else {
-if (!isNaN(at)) {
-	sum = parseFloat(at) + sum;
-	$('#last_grand_total').val(sum.toFixed(2));
-}
-else {
-	$('#last_grand_total').val(sum);
-}
-}
-});
+				$('#additional_tax').on('keyup',function(){
+				var i = this.value;
+				var ac = $('#cartage_amount').val()
+				if(!isNaN(i) && i.length != 0){
+					if (!isNaN(ac)) {
+							var a =  sum
+							var v =  parseFloat(a) + parseFloat(i) + parseFloat(ac)
+							$('#last_grand_total').val(v.toFixed(2));
+					}
+					else {
+							var a =  sum
+							var v =  parseFloat(a) + parseFloat(i)
+							$('#last_grand_total').val(v.toFixed(2));
+					}
+				}
+				else {
+				if (!isNaN(ac)) {
+					sum = parseFloat(ac) + sum;
+					$('#last_grand_total').val(sum.toFixed(2));
+				}
+				else {
+					$('#last_grand_total').val(sum);
+				}
+				}
 
-$('#additional_tax').on('keyup',function(){
-var i = this.value;
-var ac = $('#cartage_amount').val()
-if(!isNaN(i) && i.length != 0){
-	if (!isNaN(ac)) {
-			var a =  sum
-			var v =  parseFloat(a) + parseFloat(i) + parseFloat(ac)
-			$('#last_grand_total').val(v.toFixed(2));
-	}
-	else {
-			var a =  sum
-			var v =  parseFloat(a) + parseFloat(i)
-			$('#last_grand_total').val(v.toFixed(2));
-	}
-}
-else {
-if (!isNaN(ac)) {
-	sum = parseFloat(ac) + sum;
-	$('#last_grand_total').val(sum.toFixed(2));
-}
-else {
-	$('#last_grand_total').val(sum);
-}
-}
-
-})
-
-
-$('#withholding_tax').on('keyup',function(){
-var i = this.value;
-var cartage_amount = parseFloat($('#cartage_amount').val());
-var additional_tax = parseFloat($('#additional_tax').val());
-var grand_total = parseFloat(sum);
-var a =  cartage_amount + additional_tax + grand_total;
-console.log(a);
-var withholding_tax =  a.toFixed(2) * i;
-withholding_tax = withholding_tax / 100;
-var amount =  withholding_tax + cartage_amount + additional_tax +  grand_total
-$('#last_grand_total').val(amount.toFixed(2));
-})
+				})
 
 
 	//EDIT PURCHASE END
@@ -4313,8 +3979,84 @@ $.fn.extend({
 			$(this).parents("tr").remove();
 		});
 
-		// document.getElementById('box').onchange = function() {
-		// document.getElementById('invoice_no').disabled = !this.checked;
-		// };
+
+		$('#dataTable tbody').on('click','.edit_list',function(){
+		 var currrow = $(this).closest('tr');
+		 var id = currrow.find('td:eq(1)').text();
+		 var main_category_code = currrow.find('td:eq(2)').text();
+		 var col = currrow.find('td:eq(3)').text();
+		 $('#main_category_code').val(main_category_code);
+		 $('#main_category_name_edit').val(col);
+	 })
+
+		 $('#dataTable tbody').on('click','.edit_list',function(){
+			var currrow = $(this).closest('tr');
+			var id = currrow.find('td:eq(1)').text();
+			var sub_category_code = currrow.find('td:eq(3)').text();
+			var col = currrow.find('td:eq(4)').text();
+			$('#sub_category_code').val(sub_category_code);
+			$('#sub_category_name_edit').val(col);
+		})
+
+
+		$('#dataTable tbody').on('click','.edit_list',function(){
+			var currrow = $(this).closest('tr');
+			var id = currrow.find('td:eq(1)').text();
+			var account_title = currrow.find('td:eq(2)').text();
+			var parent_type = currrow.find('td:eq(3)').text();
+			var opening_balance = currrow.find('td:eq(4)').text();
+			var phone_no = currrow.find('td:eq(5)').text();
+			var email_address = currrow.find('td:eq(6)').text();
+			var ntn = currrow.find('td:eq(7)').text();
+			var stn = currrow.find('td:eq(8)').text();
+			var cnic = currrow.find('td:eq(9)').text();
+			var address = currrow.find('td:eq(10)').text();
+			var remarks = currrow.find('td:eq(11)').text();
+			var credit_limit = currrow.find('td:eq(12)').text();
+			console.log(id);
+			if (opening_balance > 0) {
+				$('#debit').prop("checked", true);
+			} else {
+				$('#credit').prop("checked", true);
+			}
+			opening_balance = Math.abs(opening_balance);
+			$('#id').val(id);
+			$('#account_title').val(account_title);
+			$('#opening_balance').val(opening_balance);
+			$('#phone_no').val(phone_no);
+			$('#email_address').val(email_address);
+			$('#ntn').val(ntn);
+			$('#stn').val(stn);
+			$('#cnic').val(cnic);
+			$('#address').val(address);
+			$('#remarks').val(remarks);
+			$('#credit_limits').val(credit_limit);
+	 })
+
+	 // $('#editCategorySubmit').on('submit', function(){
+		//  console.log("clicked");
+		//  id = $('#id_edit').val()
+		//  main_category_name_edit = $('#main_category_name_edit').val()
+		//  console.log(main_category_name_edit);
+		//  req =	$.ajax({
+		// 		headers: { "X-CSRFToken": getCookie("csrftoken") },
+		// 		type: 'POST',
+		// 		url : 'categories/main/edit',
+		// 		data:{
+		// 			'account_id':account_id,
+		// 			'invoice_no': invoice_no,
+		// 		},
+		// 		dataType: 'json'
+		// 	})
+		// 	.done(function done(data){
+		// 		location.reload();
+		// 	})
+	 // })
+
+
+
+		document.getElementById('box').onchange = function() {
+		document.getElementById('invoice_no').disabled = !this.checked;
+		};
 
 });

@@ -1952,15 +1952,11 @@ display: none;
 
 /* ================================================================================================= */
 
-#new-sale-table-direct.table {
-
-    /*table-layout: fixed*/;
-}
 #new-sale-table-direct.table tr th{
-    font-size: 10px;
+    font-size: 14px;
 }
 #new-sale-table-direct.table tr td{
-    font-size: 10px;
+    font-size: 14px;
 }
 #new-sale-table-direct.table tr th, #new-sale-table-direct.table tr td {
     border-color: #e9e9e9;
@@ -2007,7 +2003,7 @@ min-width: 24px;
 #new-sale-table-direct.table .form-control.error {
 border-color: #f50000;
 }
-#new-sale-table-direct.table td .edit-transaction-sale-ngst {
+#new-sale-table-direct.table td .edit-transaction-sale {
 display: none;
 }
 
@@ -2816,6 +2812,21 @@ display: none;
 .tree li a {
     text-decoration: none;
     color:black;
+}
+
+.nostyle {
+    text-decoration: none;
+    color:black;
+}
+
+.nostyle:hover {
+text-decoration: none;
+color:black;
+
+}
+
+.nostyleli {
+    list-style:none;
 }
 .tree li button, .tree li button:active, .tree li button:focus {
     text-decoration: none;

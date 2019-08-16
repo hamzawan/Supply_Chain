@@ -7,7 +7,7 @@
   <h4>Edit Quotation Customer</h4>
 </div>
 <ul class="list-group list-group-flush">
-<form  action="" method="post" id="edit-customer-quotation-submit">
+<form  action="" method="post" id="edit-customer-quotation-submit" autocomplete="off">
   {% csrf_token %}
   <li class="list-group-item">
       <div class="form-row">
@@ -59,15 +59,15 @@
         </div>
         <div class="form-group col-md-2">
           <label for="">Currency Rate</label>
-          <input type="text" class="form-control form-control-sm" value="{{quotation_header.currency}}" id="edit_quotation_currency_rate">
+          <input type="text" readonly class="form-control form-control-sm" value="{{quotation_header.currency}}" id="edit_quotation_currency_rate">
         </div>
         <div class="form-group col-md-2">
           <label for="">Exchange Rate</label>
-          <input type="text" class="form-control form-control-sm" value="{{quotation_header.exchange_rate}}" id="edit_quotation_exchange_rate">
+          <input type="text" readonly class="form-control form-control-sm" value="{{quotation_header.exchange_rate}}" id="edit_quotation_exchange_rate">
         </div>
         <div class="form-group col-md-2">
           <label for="">Follow Up</label>
-          <input type="date" class="form-control form-control-sm" value="{{quotation_header.follow_up|date:"Y-m-d"}}" id="edit_quotation_follow_up">
+          <input type="date"  class="form-control form-control-sm" value="{{quotation_header.follow_up|date:"Y-m-d"}}" id="edit_quotation_follow_up">
         </div>
       </div>
       <div class="form-row">

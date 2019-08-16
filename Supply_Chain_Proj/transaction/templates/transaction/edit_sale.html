@@ -43,6 +43,10 @@
           <label for="">Credit Days:</label>
           <input type="text" readonly class="form-control form-control-sm" value="{{sale_header.credit_days}}" id="credit_days">
         </div>
+        <div class="form-group col-md-2">
+          <label for="">HS Code</label>
+          <input type="text" class="form-control form-control-sm"  value="{{sale_header.hs_code}}" id="hs_code">
+        </div>
         {% if purchase_header.follow_up|date:"Y-m-d" == "2010-06-10" %}
         <div class="form-group col-md-2">
           <label for="">Follow Up</label>
@@ -79,7 +83,6 @@
           <thead>
               <tr>
                   <th width="100px">Item Code</th>
-                  <th width="70px">HS Code</th>
                   <th width="70px">Item Name</th>
                   <th width="70px">Desc.</th>
                   <th width="140px">Qty</th>
@@ -98,7 +101,6 @@
               <tr>
                 <td style="display:none;">{{value.item_id.id}}</td>
                 <td>{{value.item_id.product_code}}</td>
-                <td>{{value.hs_code}}</td>
                 <td>{{value.item_id.product_name}}</td>
                 <td><pre>{{value.item_id.product_desc}}</pre></td>
                 <td id="quantity_edit"> {{value.quantity}} </td>
@@ -150,7 +152,7 @@
             <div class="form-inline">
               <div class="form-group">
                 <label for="text" style="font-size:14px;">Additional Tax: &nbsp;&nbsp;&nbsp;</label>
-                <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="additional_tax" required value="0.00">
+                <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="additional_tax" required value="{{sale_header.additional_tax}}">
               </div>
             </div>
             <div class="form-inline">

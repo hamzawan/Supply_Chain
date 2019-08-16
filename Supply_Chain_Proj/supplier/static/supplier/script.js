@@ -1395,9 +1395,9 @@ $(document).ready(function(){
 					//ADD ITEM
 
 					$(".add-new-row").click(function(){
-						var type = $('#type').val();
-						var size = $('#size').val();
-						var product_name = $('#product_name').val();
+						var type = $('#main_category').find(":selected").text();
+						var size = $('#sub_category').find(":selected").text();
+						var product_name = $('#size').val();
 						var product_desc = $('#product_desc').val();
 						var unit = $('#select_unit').find(":selected").text();
 
@@ -1420,11 +1420,13 @@ $(document).ready(function(){
 						 .done(function done(data){
 								 var index = $("table tbody tr:last-child").index();
 										 var row = '<tr>' +
-												 '<td>'+count+'</td>' +
+												 '<td style="display:none">'+data.main_category_id+'</td>' +
+												 '<td style="display:none">'+data.sub_category_id+'</td>' +
 												 '<td>'+data.type+'</td>' +
 												 '<td>'+data.size+'</td>' +
-												 '<td>'+data.product_name+'</td>' +
+												 '<td>'+data.type+' '+data.size+' '+data.product_name+'</td>' +
 												 '<td><pre><span class="inner-pre" style="font-size: 11px"">'+data.product_desc+'</span></pre></td>' +
+												 '<td>'+data.product_name+'</td>' +
 												 '<td>'+data.unit+'</td>' +
 												 '<td>'+data.opening_stock+'</td>' +
 									 '<td><a class="add-item" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-item" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-item" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
@@ -1494,30 +1496,34 @@ $(document).ready(function(){
 								{
 									var $tds = $(this).find('td');
 									var row = {
+										'main_category_id' : "",
+										'sub_category_id' : "",
 										'item_name' : "",
-										'item_desc' : "",
-										'opening_stock' : "",
-										'type' : "",
-										'size' : "",
-										'unit':"",
+										'item_description' : "",
+										'unit' : "size",
+										'unit' : "",
+										'opening_stock':"",
 									};
 									$tds.each(function(i, el){
+										if (i === 0) {
+												row["main_category_id"] = ($(this).text());
+										}
 										if (i === 1) {
-												row["type"] = ($(this).text());
-										}
-										if (i === 2) {
-												row["size"] = ($(this).text());
-										}
-										else if (i === 3) {
-												row["item_name"] = ($(this).text());
+												row["sub_category_id"] = ($(this).text());
 										}
 										else if (i === 4) {
-												row["item_desc"] = ($(this).text());
+												row["item_name"] = ($(this).text());
 										}
 										else if (i === 5) {
-												row["unit"] = ($(this).text());
+												row["item_description"] = ($(this).text());
 										}
 										else if (i === 6) {
+												row["size"] = ($(this).text());
+										}
+										else if (i === 7) {
+												row["unit"] = ($(this).text());
+										}
+										else if (i === 8) {
 												row["opening_stock"] = ($(this).text());
 										}
 									});

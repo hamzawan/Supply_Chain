@@ -1351,8 +1351,7 @@ $(document).ready(function(){
 							var data = [];
 
 							var customer = $('#dc_customer').val();
-							var cartage_amount = $('#cartage_amount').val();
-							var comments = $('#comments').val();
+							var date = $('#date').val();
 							var follow_up = $('#follow_up').val();
 							var po_client = $('#item_code_po_dc').val();
 							var footer_remarks = $('#footer_remarks').val();
@@ -1387,8 +1386,8 @@ $(document).ready(function(){
 										url : '/customer/delivery_challan/new',
 										data:{
 											'customer':customer,
-											'cartage_amount': cartage_amount,
-											'comments': comments,
+											'date':date,
+											'po_client': po_client,
 											'follow_up': follow_up,
 											'footer_remarks': footer_remarks,
 											'items': JSON.stringify(data),
@@ -1447,47 +1446,47 @@ $(document).ready(function(){
 								});
 
 
-								$(".edit-po-customer-dc").click(function(){
-									var item_code_po_dc = $('#item_code_po_dc').val()
-									console.log(item_code_po_dc);
-									req =	$.ajax({
-										 headers: { "X-CSRFToken": getCookie("csrftoken") },
-										 type: 'POST',
-										 url : `/customer/delivery_challan/edit/${edit_id}`,
-										 data:{
-											 'item_code_po_dc': item_code_po_dc,
-										 },
-										 dataType: 'json'
-									 })
-									 .done(function done(data){
-										 if (data.row) {
-											 console.log(data.row);
-											 var index = $("table tbody tr:last-child").index();
-											 for (var i = 0; i < data.row.length; i++) {
-												 var row = '<tr>' +
-														 '<td>'+count+'</td>' +
-														 '<td style="display:none;" >'+data.row[i][0]+'</td>' +
-														 '<td id="get_item_code">'+data.row[i][1]+'</td>' +
-														 '<td>'+data.row[i][2]+'</td>' +
-														 '<td><pre>'+data.row[i][7]+'</pre></td>' +
-														 '<td id="quantity"><input type="text" class="form-control form-control-sm" required ></td>' +
-														 '<td>'+data.row[i][3]+'</td>' +
-														 '<td style="display:none;" >'+data.id+'</td>' +
-											 '<td><a class="add-edit-dc-customer-po" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-edit-dc-customer-po" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="edit-delete-dc-customer-po" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
-												 '</tr>';
-													 $("table").append(row);
-													 $("table tbody tr").eq(index + 1).find(".add-edit-dc-customer-po, .edit-edit-dc-customer-po").toggle();
-													 $('[data-toggle="tooltip"]').tooltip();
-													 $('#item_code_dc').val("");
-													 $(".edit-po-customer-dc").attr("disabled", "disabled");
-													 $(".has_id").attr("disabled", "disabled");
-											 }
-										 }
-										 else{
-											 alert(data.message)
-										 }
-									 })
-								});
+								// $(".edit-po-customer-dc").click(function(){
+								// 	var item_code_po_dc = $('#item_code_po_dc').val()
+								// 	console.log(item_code_po_dc);
+								// 	req =	$.ajax({
+								// 		 headers: { "X-CSRFToken": getCookie("csrftoken") },
+								// 		 type: 'POST',
+								// 		 url : `/customer/delivery_challan/edit/${edit_id}`,
+								// 		 data:{
+								// 			 'item_code_po_dc': item_code_po_dc,
+								// 		 },
+								// 		 dataType: 'json'
+								// 	 })
+								// 	 .done(function done(data){
+								// 		 if (data.row) {
+								// 			 console.log(data.row);
+								// 			 var index = $("table tbody tr:last-child").index();
+								// 			 for (var i = 0; i < data.row.length; i++) {
+								// 				 var row = '<tr>' +
+								// 						 '<td>'+count+'</td>' +
+								// 						 '<td style="display:none;" >'+data.row[i][0]+'</td>' +
+								// 						 '<td id="get_item_code">'+data.row[i][1]+'</td>' +
+								// 						 '<td>'+data.row[i][2]+'</td>' +
+								// 						 '<td><pre>'+data.row[i][7]+'</pre></td>' +
+								// 						 '<td id="quantity"><input type="text" class="form-control form-control-sm" required ></td>' +
+								// 						 '<td>'+data.row[i][3]+'</td>' +
+								// 						 '<td style="display:none;" >'+data.id+'</td>' +
+								// 			 '<td><a class="add-edit-dc-customer-po" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-edit-dc-customer-po" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="edit-delete-dc-customer-po" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+								// 				 '</tr>';
+								// 					 $("table").append(row);
+								// 					 $("table tbody tr").eq(index + 1).find(".add-edit-dc-customer-po, .edit-edit-dc-customer-po").toggle();
+								// 					 $('[data-toggle="tooltip"]').tooltip();
+								// 					 $('#item_code_dc').val("");
+								// 					 $(".edit-po-customer-dc").attr("disabled", "disabled");
+								// 					 $(".has_id").attr("disabled", "disabled");
+								// 			 }
+								// 		 }
+								// 		 else{
+								// 			 alert(data.message)
+								// 		 }
+								// 	 })
+								// });
 
 
 								// Add row on add button click
@@ -1600,7 +1599,9 @@ $(document).ready(function(){
 						e.preventDefault();
 						var table = $('#edit-dc-customer-table');
 						var customer = $('#edit_dc').val();
+						var date = $('#date').val();
 						var follow_up = $('#follow_up').val()
+						var item_code_po_dc = $('#item_code_po_dc').val()
 						var footer_remarks = $('#footer_remarks').val()
 						var data = [];
 
@@ -1634,8 +1635,10 @@ $(document).ready(function(){
 									url : `/customer/delivery_challan/edit/${edit_id}`,
 									data:{
 										'customer':customer,
+										'date':date,
 										'footer_remarks': footer_remarks,
 										'follow_up': follow_up,
+										'item_code_po_dc':item_code_po_dc,
 										'items': JSON.stringify(data),
 									},
 									dataType: 'json'

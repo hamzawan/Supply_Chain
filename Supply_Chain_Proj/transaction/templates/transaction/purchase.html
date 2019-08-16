@@ -8,9 +8,17 @@
 </div>
 <ul class="list-group list-group-flush">
   <li class="list-group-item">
-    <!-- <div class="form-row">
-      <input type="text" name=""class="form-control col-md-2" value="">
-    </div> -->
+    <ul style="list-style-type:none;" class="messages">
+      {% if messages %}
+        {% for msg in messages %}
+          <li>
+            <div class="alert {{msg.level_tag}}">
+              {{msg.message}}
+            </div>
+          </li>
+        {% endfor %}
+      {% endif %}
+    </ul>
     <div class="input-group">
       <div class="col-md-12">
         {% if permission.add == 1 %}
@@ -40,10 +48,10 @@
                 <td>{{ value.account_id.account_title }}</td>
                 <td>user1</td>
                 <td>
-                  {% if permission.edit == 1 %}  
+                  {% if permission.edit == 1 %}
                   <a class="edit_list" href="{% url 'edit-purchase' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
                   {% endif %}
-                  
+
                   {% if permission.r_return == 1 %}
                   <a href="{% url 'new-purchase-return' pk=value.id %}" data-toggle=""><i class="fas fa-undo"></i></a>
                   {% endif %}

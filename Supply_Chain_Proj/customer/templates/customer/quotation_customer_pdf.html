@@ -60,8 +60,7 @@
          <img style="width:150px; height:100px;" src="{{image.company_logo}}" align="right"/>
          {% for value in company_info %}
          <font size="25px" color="#0a012c" ><b>{{value.company_name}}</b></font></br>
-         <font size="11px" color="#0a012c" >33 Amina Mansion, Belasis Street,</font><br>
-         <font size="11px" color="#0a012c" >New Chali Karachi Pakistan</font><br>
+         <font size="11px" color="#0a012c" >{{value.address}}</font><br>
          <font size="11px" color="#0a012c" >{{ value.phone_no }}</font></br>
          <font size="11px" color="#0a012c" >{{ value.mobile_no }}</font></br>
          <font size="11px" color="#0a012c" >{{ value.email }}</font></br>
@@ -145,8 +144,8 @@
           </td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; width:60px;">{{detail.quantity}}</td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; width:60px;">{{detail.item_id.unit}}</td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-right:1px solid black;">{{detail.unit_price}}</td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-right:1px solid black;">{{detail.unit_price|mul:detail.quantity}}</td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-right:1px solid black;">{{detail.unit_price|floatformat:2}}</td>
+          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-right:1px solid black;">{{detail.unit_price|mul:detail.quantity|floatformat:2}}</td>
         </tr>
         {% endfor %}
       <tr class="heading_row">

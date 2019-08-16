@@ -48,7 +48,7 @@
                         <a class="edit_list" href="{% url 'edit-quotation-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
                       {% endif %}
 
-                      {% if permission.print == 1 %}
+                      {% if permission.r_print == 1 %}
                         <a href="{% url 'print-quotation-customer' pk=value.id %}" target="_blank"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a>
                       {% endif %}
 
