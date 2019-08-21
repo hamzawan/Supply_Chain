@@ -7,13 +7,13 @@ from  supplier.models import Company_info
 from .models import UserRoles, FiscalYear
 from django.db.models import Q
 from supplier.views import customer_roles,supplier_roles,transaction_roles,inventory_roles,report_roles
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test, login_required
 
 
 def Is_superuser(user):
     return True if user.is_superuser else False
 
-
+@login_required
 def register(request):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
@@ -53,10 +53,11 @@ def register(request):
         form = RegistrationFrom
     return render(request, 'user/register.html', {'form': form,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
-
+@login_required
 def forgot_password(request):
     return render(request, 'user/forgot-password.html')
 
+@login_required
 def select_company_fiscal(request):
     company = Company_info.objects.all()
     fiscal_year = FiscalYear.objects.all()
@@ -66,6 +67,7 @@ def select_company_fiscal(request):
     return render(request, 'user/select_company_fiscal.html',{'company':company,'fiscal_year':fiscal_year})
 
 
+@login_required
 @user_passes_test(Is_superuser)
 def delete_user_roles(request,pk):
     user = User.objects.get(id= pk)
@@ -79,7 +81,7 @@ def delete_user_roles(request,pk):
     return redirect('user-list')
 
 
-
+@login_required
 @user_passes_test(Is_superuser)
 def edit_user(request,pk):
     user = User.objects.get(id= pk)
@@ -100,6 +102,7 @@ def edit_user(request,pk):
     return render(request,'user/edit_user.html',{'form':form,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+@login_required
 @user_passes_test(Is_superuser)
 def user_roles(request,pk):
     allow_customer_roles = customer_roles(request.user)
@@ -1018,6 +1021,7 @@ def user_roles(request,pk):
     return render(request, 'user/user_roles.html',{'user':user,'allow_role':allow_role,'allow_role_supplier':allow_role_supplier,'allow_role_transaction':allow_role_transaction,
     'allow_role_inventory':allow_role_inventory,
     'allow_role_reports':allow_role_reports,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+
 
 
 @user_passes_test(Is_superuser)

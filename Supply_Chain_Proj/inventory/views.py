@@ -8,7 +8,7 @@ from django.db import connection
 from django.contrib import messages
 from supplier.views import customer_roles,supplier_roles,transaction_roles,inventory_roles,report_roles
 from django.db.models import Q
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test, login_required
 from django.db.models import Q
 from user.models import UserRoles
 
@@ -77,6 +77,7 @@ def allow_inventory_shop(user):
         return False
 
 
+@login_required
 @user_passes_test(allow_inventory_display)
 def item_stock(request):
     permission = inventory_form_roles(request.user)
@@ -108,6 +109,7 @@ def item_stock(request):
     'permission':permission,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+@login_required
 @user_passes_test(allow_inventory_add)
 def new_item_stock(request):
     allow_customer_roles = customer_roles(request.user)
@@ -117,7 +119,7 @@ def new_item_stock(request):
     return render(request, 'inventory/new_item_stock.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
-
+@login_required
 @user_passes_test(allow_inventory_add)
 def add_product(request):
     serial_no = 0
@@ -163,6 +165,7 @@ def add_product(request):
     return render(request, 'inventory/add_product.html',{'main_categories':main_categories,'sub_categories':sub_categories,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+@login_required
 @user_passes_test(allow_inventory_edit)
 def edit_item(request,pk):
     allow_customer_roles = customer_roles(request.user)
@@ -187,6 +190,7 @@ def edit_item(request,pk):
     return render(request, 'inventory/edit_item.html', {'all_detail':all_detail,'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+
 def item_avaliable(pk):
     cusror = connection.cursor()
     row = cusror.execute('''select case
@@ -208,6 +212,7 @@ def item_avaliable(pk):
     else:
         return False
 
+@login_required
 @user_passes_test(allow_inventory_delete)
 def delete_item(request, pk):
     allow_customer_roles = customer_roles(request.user)
@@ -223,6 +228,7 @@ def delete_item(request, pk):
         return redirect('item-stock')
 
 
+@login_required
 def categories(request):
     permission = inventory_form_roles(request.user)
     allow_customer_roles = customer_roles(request.user)
@@ -234,6 +240,7 @@ def categories(request):
     return render(request,'inventory/category_and_type.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser, 'main_categories':main_categories,'sub_categories':sub_categories})
 
 
+@login_required
 def main_categories(request):
     last_code = Category.objects.last()
     if last_code:
@@ -247,6 +254,7 @@ def main_categories(request):
     return redirect('categories')
 
 
+@login_required
 def edit_main_categories(request):
     if request.method == "POST":
         main_category_code = request.POST.get('main_category_code')
@@ -257,6 +265,7 @@ def edit_main_categories(request):
     return redirect('categories')
 
 
+@login_required
 def sub_categories(request):
     if request.method == "POST":
         main_category_id = request.POST.get('main_category')
@@ -272,6 +281,7 @@ def sub_categories(request):
     return redirect('categories')
 
 
+@login_required
 def edit_sub_categories(request):
     if request.method == "POST":
         sub_category_code = request.POST.get('sub_category_code')
@@ -291,6 +301,7 @@ def edit_sub_categories(request):
     return redirect('categories')
 
 
+
 def main_category_avaliable(pk):
     cusror = connection.cursor()
     row = cusror.execute('''select case
@@ -307,6 +318,7 @@ def main_category_avaliable(pk):
         return False
 
 
+@login_required
 def delete_categories(request,pk):
     category = main_category_avaliable(pk)
     if category == True:
@@ -315,6 +327,7 @@ def delete_categories(request,pk):
     else:
         messages.add_message(request, messages.ERROR, "You cannot delete this Category, it is refrenced")
     return redirect('categories')
+
 
 
 def sub_category_avaliable(pk):
@@ -334,6 +347,7 @@ def sub_category_avaliable(pk):
         return False
 
 
+@login_required
 def delete_sub_categories(request,pk):
     category = sub_category_avaliable(pk)
     if category == True:

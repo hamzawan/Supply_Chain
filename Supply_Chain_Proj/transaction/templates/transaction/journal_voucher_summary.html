@@ -28,7 +28,6 @@
                   <th width="140px">Voucher No</th>
                   <th >Date</th>
                   <th >Document No</th>
-                  <th >From</th>
                   <th >Action</th>
               </tr>
           </thead>
@@ -38,18 +37,17 @@
                 <td>{{ value.1 }}</td>
                 <td>{{ value.2 }}</td>
                 <td>{{ value.3 }}</td>
-                <td>user1</td>
                 <td>
                   {% if permission.edit == 1 %}
-                  <a class="edit_list" href="{% url 'edit-journal-voucher' pk=value.0 %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
+                  <a class="edit_list" href="{% url 'edit-journal-voucher' pk=value.0 %}" data-toggle=""><i class="fas fa-eye"></i></a>
                   {% endif %}
-                  
+
                   {% if permission.r_print == 1 %}
-                  <a data-toggle="modal" href="#"  class="has_id" id="{{value.id}}"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a>
+                  <a data-toggle="modal" href="{% url 'jv-pdf' pk=value.0 %}"  class="has_id" id="{{value.id}}"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a>
                   {% endif %}
-                  
+
                   {% if permission.delete == 1 %}
-                  <a class="delete"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                  <a class="delete" href="{% url 'delete-journal-voucher' pk=value.0 %}"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
                   {% endif %}
                 </td>
             </tr>

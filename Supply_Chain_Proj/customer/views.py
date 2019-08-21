@@ -18,7 +18,7 @@ from django.db.models import Q
 from django.core import mail
 from django.core.mail import EmailMessage
 from user.models import UserRoles
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test, login_required
 from supplier.views import customer_roles,supplier_roles,transaction_roles,inventory_roles,report_roles
 from django.contrib import messages
 from django.db import IntegrityError
@@ -324,6 +324,7 @@ def mrn_roles(user):
     return mrn_roles
 
 
+@login_required
 @user_passes_test(allow_rfq_display)
 def rfq_customer(request):
     company =  request.session['company']
@@ -339,6 +340,7 @@ def rfq_customer(request):
     'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+@login_required
 @user_passes_test(bool_allow_rfq_add)
 def new_rfq_customer(request):
     allow_customer_roles = customer_roles(request.user)
@@ -388,6 +390,7 @@ def new_rfq_customer(request):
     return render(request,'customer/new_rfq_customer.html',{'get_last_rfq_no':get_last_rfq_no,'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+@login_required
 @user_passes_test(allow_rfq_edit)
 def edit_rfq_customer(request,pk):
     allow_customer_roles = customer_roles(request.user)
@@ -443,6 +446,7 @@ def edit_rfq_customer(request,pk):
     return render(request,'customer/edit_rfq_customer.html',{'rfq_header':rfq_header,'pk':pk,'rfq_detail':rfq_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+@login_required
 @user_passes_test(allow_rfq_delete)
 def delete_rfq_customer(request,pk):
     RfqCustomerDetail.objects.filter(rfq_id_id = pk).all().delete()
@@ -467,6 +471,7 @@ def quotation_customer(request):
     return render(request, 'customer/quotation_customer.html',{'all_quotation':all_quotation,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'permission':permission,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+@login_required
 @user_passes_test(bool_allow_quotation_add)
 def new_quotation_customer(request):
     allow_customer_roles = customer_roles(request.user)
@@ -527,7 +532,7 @@ def new_quotation_customer(request):
     return render(request, 'customer/new_quotation_customer.html',{'all_item_code':all_item_code,'get_last_quotation_no':get_last_quotation_no,'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
-
+@login_required
 def send_email(request, pk,id):
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
@@ -540,6 +545,7 @@ def send_email(request, pk,id):
     return redirect('new-quotation-customer')
 
 
+@login_required
 @user_passes_test(allow_quotation_edit)
 def edit_quotation_customer(request,pk):
     allow_customer_roles = customer_roles(request.user)
@@ -612,6 +618,7 @@ def edit_quotation_customer(request,pk):
     return render(request,'customer/edit_quotation_customer.html',{'quotation_header':quotation_header,'pk':pk,'quotation_detail':quotation_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+@login_required
 @user_passes_test(allow_quotation_print)
 def print_quotation_customer(request,pk):
     allow_customer_roles = customer_roles(request.user)
@@ -642,6 +649,7 @@ def print_quotation_customer(request,pk):
     return HttpResponse("Not found")
 
 
+@login_required
 @user_passes_test(allow_quotation_delete)
 def delete_quotation_customer(request,pk):
     QuotationDetailCustomer.objects.filter(quotation_id_id = pk).all().delete()
@@ -650,7 +658,7 @@ def delete_quotation_customer(request,pk):
     return redirect('quotation-customer')
 
 
-
+@login_required
 @user_passes_test(allow_purchase_order_display)
 def purchase_order_customer(request):
     allow_customer_roles = customer_roles(request.user)
@@ -666,7 +674,7 @@ def purchase_order_customer(request):
     all_po = PoHeaderCustomer.objects.all()
     return render(request, 'customer/purchase_order_customer.html',{'all_po':all_po,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
-
+@login_required
 @user_passes_test(allow_purchase_order_add)
 def new_purchase_order_customer(request):
     allow_customer_roles = customer_roles(request.user)
@@ -727,6 +735,7 @@ def new_purchase_order_customer(request):
     return render(request, 'customer/new_purchase_order_customer.html',{'get_last_po_no':get_last_po_no,'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+@login_required
 @user_passes_test(allow_purchase_order_edit)
 def edit_purchase_order_customer(request,pk):
     allow_customer_roles = customer_roles(request.user)
@@ -800,6 +809,7 @@ def edit_purchase_order_customer(request,pk):
     return render(request,'customer/edit_purchase_order_customer.html',{'po_header':po_header,'pk':pk,'po_detail':po_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+@login_required
 @user_passes_test(allow_purchase_order_print)
 def print_po_customer(request,pk):
     allow_customer_roles = customer_roles(request.user)
@@ -827,6 +837,7 @@ def print_po_customer(request,pk):
     return HttpResponse("Not found")
 
 
+@login_required
 @user_passes_test(allow_purchase_order_delete)
 def delete_po_customer(request,pk):
     PoDetailCustomer.objects.filter(po_id_id = pk).all().delete()
@@ -835,6 +846,7 @@ def delete_po_customer(request,pk):
     return redirect('purchase-order-customer')
 
 
+@login_required
 @user_passes_test(allow_delivery_challan_display)
 def delivery_challan_customer(request):
     company =  request.session['company']
@@ -870,6 +882,7 @@ def delivery_challan_customer(request):
     return render(request, 'customer/delivery_challan_customer.html',{'gst':gst,'all_dc':all_dc,'is_dc':is_dc,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+@login_required
 @user_passes_test(allow_delivery_challan_add)
 def new_delivery_challan_customer(request):
     company =  request.session['company']
@@ -882,7 +895,7 @@ def new_delivery_challan_customer(request):
     cursor = connection.cursor()
     all_item_code = Add_products.objects.all()
     all_po_code = PoHeaderCustomer.objects.all()
-    get_last_dc_no = DcHeaderCustomer.objects.last()
+    get_last_dc_no = DcHeaderCustomer.objects.filter(company_id = company.id).last()
     customer = Q(account_id = "100")
     supplier = Q(account_id = "200")
     all_accounts = ChartOfAccount.objects.filter(customer|supplier).all()
@@ -954,7 +967,7 @@ def new_delivery_challan_customer(request):
         dc_header = DcHeaderCustomer(dc_no = get_last_dc_no, date = date, follow_up = follow_up,cartage_amount = 0.00, po_no = po_client, footer_remarks = footer_remarks ,account_id = account_id, user_id = request.user, company_id = company)
         dc_header.save()
         items = json.loads(request.POST.get('items'))
-        header_id = DcHeaderCustomer.objects.get(dc_no = get_last_dc_no)
+        header_id = DcHeaderCustomer.objects.filter(company_id = company.id).get(dc_no = get_last_dc_no)
         for value in items:
             item_id = Add_products.objects.get(id = value["id"])
             dc_detail = DcDetailCustomer(item_id = item_id, quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, po_no = value["po_no"] ,dc_id = header_id)
@@ -963,6 +976,7 @@ def new_delivery_challan_customer(request):
     return render(request, 'customer/new_delivery_challan_customer.html',{'all_item_code':all_item_code,'get_last_dc_no':get_last_dc_no,'all_accounts':all_accounts,'all_po_code':all_po_code,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+@login_required
 @user_passes_test(allow_delivery_challan_edit)
 def edit_delivery_challan_customer(request,pk):
     company =  request.session['company']
@@ -1031,6 +1045,7 @@ def edit_delivery_challan_customer(request,pk):
     return render(request,'customer/edit_delivery_challan_customer.html',{'dc_header':dc_header,'pk':pk,'dc_detail':dc_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'all_po_code':all_po_code,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+@login_required
 @user_passes_test(allow_delivery_challan_print)
 def print_dc_customer(request,pk):
     company =  request.session['company']
@@ -1056,6 +1071,7 @@ def print_dc_customer(request,pk):
     return HttpResponse("Not found")
 
 
+@login_required
 @user_passes_test(allow_delivery_challan_delete)
 def delete_delivery_challan_customer(request,pk):
     if SaleDetail.objects.filter(dc_ref = pk).all():
@@ -1069,7 +1085,7 @@ def delete_delivery_challan_customer(request,pk):
 
 
 
-
+@login_required
 @user_passes_test(allow_mrn_display)
 def mrn_customer(request):
     company =  request.session['company']
@@ -1084,6 +1100,7 @@ def mrn_customer(request):
     return render(request, 'customer/mrn_customer.html',{'all_dc':all_dc,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
 
 
+@login_required
 @user_passes_test(allow_mrn_edit)
 def edit_mrn_customer(request,pk):
     company =  request.session['company']

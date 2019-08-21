@@ -75,7 +75,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'customer.context_processors.company_name_processor',
                 'supplier.context_processors.company_name_processor',
             ],
         },
@@ -154,6 +153,7 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')
 EMAIL_USE_TLS = True
 LOGIN_REDIRECT_URL = 'company-fiscal'
 LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = 'login'
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'alert-info',

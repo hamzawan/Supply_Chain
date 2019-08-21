@@ -29,8 +29,11 @@ urlpatterns = [
 
     path('sale/new/ngst', views.new_sale_non_gst, name = 'new-sale-ngst'),
     path('sale/edit/ngst/<pk>', views.edit_sale_non_gst, name = 'edit-sale-ngst'),
-    path('sale/delete/ngst/<pk>', views.delete_sale_non_gst, name = 'delete-sale-ngst'),
     path('dc/sale/new/ngst/<pk>', views.direct_sale_non_gst, name = 'direct-sale-ngst'),
+
+
+    path('purchase/new/ngst', views.new_purchase_non_gst, name = 'new-purchase-ngst'),
+    path('purchase/edit/ngst/<pk>', views.edit_purchase_non_gst, name = 'edit-purchase-ngst'),
 
 
     path('sale_return_summary/', views.sale_return_summary, name = 'sale-return-summary'),
@@ -41,6 +44,8 @@ urlpatterns = [
     path('journal_voucher_summary/', views.journal_voucher_summary, name = 'journal-voucher-summary'),
     path('journal_voucher/new', views.journal_voucher, name = 'new-journal-voucher'),
     path('journal_voucher/edit/<pk>', views.edit_journal_voucher, name = 'edit-journal-voucher'),
+    path('journal_voucher/delete/<pk>', views.delete_journal_voucher, name='delete-journal-voucher'),
+    path('jv_pdf/<pk>', views.jv_pdf, name='jv-pdf'),
 
 
     path('cash_receiving_voucher', views.cash_receiving_voucher, name='cash-receiving-voucher'),

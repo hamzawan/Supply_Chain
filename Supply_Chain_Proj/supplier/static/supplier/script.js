@@ -1420,6 +1420,7 @@ $(document).ready(function(){
 						 .done(function done(data){
 								 var index = $("table tbody tr:last-child").index();
 										 var row = '<tr>' +
+										 		'<td>'+count+'</td>' +
 												 '<td style="display:none">'+data.main_category_id+'</td>' +
 												 '<td style="display:none">'+data.sub_category_id+'</td>' +
 												 '<td>'+data.type+'</td>' +
@@ -1434,6 +1435,7 @@ $(document).ready(function(){
 									 $("table").append(row);
 								 $("table tbody tr").eq(index + 1).find(".add-item, .edit-item").toggle();
 										 $('[data-toggle="tooltip"]').tooltip();
+										 count++;
 						 })
 					});
 
@@ -1505,25 +1507,25 @@ $(document).ready(function(){
 										'opening_stock':"",
 									};
 									$tds.each(function(i, el){
-										if (i === 0) {
+										if (i === 1) {
 												row["main_category_id"] = ($(this).text());
 										}
-										if (i === 1) {
+										if (i === 2) {
 												row["sub_category_id"] = ($(this).text());
 										}
-										else if (i === 4) {
+										else if (i === 5) {
 												row["item_name"] = ($(this).text());
 										}
-										else if (i === 5) {
+										else if (i === 6) {
 												row["item_description"] = ($(this).text());
 										}
-										else if (i === 6) {
+										else if (i === 7) {
 												row["size"] = ($(this).text());
 										}
-										else if (i === 7) {
+										else if (i === 8) {
 												row["unit"] = ($(this).text());
 										}
-										else if (i === 8) {
+										else if (i === 9) {
 												row["opening_stock"] = ($(this).text());
 										}
 									});

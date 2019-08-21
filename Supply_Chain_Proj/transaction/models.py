@@ -23,7 +23,7 @@ class ChartOfAccount(models.Model):
 
 
 class PurchaseHeader(models.Model):
-    purchase_no = models.CharField(max_length = 100, unique = True)
+    purchase_no = models.CharField(max_length = 100)
     date = models.DateField(default = datetime.date.today)
     footer_description = models.TextField()
     payment_method = models.CharField(max_length = 100)
@@ -49,7 +49,7 @@ class PurchaseDetail(models.Model):
 
 
 class PurchaseReturnHeader(models.Model):
-    purchase_no = models.CharField(max_length = 100, unique = True)
+    purchase_no = models.CharField(max_length = 100)
     date = models.DateField(default = datetime.date.today)
     footer_description = models.TextField()
     payment_method = models.CharField(max_length = 100)
@@ -72,7 +72,7 @@ class PurchaseReturnDetail(models.Model):
 
 
 class SaleHeader(models.Model):
-    sale_no = models.CharField(max_length = 100, unique = True)
+    sale_no = models.CharField(max_length = 100)
     date = models.DateField(default = datetime.date.today)
     footer_description = models.TextField()
     payment_method = models.CharField(max_length = 100)
@@ -99,7 +99,7 @@ class SaleDetail(models.Model):
 
 
 class SaleReturnHeader(models.Model):
-    sale_no = models.CharField(max_length = 100, unique = True)
+    sale_no = models.CharField(max_length = 100)
     date = models.DateField(default = datetime.date.today)
     footer_description = models.TextField()
     payment_method = models.CharField(max_length = 100)

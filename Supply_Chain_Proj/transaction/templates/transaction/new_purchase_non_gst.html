@@ -4,20 +4,20 @@
 
 <div class="card" style="width: 100%;">
 <div class="card-header">
-  <h4>Sales Invoice</h4>
+  <h4>Purchase Invoice</h4>
 </div>
 <ul class="list-group list-group-flush">
-<form  action="" id="new-sale-submit-ngst" autocomplete="off" method="post">
+<form  action="" id="new-purchase-submit-ngst" autocomplete="off" method="post">
   {% csrf_token %}
   <li class="list-group-item">
       <div class="form-row">
         <div class="form-group col-md-2">
-          <label for="">Sales ID</label>
-          <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_sale_no }}" id="sale_id">
+          <label for="">Purchase ID</label>
+          <input type="text" readonly class="form-control form-control-sm" required value="{{ get_last_purchase_no }}" id="purchase_id">
         </div>
         <div class="form-group col-md-2">
-          <label>Customer Name</label>
-          <input list="account" id="customer_name_sale" class="form-control form-control-sm" required >
+          <label>Supplier Name</label>
+          <input list="account" id="supplier_name_purchase" class="form-control form-control-sm" required >
           <datalist id="account">
             {% for value in all_accounts %}
             <option value="{{value.account_title}}">{{value.account_title}}</option>
@@ -46,23 +46,28 @@
       </div>
     </li>
     <li class="list-group-item">
-    <div class="table-title">
-        <div class="row">
+      <div class="table-title">
+          <div class="row">
             <div class="form-group col-md-3">
-              <input type="text" list="dc" placeholder="Enter Dc No here..." class="form-control form-control-sm" id="dc_code_sale">
+              <input type="text" list="item" placeholder="Enter Item Code here..." class="form-control form-control-sm" id="item_code_purchase">
             </div>
-            <datalist id="dc">
+            <datalist id="item">
+              {% for value in all_item_code %}
+              <option value="{{value.product_code}}" />
+              {% endfor %}
             </datalist>
               <div style="margin-left:20px;">
-                  <button type="button" class="btn btn-info add-item-sale-ngst"><i class="fa fa-plus"></i>Insert Delivery Challan</button>
+                  <button type="button" class="btn btn-info add-item-purchase-ngst"><i class="fa fa-plus"></i>Insert Item</button>
               </div>
-        </div>
-    </div>
+              <div style="margin-left:20px;">
+                  <a type="button" href="{% url 'add-product' %}" target="_blank" class="btn btn-info add-item-purchase-ngst"><i class="fa fa-plus"></i>Add Item in Inventory</a>
+              </div>
+          </div>
+      </div>
     <div class="table table-responsive">
-      <table class="table table-bordered" id="new-sale-table-ngst">
+      <table class="table table-bordered" id="new-purchase-table-ngst">
           <thead>
               <tr>
-                  <th width="40px" style="font-size:10px;">S No.</th>
                   <th width="100px">Item Code</th>
                   <th width="70px">Item Name</th>
                   <th width="70px">Desc.</th>
@@ -119,7 +124,7 @@
       <br>
       <br>
     <div class="text-center">
-      <button type="submit" class="btn btn-outline-primary">Submit <small>(Sale)</small></button>
+      <button type="submit" class="btn btn-outline-primary">Submit <small>(Purchase)</small></button>
     </div>
     <br>
 </form>

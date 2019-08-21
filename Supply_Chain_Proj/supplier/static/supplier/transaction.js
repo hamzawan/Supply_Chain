@@ -97,6 +97,42 @@ $(document).ready(function(){
 				});
 
 
+				// add data to rfq table from product
+					$(".add-item-purchase-ngst").click(function(){
+						var item_code_purchase = $('#item_code_purchase').val();
+						req =	$.ajax({
+							 headers: { "X-CSRFToken": getCookie("csrftoken") },
+							 type: 'POST',
+							 url : '/transaction/purchase/new/ngst',
+							 data:{
+								 'item_code_purchase': item_code_purchase,
+							 },
+							 dataType: 'json'
+						 })
+						 .done(function done(data){
+							 var type = JSON.parse(data.row);
+							 var index = $("table tbody tr:last-child").index();
+							 total_amount = (type[0].fields['unit_price'] * type[0].fields['quantity']);
+									 var row = '<tr>' +
+											 '<td style="display:none;">'+type[0]['pk']+'</td>' +
+											 '<td>'+type[0].fields['product_code'] +'</td>' +
+											 '<td>'+type[0].fields['product_name'] +'</td>' +
+											 '<td id="desc" ><pre>'+ type[0].fields['product_desc'] +'</pre></td>' +
+											 '<td id="quantity" ><input type="text" class="form-control" value=""></td>' +
+											 '<td>'+ type[0].fields['unit'] +'</td>' +
+											 '<td id="price" ><input type="text" class="form-control" value=""></td>' +
+											 '<td id="value_of_goods" >0.00</td>' +
+											 '<td id="total" style="font-weight:bold;" class="sum"><b>0.00</b></td>' +
+								 '<td><a class="add-transaction-purchase-ngst" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-transaction-purchase-ngst" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="delete-transaction-purchase-ngst" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+									 '</tr>';
+									 count++;
+								 $("#new-purchase-table-ngst").append(row);
+							 $("table tbody tr").eq(index + 1).find(".add-transaction-purchase-ngst, .edit-transaction-purchase-ngst").toggle();
+									 $('[data-toggle="tooltip"]').tooltip();
+						 });
+					});
+
+
 				// Add row on add button click
 				$(document).on("click", ".add-transaction", function(){
 					sum = 0;
@@ -200,6 +236,108 @@ $(document).ready(function(){
 					$(this).parents("tr").remove();
 					$(".add-new-rfq-customer").removeAttr("disabled");
 				});
+
+
+				// Add row on add button click
+				$(document).on("click", ".add-transaction-purchase-ngst", function(){
+					console.log("clicked");
+					sum = 0;
+					tax = 0;
+				var get_item_code = $($(this).parents("tr").find("#get_item_code")).filter(function() {
+								item_code = $(this).text();
+								return item_code
+						}).closest("tr");
+
+						var empty = false;
+						var input = $(this).parents("tr").find('input[type="text"]');
+								input.each(function(){
+							if(!$(this).val()){
+								$(this).addClass("error");
+								empty = true;
+							}
+							else{
+									$(this).removeClass("error");
+									}
+						});
+
+						$(this).parents("tr").find(".error").first().focus();
+						if(!empty){
+							input.each(function(){
+								$(this).parent("td").html($(this).val());
+							});
+							$(this).parents("tr").find(".add-transaction-purchase-ngst, .edit-transaction-purchase-ngst").toggle();
+							$(".add-item-sale").removeAttr("disabled");
+						}
+
+				var get_price_edit = $($(this).parents("tr").find("#price")).filter(function() {
+								price = $(this).text();
+								return price
+						}).closest("tr");
+
+				var get_quantity = $($(this).parents("tr").find("#quantity")).filter(function() {
+								quantity = $(this).text();
+								return quantity
+						}).closest("tr");
+						console.log(quantity);
+				var set_valueOfGoods = $($(this).parents("tr").find("#value_of_goods")).filter(function() {
+								value_of_goods =  quantity * price
+								$(this).text(value_of_goods.toFixed(2))
+								return value_of_goods;
+						}).closest("tr");
+
+
+				var set_total = $($(this).parents("tr").find("#total")).filter(function() {
+								total = value_of_goods
+								$(this).text(total.toFixed(2));
+								return set_total;
+						}).closest("tr");
+
+						$($(this).parents("tr").find("#total")).each(function() {
+								var value = $(this).text();
+								// add only if the value is number
+								if(!isNaN(value) && value.length != 0) {
+										console.log(value);
+								}
+					});
+
+					$('#new-purchase-table-ngst > tbody  > tr').each(function() {
+						 sum = sum + parseFloat($(this).find('td#total').text());
+					});
+
+				cartage_amount =	0.00;
+				additional_tax = 0.00;
+				console.log(sum);
+				grand = parseFloat(cartage_amount) + parseFloat(additional_tax) +  sum;
+				$('#last_grand_total').val(grand.toFixed(2));
+
+				});
+
+							// Edit row on edit button click
+				$(document).on("click", ".edit-transaction-purchase-ngst", function(){
+					$(this).parents("tr").find("td:not(:last-child)").each(function(i){
+							if (i === 5) {
+								$(this).html('<input type="text" style="width:80px;" class="form-control" value="' + $(this).text() + '">');
+							}
+							if (i === 7) {
+								 $(this).html('<input type="text" style="width:80px;" class="form-control" value="' + $(this).text() + '">');
+							}
+
+				});
+				$(this).parents("tr").find(".add-transaction-purchase-ngst, .edit-transaction-purchase-ngst").toggle();
+				$(".add-item-sale").attr("disabled", "disabled");
+				});
+
+				// Delete row on delete button click
+				$(document).on("click", ".delete-transaction-purchase-ngst", function(){
+					var row =  $(this).closest('tr');
+					var siblings = row.siblings();
+					siblings.each(function(index) {
+					$(this).children('td').first().text(index + 1);
+					});
+					$(this).parents("tr").remove();
+					$(".add-item-sale").removeAttr("disabled");
+				});
+
 
 		$('#cartage_amount_purchase').on('keyup',function(e){
 			var i = this.value;
@@ -322,6 +460,91 @@ $(document).ready(function(){
 							})
 				});
 
+
+				$('#new-purchase-submit-ngst').on('submit',function(e){
+				e.preventDefault();
+				var table = $('#new-purchase-table-ngst');
+				var cartage_table = $('#cartage-table');
+				var data = [];
+				var datax = [];
+				var purchase_id = $('#purchase_id').val();
+				var follow_up = $('#follow_up').val();
+				var credit_days = $('#credit_days').val();
+				var supplier = $('#supplier_name_purchase').val();
+				var payment_method = $('#payment_method').val();
+				var footer_desc = $('#footer_desc').val();
+
+				console.log(cartage_table);
+				table.find('tr').each(function (i, el){
+				if(i != 0)
+				{
+					var $tds = $(this).find('td');
+					var row = {
+						'id' : "",
+						'quantity' : "",
+						'price' : "",
+						'dc_no': ""
+					};
+					$tds.each(function(i, el){
+						if (i === 0) {
+								row["id"] = ($(this).text());
+								console.log($(this).text());
+						}
+						else if (i === 4) {
+								row["quantity"] = ($(this).text());
+						}
+						else if (i === 6) {
+								row["price"] = ($(this).text());
+						}
+					});
+					data.push(row);
+				}
+				});
+				cartage_table.find('tr').each(function (i, el){
+				if(i != 0)
+				{
+					var $tdc = $(this).find('td');
+					var rowx = {
+						'cartage_amount' : "",
+						'po_no': "",
+					};
+					$tdc.each(function(i, el){
+						if (i === 1) {
+								rowx["cartage_amount"] = ($(this).text());
+								console.log($(this).text());
+						}
+						if (i === 3) {
+								rowx["po_no"] = ($(this).text());
+								console.log($(this).text());
+						}
+					});
+					datax.push(rowx);
+				}
+				});
+				console.log(datax);
+				 req =	$.ajax({
+						headers: { "X-CSRFToken": getCookie("csrftoken") },
+						type: 'POST',
+						url : '/transaction/purchase/new/ngst',
+						data:{
+							'purchase_id': purchase_id,
+							'supplier': supplier,
+							'follow_up': follow_up,
+							'credit_days': credit_days,
+							'payment_method': payment_method,
+							'footer_desc': footer_desc,
+							'items': JSON.stringify(data),
+							'cartage': JSON.stringify(datax),
+						},
+						dataType: 'json'
+					})
+					.done(function done(){
+						alert("Purchase Created");
+						location.reload();
+					})
+				});
+
+
 // =================================================================================
 
 			$('#edit-purchase-table tbody tr').each(function() {
@@ -345,7 +568,6 @@ $(document).ready(function(){
 			});
 
 	$(".add-item-purchase-edit").click(function(){
-		console.log("click");
 		var item_code_purchase = $('#item_code_purchase_edit').val();
 		console.log(item_code_purchase);
 		req =	$.ajax({
@@ -573,6 +795,223 @@ $(document).on("click", ".edit-transaction-edit", function(){
 
 // =============================================================================
 //
+
+$('#edit-purchase-table-ngst tbody tr').each(function() {
+	var tdObject = $(this).find('td:eq(7)');
+	var total = tdObject.text()
+	if (!isNaN(total) && total.length !== 0) {
+			sum_add += parseFloat(total);
+	}
+	$('#last_grand_total').val((sum_add).toFixed(2));
+});
+$(".add-item-purchase-edit-ngst").click(function(){
+	var item_code_purchase = $('#item_code_purchase_edit_ngst').val();
+	console.log(item_code_purchase);
+	req =	$.ajax({
+		 headers: { "X-CSRFToken": getCookie("csrftoken") },
+		 type: 'POST',
+		 url : `/transaction/purchase/edit/ngst/${edit_id}`,
+		 data:{
+			 'item_code_purchase': item_code_purchase,
+		 },
+		 dataType: 'json'
+	 })
+	 .done(function done(data){
+		 var type = JSON.parse(data.row);
+		 var index = $("table tbody tr:last-child").index();
+		 total_amount = (type[0].fields['unit_price'] * type[0].fields['quantity']);
+				 var row = '<tr>' +
+						 '<td style="display:none;">'+type[0]['pk']+'</td>' +
+						 '<td>'+type[0].fields['product_code']+'</td>' +
+						 '<td>'+type[0].fields['product_name']+'</td>' +
+						 '<td id="desc" ><pre>'+type[0].fields['product_desc']+'</pre></td>' +
+						 '<td id="quantity_edit" ><input type="text" class="form-control" value=""></td>' +
+						 '<td>'+type[0].fields['unit']+'</td>' +
+						 '<td id="price_edit" ><input type="text" class="form-control" value=""></td>' +
+						 '<td id="value_of_goods_edit" >0.00</td>' +
+			 '<td><a class="add-purchase-edit-ngst" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-purchase-edit-ngst" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="delete-purchase-edit-ngst" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+				 '</tr>';
+				 count++;
+			 $("#edit-purchase-table-ngst").append(row);
+		 $("table tbody tr").eq(index + 1).find(".add-purchase-edit-ngst, .edit-purchase-edit-ngst").toggle();
+				 $('[data-toggle="tooltip"]').tooltip();
+	 });
+});
+
+
+		// Add row on add button click
+		$(document).on("click", ".add-purchase-edit-ngst", function(){
+		sum = 0;
+		var empty = false;
+		var input = $(this).parents("tr").find('input[type="text"]');
+				input.each(function(){
+			if(!$(this).val()){
+				$(this).addClass("error");
+				empty = true;
+			}
+			else{
+					$(this).removeClass("error");
+					}
+		});
+		$(this).parents("tr").find(".error").first().focus();
+		if(!empty){
+			input.each(function(){
+				$(this).parent("td").html($(this).val());
+			});
+			$(this).parents("tr").find(".add-purchase-edit-ngst, .edit-purchase-edit-ngst").toggle();
+		}
+		var get_price = $($(this).parents("tr").find("#price_edit")).filter(function() {
+						price = $(this).text();
+						console.log(price);
+						return price
+				}).closest("tr");
+
+		var get_quantity = $($(this).parents("tr").find("#quantity_edit")).filter(function() {
+						quantity = $(this).text();
+						return quantity
+				}).closest("tr");
+				console.log(quantity);
+		var set_valueOfGoods = $($(this).parents("tr").find("#value_of_goods_edit")).filter(function() {
+						value_of_goods =  quantity * price
+						$(this).text(value_of_goods.toFixed(2))
+						return value_of_goods;
+				}).closest("tr");
+
+
+		var set_total = $($(this).parents("tr").find("#total")).filter(function() {
+						total = value_of_goods
+						$(this).text(total.toFixed(2));
+						return sales_tax;
+				}).closest("tr");
+
+				var total_amount = $($(this).parents("tr").find("#total_amount")).filter(function() {
+								total = value_of_goods
+								$(this).text(total.toFixed(2));
+								return total_amount;
+						}).closest("tr");
+				sum_add = 0;
+				sum_st = 0;
+				$('#edit-purchase-table-ngst tbody tr').each(function() {
+					var tdObject = $(this).find('td:eq(7)');
+					var total = tdObject.text()
+					if (!isNaN(total) && total.length !== 0) {
+							sum_add += parseFloat(total);
+					}
+					$('#last_grand_total').val((sum_add).toFixed(2));
+				});
+		});
+
+					// Edit row on edit button click
+		$(document).on("click", ".edit-purchase-edit-ngst", function(){
+			$(this).parents("tr").find("td:not(:last-child)").each(function(i){
+					if (i === 4) {
+						$(this).html('<input type="text" style="width:70px;" class="form-control" value="' + $(this).text() + '">');
+					}
+					if (i === 6) {
+						 $(this).html('<input type="text" style="width:70px;" class="form-control" value="' + $(this).text() + '">');
+					}
+
+		});
+		$(this).parents("tr").find(".add-purchase-edit-ngst, .edit-purchase-edit-ngst").toggle();
+		$(".add-item-purchase").attr("disabled", "disabled");
+		});
+
+// Delete row on delete button click
+$(document).on("click", ".delete-purchase-edit-ngst", function(){
+	var row =  $(this).closest('tr');
+	var siblings = row.siblings();
+	siblings.each(function(index) {
+	$(this).children('td').first().text(index + 1);
+	});
+	$(this).parents("tr").remove();
+	$(".add-new-rfq-customer").removeAttr("disabled");
+});
+
+
+
+	//EDIT PURCHASE END
+
+$('#edit-purchase-submit-ngst').on('submit',function(e){
+	e.preventDefault();
+	var table = $('#edit-purchase-table-ngst');
+	var cartage_table = $('#cartage-table');
+	var data = [];
+	var datax = [];
+	var purchase_id = $('#purchase_id').val();
+	var credit_days = $('#credit_days').val();
+	var supplier = $('#supplier_name_purchase').val();
+	var follow_up = $('#follow_up').val();
+	var payment_method = $('#payment_method').val();
+	var footer_desc = $('#footer_desc').val();
+
+
+	table.find('tr').each(function (i, el){
+		if(i != 0)
+		{
+			var $tds = $(this).find('td');
+			var row = {
+				'id' : "",
+				'quantity' : "",
+				'price' : "",
+			};
+			$tds.each(function(i, el){
+				if (i === 0) {
+						row["id"] = ($(this).text());
+				}
+				else if (i === 4) {
+						row["quantity"] = ($(this).text());
+				}
+				else if (i === 6) {
+						row["price"] = ($(this).text());
+				}
+			});
+			data.push(row);
+		}
+	});
+	console.log(data);
+
+	cartage_table.find('tr').each(function (i, el){
+		if(i != 0)
+		{
+			var $tdc = $(this).find('td');
+			var rowx = {
+				'cartage_amount' : "",
+				'po_no': "",
+			};
+			$tdc.each(function(i, el){
+				if (i === 1) {
+						rowx["cartage_amount"] = ($(this).text());
+				}
+				if (i === 3) {
+						rowx["po_no"] = ($(this).text());
+				}
+			});
+			datax.push(rowx);
+		}
+	});
+
+		 req =	$.ajax({
+				headers: { "X-CSRFToken": getCookie("csrftoken") },
+				type: 'POST',
+				url : `/transaction/purchase/edit/ngst/${edit_id}`,
+				data:{
+					'purchase_id': purchase_id,
+					'supplier': supplier,
+					'follow_up': follow_up,
+					'payment_method': payment_method,
+					'credit_days': credit_days,
+					'footer_desc': footer_desc,
+					'items': JSON.stringify(data),
+					'cartage': JSON.stringify(datax)
+				},
+				dataType: 'json'
+			})
+			.done(function done(){
+				alert("Purchase Updated");
+				location.reload();
+			})
+});
+
 //
 // $('#edit-purchase-return-submit').on('submit',function(e){
 // 	e.preventDefault();
@@ -2653,7 +3092,14 @@ $('#edit-sale-submit').on('submit',function(e){
 
 
 //=======================================================================================
-
+				$('#edit-sale-table-ngst tbody tr').each(function() {
+					var tdObject = $(this).find('td:eq(7)');
+					var total = tdObject.text()
+					if (!isNaN(total) && total.length !== 0) {
+							sum_add += parseFloat(total);
+					}
+					$('#last_grand_total').val((Math.round(sum_add).toFixed(2)));
+				});
 		// $('#edit-sale-table-ngst tbody tr').each(function() {
 		// 	var tdObject = $(this).find('td:eq(11)');
 		// 	var total = tdObject.text()
@@ -2755,9 +3201,6 @@ $('#edit-sale-submit').on('submit',function(e){
 					$("#edit-sale-table-ngst tbody tr").eq(index + i+1).find(".add-sale-edit-ngst, .edit-sale-edit-ngst").toggle();
 						$('[data-toggle="tooltip"]').tooltip();
 						$('#dc_code_sale').val("");
-						for (var j = 1; j < data.hs_code.length; j++) {
-							 $("#hs_code").append($("<option>").attr('value', data.hs_code[j]).text(data.hs_code[j]));
-						}
 					 }
 				 });
 			}
@@ -2818,27 +3261,14 @@ $('#edit-sale-submit').on('submit',function(e){
 
 						sum_add = 0;
 						sum_st = 0;
-						$('#edit-sale-table tbody tr').each(function() {
-							var tdObject = $(this).find('td:eq(11)');
+						$('#edit-sale-table-ngst tbody tr').each(function() {
+							var tdObject = $(this).find('td:eq(7)');
 							var total = tdObject.text()
 							if (!isNaN(total) && total.length !== 0) {
 									sum_add += parseFloat(total);
 							}
-							additional_tax = $('#additional_tax').val();
-							// cartage_amount = 0.00;
-							$('#last_grand_total').val((Math.round(sum_add + parseFloat(additional_tax))).toFixed(2));
+							$('#last_grand_total').val((Math.round(sum_add).toFixed(2)));
 						});
-
-						$('#edit-sale-table-ngst tbody tr').each(function() {
-						var sales_tax = $(this).find('td:eq(10)');
-						var total_sales_tax = sales_tax.text()
-						if (!isNaN(total_sales_tax) && total_sales_tax.length !== 0) {
-								sum_st += parseFloat(total_sales_tax);
-						}
-						$('#total_sales_tax').val(sum_st.toFixed(2));
-						});
-
-
 });
 
 			// Edit row on edit button click
@@ -3130,6 +3560,10 @@ $.fn.extend({
 				var doc_date = $('#doc_date').val();
 				var description = $('#description').val();
 
+				if ($('#sales_tax_check').is(':checked')) {
+					var check = 1;
+				}
+
 				table.find('tr').each(function (i, el){
 					if(i != 0)
 					{
@@ -3168,6 +3602,7 @@ $.fn.extend({
 							 'doc_no': doc_no,
 							 'doc_date': doc_date,
 							 'description': description,
+							 'check': check,
 							 'items': JSON.stringify(data),
 						 },
 						 dataType: 'json'
@@ -3393,6 +3828,7 @@ $.fn.extend({
 							 }
 						 }
 				 })
+				 $(".load-invoices").attr("disabled", "disabled");
 			});
 
 
@@ -3531,6 +3967,7 @@ $.fn.extend({
 									 }
 								 }
 						 })
+						 $(".load-invoices-brv").attr("disabled", "disabled");
 					});
 
 
@@ -3671,6 +4108,7 @@ $.fn.extend({
 										 }
 									 }
 							 })
+							 $(".load-invoices-bpv").attr("disabled", "disabled");
 						});
 
 
@@ -3811,6 +4249,7 @@ $.fn.extend({
 								 }
 							 }
 					 })
+					 $(".load-invoices-cpv").attr("disabled", "disabled");
 				});
 
 

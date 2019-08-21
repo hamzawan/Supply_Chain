@@ -38,7 +38,6 @@
         <a role="button" href="{% url 'new-sale-ngst' %}" style="float:right;" class="btn btn-outline-secondary" name="button"><i class="fas fa-plus"></i> Add New</a>
         {% endif %}
         {% endif %}
-
       </div>
     </div>
     <br>
@@ -64,7 +63,11 @@
                 <td>
 
                   {% if permission.edit == 1 %}
-                  <a class="edit_list" href="{% url 'edit-sale' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
+                    {% if gst.company_type == 1 %}
+                      <a class="edit_list" href="{% url 'edit-sale' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
+                    {% else %}
+                      <a class="edit_list" href="{% url 'edit-sale-ngst' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
+                    {% endif %}
                   {% endif %}
 
                   {% if permission.r_print == 1 %}
@@ -76,7 +79,7 @@
                   {% endif %}
 
                   {% if permission.r_return == 1 %}
-                  <a class="return" href="{% url 'new-sale-return' pk=value.id %}" data-toggle=""><i class="fas fa-undo"></i></a>
+                  <a class="return" href="#" data-toggle=""><i class="fas fa-undo"></i></a>
                   {% endif %}
 
                   {% if permission.delete == 1 %}
