@@ -1410,6 +1410,7 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 				var data = [];
 				var datax = [];
 				var sale_id = $('#sale_id').val();
+				var date = $('#date').val();
 				var follow_up = $('#follow_up').val();
 				var credit_days = $('#credit_days').val();
 				var customer = $('#customer_name_sale').val();
@@ -1490,6 +1491,7 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 								'credit_days': credit_days,
 								'payment_method': payment_method,
 								'hs_code': hs_code,
+								'date':date,
 								'footer_desc': footer_desc,
 								'cartage_amount': cartage_amount,
 								'additional_tax':additional_tax,

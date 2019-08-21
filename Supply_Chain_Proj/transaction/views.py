@@ -1344,6 +1344,7 @@ def new_sale(request):
     #         return JsonResponse({"message":"False"})
     if request.method == 'POST':
         sale_id = request.POST.get('sale_id',False)
+        date = request.POST.get('date',False)
         customer = request.POST.get('customer',False)
         follow_up = request.POST.get('follow_up',False)
         credit_days = request.POST.get('credit_days',False)
@@ -1354,13 +1355,11 @@ def new_sale(request):
         additional_tax = request.POST.get('additional_tax',False)
         withholding_tax = request.POST.get('withholding_tax',False)
         account_id = ChartOfAccount.objects.get(account_title = customer)
-        date = datetime.date.today()
 
         if follow_up:
             follow_up = follow_up
         else:
             follow_up = '2010-06-10'
-
         sale_header = SaleHeader(sale_no = sale_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = withholding_tax, account_id = account_id, follow_up = follow_up, credit_days = credit_days, company_id = company, user_id = request.user, hs_code = hs_code)
         cart = json.loads(request.POST.get('cartage'))
         items = json.loads(request.POST.get('items'))
@@ -1639,9 +1638,9 @@ def edit_sale(request,pk):
             tran_type = Q(tran_type = "Sale Invoice")
             delete = Transactions.objects.filter(refrence_id, tran_type)
             delete.delete()
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, ref_inv_tran_id = 0, ref_inv_tran_type = "" ,remarks = "Amount Debit", company_id = company, user_id = request.user)
+            tran1 = Transactions(refrence_id = header_id, refrence_date = sale_header.date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, ref_inv_tran_id = 0, ref_inv_tran_type = "" ,remarks = "Amount Debit", company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit",  ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
+            tran2 = Transactions(refrence_id = header_id, refrence_date = sale_header.date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit",  ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
             tran2.save()
         else:
             refrence_id = Q(refrence_id = header_id)
@@ -1649,9 +1648,9 @@ def edit_sale(request,pk):
             delete = Transactions.objects.filter(refrence_id, tran_type)
             delete.delete()
             sale_account = ChartOfAccount.objects.get(account_title = 'Sales')
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit", ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
+            tran1 = Transactions(refrence_id = header_id, refrence_date = sale_header.date, account_id = account_id, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit", ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_account, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit", ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
+            tran2 = Transactions(refrence_id = header_id, refrence_date = sale_header.date, account_id = sale_account, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit", ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/edit_sale.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'sale_header':sale_header, 'sale_detail':sale_detail, 'pk':pk, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser,'cartages':cartages})
@@ -3754,17 +3753,17 @@ def sales_tax_invoice(request,pk):
     ca = 0
     company_info = Company_info.objects.filter(id=company)
     header = SaleHeader.objects.filter(id = pk).first()
-    detail = cursor.execute('''Select SaleId,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax from(
+    detail = cursor.execute('''Select SaleId,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax, total from(
                             select SD.sale_id_id as SaleID, PS.id,PS.product_name as product_name, PS.product_desc as product_desc, PS.unit as unit,
                             SD.quantity as quantity, SD.cost_price as cost_price, SD.sales_tax as sales_tax,
-                            DC.dc_no as DcNo, DCD.PO_no  as po_no
+                            DC.dc_no as DcNo, DCD.PO_no  as po_no, total
                             from transaction_saledetail SD
                             inner join inventory_add_products PS on PS.id = SD.item_id_id
                             inner join customer_dcheadercustomer DC on SD.dc_ref = DC.id
                             inner join customer_dcdetailcustomer DCD on DCD.dc_id_id = DC.id
                             left join customer_poheadercustomer PO on PO.id = DCD.po_no
                             group by SD.id
-                            )as tblData where tblData.SaleId = %s ''',[pk])
+                            )as tblData where tblData.SaleId =  %s ''',[pk])
     detail = detail.fetchall()
     hs_code = SaleDetail.objects.filter(sale_id = pk).first()
     if header.account_id.parent_id == 5:
@@ -3808,10 +3807,10 @@ def commercial_invoice(request,pk):
     cartage = 0
     company_info = Company_info.objects.filter(id=company)
     header = SaleHeader.objects.filter(id = pk).first()
-    detail = cursor.execute('''Select SaleId,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax from(
+    detail = cursor.execute('''Select SaleId,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax, total from(
                             select SD.sale_id_id as SaleID, PS.id,PS.product_name as product_name, PS.product_desc as product_desc, PS.unit as unit,
                             SD.quantity as quantity, SD.cost_price as cost_price, SD.sales_tax as sales_tax,
-                            DC.dc_no as DcNo, DCD.PO_no  as po_no
+                            DC.dc_no as DcNo, DCD.PO_no  as po_no, total
                             from transaction_saledetail SD
                             inner join inventory_add_products PS on PS.id = SD.item_id_id
                             inner join customer_dcheadercustomer DC on SD.dc_ref = DC.id
