@@ -51,7 +51,7 @@
           </div>
           <datalist id="item">
             {% for value in all_item_code %}
-            <option value="{{value.product_code}}"></option>
+              <option value="{{value.product_code}}">{{value.product_code}}| {{value.product_name}} | {{value.product_desc}}</option>
             {% endfor %}
           </datalist>
             <div style="margin-left:20px;">

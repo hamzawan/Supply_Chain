@@ -3477,13 +3477,14 @@ def brv_pdf(request, pk):
 
 @login_required
 def account_ledger(request):
+    company =  request.session['company']
     if request.method == "POST":
         debit_amount = 0
         credit_amount = 0
         pk = request.POST.get('account_title')
         from_date = request.POST.get('from_date')
         to_date = request.POST.get('to_date')
-        company_info = Company_info.objects.filter(id=1).all()
+        company_info = Company_info.objects.filter(id=company).all()
         image = Company_info.objects.filter(id=1).first()
         cursor = connection.cursor()
         cursor.execute('''Select tran_type,refrence_id,refrence_date,remarks,ref_inv_tran_id,ref_inv_tran_type,Sum(Debit) Debit,Sum(Credit) Credit From (
@@ -3563,6 +3564,7 @@ def account_ledger(request):
 
 @login_required
 def trial_balance(request):
+    company =  request.session['company']
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -3572,8 +3574,7 @@ def trial_balance(request):
         credit_amount = 0
         from_date = request.POST.get('from_date')
         to_date = request.POST.get('to_date')
-        company_info = Company_info.objects.all()
-        image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
+        company_info = Company_info.objects.filter(id=company).all()
         cursor = connection.cursor()
         cursor.execute('''Select id,account_title,ifnull(amount,0) + opening_balance As Amount
                         from transaction_chartofaccount
@@ -3588,7 +3589,7 @@ def trial_balance(request):
                 debit_amount = debit_amount + v[2]
             else:
                 credit_amount = credit_amount + v[2]
-        pdf = render_to_pdf('transaction/trial_balance_pdf.html', {'company_info':company_info,'image':image,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount,'from_date':from_date,'to_date':to_date,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+        pdf = render_to_pdf('transaction/trial_balance_pdf.html', {'company_info':company_info,'row':row, 'debit_amount':debit_amount, 'credit_amount': credit_amount,'from_date':from_date,'to_date':to_date,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "TrialBalance%s.pdf" %("000")
@@ -3641,6 +3642,7 @@ def sale_detail(request):
 
 @login_required
 def sale_detail_item_wise(request):
+    company =  request.session['company']
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
@@ -3649,9 +3651,8 @@ def sale_detail_item_wise(request):
     if request.method == "POST":
         from_date = request.POST.get('from_date')
         to_date = request.POST.get('to_date')
-        company_info = Company_info.objects.filter(id=1)
+        company_info = Company_info.objects.filter(id=company)
         print(company_info)
-        image = Company_info.objects.filter(company_name = "Hamza Enterprise").first()
         cursor = connection.cursor()
         cursor.execute('''Select item_code, item_name, item_description,Sum(Total) As TotalAmount From (
                     select IP.product_code as item_code , IP.product_name as item_name, IP.product_desc as item_description, sum(SD.cost_price * SD.quantity) As Total
@@ -3676,7 +3677,7 @@ def sale_detail_item_wise(request):
         for value in row:
             total = total + value[3]
         print(total)
-        pdf = render_to_pdf('transaction/sale_detail_item_wise_pdf.html', {'company_info':company_info,'image':image,'row':row,'from_date':from_date, 'to_date':to_date,'total':total,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+        pdf = render_to_pdf('transaction/sale_detail_item_wise_pdf.html', {'company_info':company_info,'row':row,'from_date':from_date, 'to_date':to_date,'total':total,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "Sale_Detail_Item_Wise%s.pdf" %("000")

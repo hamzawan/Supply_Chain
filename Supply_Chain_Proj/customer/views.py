@@ -992,7 +992,7 @@ def edit_delivery_challan_customer(request,pk):
     dc_header = DcHeaderCustomer.objects.filter(company, id = pk).first()
     dc_detail = DcDetailCustomer.objects.filter(dc_id = dc_header.id).all()
     all_po_code = PoHeaderCustomer.objects.filter(company).all()
-    all_item_code = list(Add_products.objects.values('product_code'))
+    all_item_code = Add_products.objects.all()
     customer = Q(account_id = "100")
     supplier = Q(account_id = "200")
     all_accounts = ChartOfAccount.objects.filter(customer|supplier).all()
@@ -1028,7 +1028,6 @@ def edit_delivery_challan_customer(request,pk):
             follow_up = follow_up
         else:
             follow_up = '2010-06-22'
-        print("Hamza",po_no)
         dc_header.account_id = account_id
         dc_header.date = date
         dc_header.po_no = po_no
@@ -1049,6 +1048,7 @@ def edit_delivery_challan_customer(request,pk):
 @user_passes_test(allow_delivery_challan_print)
 def print_dc_customer(request,pk):
     company =  request.session['company']
+    company_info = Company_info.objects.filter(id = company).all()
     company = Company_info.objects.get(id = company)
     company = Q(company_id = company)
     allow_customer_roles = customer_roles(request.user)
@@ -1057,7 +1057,6 @@ def print_dc_customer(request,pk):
     allow_inventory_roles = inventory_roles(request.user)
     lines = 0
     total_amount = 0
-    company_info = Company_info.objects.filter(id = 1).all()
     image = Company_info.objects.filter(id = 1).first()
     header = DcHeaderCustomer.objects.filter(company, id = pk).first()
     detail = DcDetailCustomer.objects.filter(dc_id = header.id).all()
