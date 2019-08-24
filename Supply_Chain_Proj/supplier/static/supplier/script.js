@@ -1706,6 +1706,12 @@ $(document).ready(function(){
 								})
 					});
 
+					$(".delete-rfq-supplier").on('click',function(){
+						console.log(this.id);
+						$("#modal_delete_button").attr("href", `/supplier/rfq/delete/${this.id}`);
+						console.log($("#modal_delete_button").attr('href'));
+					})
+
 				$(document).ready(function() {
 						$('.sort').DataTable();
 					});

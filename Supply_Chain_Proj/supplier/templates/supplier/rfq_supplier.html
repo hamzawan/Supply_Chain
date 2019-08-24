@@ -19,6 +19,17 @@
       </div>
     </div>
     <br>
+    <ul style="list-style-type:none;" class="messages">
+      {% if messages %}
+        {% for msg in messages %}
+          <li>
+            <div class="alert {{msg.level_tag}}">
+              {{msg.message}}
+            </div>
+          </li>
+        {% endfor %}
+      {% endif %}
+    </ul>
     <div class="table table-responsive">
       <table class="table table-bordered sort" id="dataTable">
           <thead>
@@ -49,7 +60,7 @@
                   {% endif %}
 
                   {% if permission.delete == 1 %}
-                  <a class="delete-rfq-supplier" href="{% url 'delete-rfq-supplier' pk=row.id %}" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                  <a class="delete-rfq-supplier" href="" data-toggle="modal" data-target="#deleteRfqModal" id="{{row.id}}"><i class="material-icons">&#xE872;</i></a>
                   {% endif %}
                 </td>
             </tr>
@@ -60,6 +71,27 @@
   </li>
 </ul>
 </div>
+
+<!-- Logout Modal-->
+<div class="modal fade" id="deleteRfqModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Delete RFQ</h5>
+        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">Are you sure you want to delete?</div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <a class="btn btn-danger" href="" id="modal_delete_button">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Modal -->
 
 
 {% endblock body %}
