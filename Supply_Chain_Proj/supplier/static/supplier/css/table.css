@@ -298,6 +298,36 @@ table.table td a.edit_list {
 table.table td a.delete-all {
     color: #E34724;
 }
+table.table td a.delete-rfq-customer-summary {
+    color: #E34724;
+}
+table.table td a.delete-quotation-customer-summary {
+    color: #E34724;
+}
+table.table td a.delete-po-customer-summary {
+    color: #E34724;
+}
+table.table td a.delete-dc-customer-summary {
+    color: #E34724;
+}
+table.table td a.delete-chart-of-account {
+    color: #E34724;
+}
+table.table td a.delete-jv-summary {
+    color: #E34724;
+}
+table.table td a.delete-brv-summary {
+    color: #E34724;
+}
+table.table td a.delete-crv-summary {
+    color: #E34724;
+}
+table.table td a.delete-bpv-summary {
+    color: #E34724;
+}
+table.table td a.delete-cpv-summary {
+    color: #E34724;
+}
 pre {font-family: "Avenir", Verdana, sans-serif
     }
 #dataTable.table td a.delete_item_row {
@@ -1570,7 +1600,7 @@ cursor: pointer;
   margin: 0 5px;
 min-width: 24px;
 }
-#new-dc-customer-table.table td a.add-dc-customer {
+#new-dc-customer-table.table td button.add-dc-customer {
     color: #27C46B;
 }
 #new-dc-customer-table.table td a.edit-dc-customer {

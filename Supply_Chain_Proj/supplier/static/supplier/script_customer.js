@@ -817,7 +817,7 @@ $(document).ready(function(){
 	  		var exchange_rate = $('#po_customer_exchange_rate').val();
 	  		var follow_up = $('#po_customer_follow_up').val();
 				var footer_remarks = $('#footer_remarks').val();
-
+				console.log(customer);
 				table.find('tr').each(function (i, el){
 					if(i != 0)
 					{
@@ -843,6 +843,7 @@ $(document).ready(function(){
 							}
 						});
 						data.push(row);
+						console.log(data);
 					}
 				});
 
@@ -1065,9 +1066,25 @@ $(document).ready(function(){
 					//DC ORDER CUSTOMER
 
 		// // Append table with add row in dc supplier
+					// $(window).focus(function(e) {
+					// 	var focus = "focus"
+					// 	req =	$.ajax({
+					// 		 headers: { "X-CSRFToken": getCookie("csrftoken") },
+					// 		 type: 'POST',
+					// 		 url : '/customer/delivery_challan/new',
+					// 		 data:{
+					// 			 'focus': focus,
+					// 		 },
+					// 		 dataType: 'json'
+					// 	 })
+					// 	 .done(function done(data){
+					// 		 dc_type = JSON.parse(data.)
+					// 		 console.log(data);
+					// 	 })
+					// 	});
 
-					$(".add-new-dc-customer").click(function(){
-						var item_code_dc = $('#item_code_dc').val();
+					$(".add-new-dc-customer").on('click',function(){
+						var item_code_dc = $("#item_code_dc").val();
 						req =	$.ajax({
 							 headers: { "X-CSRFToken": getCookie("csrftoken") },
 							 type: 'POST',
@@ -1091,7 +1108,7 @@ $(document).ready(function(){
 												 '<td id="quantity"><input type="text" class="form-control form-control-sm" required ></td>' +
 												 '<td>'+type[0].fields['unit']+'</td>' +
 												 '<td style="display:none;"></td>' +
-									 '<td><a class="add-dc-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-dc-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-dc-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+									 '<td><button type="button" class="btn btn-succes add-dc-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></button><a class="edit-dc-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-dc-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 										 '</tr>';
 									 $("#new-dc-customer-table").append(row);
 								 $("table tbody tr").eq(index + 1).find(".add-dc-customer, .edit-dc-customer").toggle();
@@ -1109,7 +1126,6 @@ $(document).ready(function(){
 
 					$(".add-new-po-customer-dc").click(function(){
 						var item_code_po_dc = $('#item_code_po_dc').val()
-						console.log(item_code_po_dc);
 						req =	$.ajax({
 							 headers: { "X-CSRFToken": getCookie("csrftoken") },
 							 type: 'POST',
@@ -1133,7 +1149,7 @@ $(document).ready(function(){
 											 '<td id="quantity"><input type="text" class="form-control form-control-sm" required ></td>' +
 											 '<td>'+data.row[i][3]+'</td>' +
 											 '<td style="display:none;" >'+data.id+'</td>' +
-								 '<td><a class="add-dc-customer-po" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-dc-customer-po" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-dc-customer-po" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+								 '<td><a  class="add-dc-customer-po" title="Add" data-toggle="tooltip"><i type="button" class="material-icons">&#xE03B;</i></a><a class="edit-dc-customer-po" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-dc-customer-po" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 									 '</tr>';
 	 									 $("table").append(row);
 										 $("table tbody tr").eq(index + 1).find(".add-dc-customer-po, .edit-dc-customer-po").toggle();
@@ -1149,7 +1165,71 @@ $(document).ready(function(){
 						 })
 					});
 
-					// Add row on add button click
+				// 	// Add row on add button click
+				// 	$(document).keypress(function(event){
+				// 		if (event.which == 13) {
+				// 			var empty = false;
+				// 			var input = $(".add-dc-customer").parents("tr").find('input[type="text"]');
+				// 			console.log(input);
+				// 			input.each(function(i){
+				// 				if (i == 2) {
+				// 							$(this).removeClass("error");
+				// 				}
+				// 				else{
+				// 					if(!$(this).val()){
+				// 						$(this).addClass("error");
+				// 						empty = true;
+				// 					}
+				// 					else{
+				// 							$(this).removeClass("error");
+				// 							}
+				// 				}
+				// 				});
+				// 			$(".add-dc-customer").parents("tr").find(".error").first().focus();
+				// 			if(!empty){
+				// 				input.each(function(){
+				// 					$(this).parent("td").html($(this).val());
+				// 				});
+				// 				$(".add-dc-customer").parents("tr").find(".add-dc-customer, .edit-dc-customer").toggle();
+				// 				$(".add-new-dc-customer").removeAttr("disabled");
+				// 				$(".add-new-po-customer-dc").removeAttr("disabled");
+				// 				$(".has_id").removeAttr("disabled");
+				// 			}
+				// 			var get_quantity = $($(this).parents("tr").find("#quantity")).filter(function() {
+				// 							quantity = $(this).text();
+				// 							return quantity
+				// 					}).closest("tr");
+				//
+				// 			var get_item_code = $($(this).parents("tr").find("#get_item_code")).filter(function() {
+				// 							item_code = $(this).text();
+				// 							return item_code
+				// 					}).closest("tr");
+				//
+				// 		item_code = $('#item_code').val()
+				// 		req =	$.ajax({
+				// 			 headers: { "X-CSRFToken": getCookie("csrftoken") },
+				// 			 type: 'POST',
+				// 			 url : '/customer/delivery_challan/new',
+				// 			 data:{
+				// 				 'quantity':quantity,
+				// 				 'item_code':item_code
+				// 			 },
+				// 			 dataType: 'json'
+				// 		 })
+				// 		 .done(function done(data){
+				//
+				// 			 if(data.message === "False"){
+				// 				alert("Not enough stock")
+				// 			table.find("tr").find(".add-transaction-sale, .edit-transaction-sale").toggle();
+				// 			$(".add-item-sale").attr("disabled", "disabled");
+				// 			 }
+				// 			 else{
+				//
+				// 			 }
+				// 		});
+				// 	}
+				// });
+
 					$(document).on("click", ".add-dc-customer", function(){
 					var empty = false;
 					var input = $(this).parents("tr").find('input[type="text"]');
@@ -1216,7 +1296,6 @@ $(document).ready(function(){
 				});
 
 					});
-
 
 					// Edit row on edit button click
 					$(document).on("click", ".edit-dc-customer", function(){
@@ -1794,5 +1873,20 @@ $(document).ready(function(){
 	 				});
 	 		 });
 
+		 $(".delete-rfq-customer-summary").on('click',function(){
+			 $("#modal_delete_button").attr("href", `/customer/rfq/delete/${this.id}`);
+		 })
+
+		 $(".delete-quotation-customer-summary").on('click',function(){
+			 $("#modal_delete_button").attr("href", `/customer/quotation/delete/${this.id}`);
+		 })
+
+		 $(".delete-po-customer-summary").on('click',function(){
+			 $("#modal_delete_button").attr("href", `/customer/purchase_order/delete/${this.id}`);
+		 })
+
+		 $(".delete-dc-customer-summary").on('click',function(){
+			 $("#modal_delete_button").attr("href", `/customer/delivery_challan/delete/${this.id}`);
+		 })
 
 });

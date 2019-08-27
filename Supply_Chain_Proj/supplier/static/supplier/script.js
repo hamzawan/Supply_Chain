@@ -1712,6 +1712,18 @@ $(document).ready(function(){
 						console.log($("#modal_delete_button").attr('href'));
 					})
 
+					$(".delete-quotation-supplier").on('click',function(){
+						$("#modal_delete_button").attr("href", `/supplier/quotation/delete/${this.id}`);
+					})
+
+					$(".delete-po-supplier").on('click',function(){
+						$("#modal_delete_button").attr("href", `/supplier/purchase_order/delete/${this.id}`);
+					})
+
+					$(".delete-dc-supplier").on('click',function(){
+						$("#modal_delete_button").attr("href", `/supplier/delivery_challan/delete/${this.id}`);
+					})
+
 				$(document).ready(function() {
 						$('.sort').DataTable();
 					});

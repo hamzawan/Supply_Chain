@@ -48,7 +48,7 @@
        </div>
      </div>
   page <pdf:pagenumber> of <pdf:pagecount>
-  <p style="text-align:center;">Software Developed By TechFurq, 92 322 2832789, info@techfurq.com, www.techfurq.com</p>
+  <p style="text-align:center;">Software Developed By TechFurq, +92 333 2832788, www.techfurq.com</p>
 </div>
 
     <!-- HTML Content -->
@@ -84,24 +84,15 @@
             </td>
            {% endif %}
            <th align="left" style="width: 180px;"><font size="13px" color="#0a012c">Invoice No.</font</th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.sale_no}}</font></td>
+           <td align="center" style="padding-top:4px;"><font size="16px" color="#0a012c"><b>{{header.sale_no}}</b></font></td>
          </tr>
          <tr>
            <th align="left"><font size="12px" color="#0a012c">Address</font</th>
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.Address}}</font></td>
            <th align="left"><font size="12px" color="#0a012c">Invoice Date</font</th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.date}}</font></td>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.date|date:"d-m-Y"}}</font></td>
 
          </tr>
-         <!-- <tr>
-           <th align="left"><font size="12px" color="#0a012c">Purchase Order No.</font></th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">102029</font></td>
-           <th align="left"><font size="12px" color="#0a012c">Delivery Challan</font</th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">145950</font></td>
-
-           <th align="left"><font size="12px" color="#0a012c">Delivery Challan #</font</th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c"></font>DC/CU/101</td>
-         </tr> -->
        </thead>
        </table>
      </header>
@@ -111,13 +102,12 @@
       <thead>
         <tr class="heading_row">
           <th align="center" style="width: 70px;"><font size="12px">S No.</font></th>
-          <th style="width:400px;"><font size="12px">Part Name & Description</font></th>
+          <th style="width:400px;"><font size="12px">Item Name & Description</font></th>
           <th><font size="12px">Qty</font></th>
           <th><font size="12px">Unit</font></th>
           <th><font size="12px">Unit/Price</font></th>
           <th><font size="12px">Values Of Goods</font></th>
-          <th><font size="12px">Sales Tax 17%</font></th>
-          <th style="width:200px;"><font size="12px">Value Including Sales Tax</font></th>
+          <th style="width:200px;"><font size="12px">Total</font></th>
         </tr>
       </thead>
       <tbody>
@@ -134,7 +124,6 @@
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;"></td>
         </tr>
         {% endifchanged %}
         <tr>
@@ -144,7 +133,6 @@
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{unit}}</td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{price}}</td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{value_of_goods|floatformat:2}}</td>
-          <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{tax|floatformat:2}}</td>
           <td style="border-left:1px solid black; text-align: center; border-right:1px solid black; border-bottom:1px solid black;">{{value_of_goods_tax}}</td>
         </tr>
         {% endwith %}
@@ -153,7 +141,6 @@
       <tr class="heading_row">
         <td style="width: 70px;"></td>
         <td style="width:400px;"></td>
-        <td></td>
         <td></td>
         <td></td>
         <td></td>
@@ -173,7 +160,7 @@
         <td></td>
         <td></td>
         <td></td>
-        <td style=" text-align: center; padding-top:10px;  width:700px;" ><b>Cartage Amount : {{forloop.counter}} Po No : {{v.po_no}}</b></td>
+        <td style=" text-align: center; padding-top:10px;  width:700px;" ><b>Cartage Amount {{forloop.counter}} : Po No : {{v.po_no}}</b></td>
         <td style="text-align:center;  border-bottom:1px solid black; width:200px;" >{{v.cartage|floatformat:2}}</td>
       </tr>
       {% endfor %}

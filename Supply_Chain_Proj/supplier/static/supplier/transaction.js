@@ -4494,6 +4494,37 @@ $.fn.extend({
 		// 	})
 	 // })
 
+	 $(".delete-chart-of-account").on('click',function(){
+		 $("#modal_delete_button").attr("href", `/transaction/chart_of_account/delete/${this.id}`);
+	 })
+
+	 $(".delete_purchase").on('click',function(){
+		 $("#modal_delete_button").attr("href", `/transaction/purchase/delete/${this.id}`);
+	 })
+
+	 $(".delete").on('click',function(){
+		 $("#modal_delete_button").attr("href", `/transaction/sale/delete/${this.id}`);
+	 })
+
+	 $(".delete-jv-summary").on('click',function(){
+		 $("#modal_delete_button").attr("href", `/transaction/journal_voucher/delete/${this.id}`);
+	 })
+
+	 $(".delete-brv-summary").on('click',function(){
+		 $("#modal_delete_button").attr("href", `/transaction/bank_receiving_voucher/delete/${this.id}`);
+	 })
+
+	 $(".delete-crv-summary").on('click',function(){
+		 $("#modal_delete_button").attr("href", `/transaction/cash_receiving_voucher/delete/${this.id}`);
+	 })
+
+	 $(".delete-bpv-summary").on('click',function(){
+		 $("#modal_delete_button").attr("href", `/transaction/bank_payment_voucher/delete/${this.id}`);
+	 })
+
+	 $(".delete-cpv-summary").on('click',function(){
+		 $("#modal_delete_button").attr("href", `/transaction/cash_payment_voucher/delete/${this.id}`);
+	 })
 
 
 		document.getElementById('box').onchange = function() {

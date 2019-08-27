@@ -3767,7 +3767,7 @@ def sales_tax_invoice(request,pk):
                             )as tblData where tblData.SaleId =  %s ''',[pk])
     detail = detail.fetchall()
     hs_code = SaleDetail.objects.filter(sale_id = pk).first()
-    if header.account_id.parent_id == 5:
+    if header.account_id.parent_id == 13 or header.account_id.parent_id == 12:
         parent_company_name = header.account_id
     else:
         parent_company_name = ChartOfAccount.objects.filter(id = header.account_id.parent_id).first()
@@ -3776,11 +3776,12 @@ def sales_tax_invoice(request,pk):
         lines = lines + len(value[4].split('\n'))
         amount = float(value[7] * value[6])
         total_amount_item = total_amount_item + amount
-        sales_tax_amount = round(amount) * 17 / 100
+        sales_tax_amount = amount * 17 / 100
         tax_amount = tax_amount + sales_tax_amount
-        tax_amount = round(tax_amount)
+        tax_amount = tax_amount
         total_amount_item = total_amount_item + sales_tax_amount
-        total_amount_item = round(total_amount_item)
+        total_amount_item = total_amount_item
+    total_amount_item = round(total_amount_item)
     total_amount = total_amount_item
     total_amount = round(total_amount)
     lines = lines + len(detail) + len(detail)
@@ -3821,11 +3822,10 @@ def commercial_invoice(request,pk):
                             )as tblData where tblData.SaleId = %s ''',[pk])
     detail = detail.fetchall()
     hs_code = SaleDetail.objects.filter(sale_id = pk).first()
-    if header.account_id.parent_id == 5 or header.account_id.parent_id == 13:
+    if header.account_id.parent_id == 13 or header.account_id.parent_id == 12:
         parent_company_name = header.account_id
     else:
         parent_company_name = ChartOfAccount.objects.filter(id = header.account_id.parent_id).first()
-    print(parent_company_name)
     cartage_amounts = Cartage_and_Po.objects.filter(invoice_id = pk).all()
     for value in cartage_amounts:
         cartage = cartage + value.cartage
@@ -3833,12 +3833,14 @@ def commercial_invoice(request,pk):
         lines = lines + len(value[4].split('\n'))
         amount = float(value[7] * value[6])
         total_amount_item = total_amount_item + amount
-        sales_tax_amount = round(amount) * 17 / 100
+        sales_tax_amount = amount * 17 / 100
         tax_amount = tax_amount + sales_tax_amount
-        tax_amount = round(tax_amount)
+        tax_amount = tax_amount
         total_amount_item = total_amount_item + sales_tax_amount
-        total_amount_item = round(total_amount_item)
-    total_amount = total_amount_item + cartage + header.additional_tax
+        total_amount_item = total_amount_item
+    total_amount_item = round(total_amount_item)
+    tax_amount = round(tax_amount)
+    total_amount = Decimal(total_amount_item) + Decimal(cartage) + Decimal(header.additional_tax)
     total_amount = round(total_amount)
     lines = lines + len(detail) + len(detail)
     total_lines = 36 - lines

@@ -86,20 +86,20 @@
             </td>
            {% endif %}
            <th align="left" style="width: 180px;"><font size="13px" color="#0a012c">Invoice No.</font</th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.sale_no}}</font></td>
+           <td align="center" style="padding-top:4px;"><font size="15px" color="#0a012c"><b>{{header.sale_no}}</b></font></td>
          </tr>
          <tr>
            <th align="left"><font size="12px" color="#0a012c">Address</font</th>
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.Address}}</font></td>
            <th align="left"><font size="12px" color="#0a012c">Invoice Date</font</th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.date}}</font></td>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.date|date:"d-m-Y"}}</font></td>
 
          </tr>
          <tr>
            <th align="left"><font size="12px" color="#0a012c">Telephone No.</font></th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.phone_no}}</font></td>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{parent_company_name.phone_no}}</font></td>
            <th align="left"><font size="12px" color="#0a012c">Sales Tax Number</font</th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.stn}}</font></td>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{parent_company_name.stn}}</font></td>
 
            <!-- <th align="left"><font size="12px" color="#0a012c">Delivery Challan #</font</th>
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c"></font>DC/CU/101</td> -->

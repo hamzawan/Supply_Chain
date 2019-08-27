@@ -17,6 +17,19 @@
         {% endif %}
       </div>
     </div>
+
+    <ul style="list-style-type:none;" class="messages">
+      {% if messages %}
+        {% for msg in messages %}
+          <li>
+            <div class="alert {{msg.level_tag}}">
+              {{msg.message}}
+            </div>
+          </li>
+        {% endfor %}
+      {% endif %}
+    </ul>
+
     <br>
     <div class="table table-responsive content-loader">
       <table class="table table-bordered sort" id="dataTable">
@@ -40,22 +53,22 @@
                 <td> {{ value.quotation_no }} </td>
                 <td> {{ value.account_id.account_title }} </td>
                 <td> {{ value.date }} </td>
-                <td> User1  </td>
+                <td> {{value.user_id.username}}  </td>
                 <td> {{ value.currency }} </td>
                 <td> {{ value.exchange_rate }} </td>
                 <td> {{ value.follow_up }} </td>
                 <td>
-                  
+
                   {% if permission.edit == 1 %}
                   <a class="edit_list" href="{% url 'edit-quotation-supplier' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
                   {% endif %}
-                  
+
                   {% if permission.r_print == 1 %}
                   <a href="{% url 'print-quotation-supplier' pk=value.id %}" target="_blank"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a>
                   {% endif %}
-                  
+
                   {% if permission.delete == 1 %}
-                  <a class="delete-all" href="{% url 'delete-quotation-supplier' pk=value.id %}"  data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
+                  <a class="delete-quotation-supplier" href="" data-toggle="modal" data-target="#deleteQuotationModal" id="{{value.id}}"><i class="material-icons">&#xE872;</i></a>
                   {% endif %}
                 </td>
             </tr>
@@ -66,6 +79,26 @@
   </li>
 </ul>
 </div>
+
+<!-- Delete Modal-->
+<div class="modal fade" id="deleteQuotationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Delete Quotation</h5>
+        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">Are you sure you want to delete?</div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+        <a class="btn btn-danger" href="" id="modal_delete_button">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- Modal -->
 
 
 {% endblock body %}

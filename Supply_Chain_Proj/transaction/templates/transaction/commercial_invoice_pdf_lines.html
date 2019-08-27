@@ -48,7 +48,7 @@
        </div>
      </div>
   page <pdf:pagenumber> of <pdf:pagecount>
-  <p style="text-align:center;">Software Developed By TechFurq, 92 322 2832789, info@techfurq.com, www.techfurq.com</p>
+  <p style="text-align:center;">Software Developed By TechFurq, 92 333 2832788, www.techfurq.com</p>
 </div>
 
     <!-- HTML Content -->
@@ -76,24 +76,23 @@
        <thead>
          <tr>
            <th align="left" style="width: 180px;"><font size="12px" color="#0a012c">Buyer's Name</font></th>
-           {% if parent_company_name.id == header.account_id.id %}
-             <td align="left" style="padding-top:4px;">
-               <font size="12px" color="#0a012c">{{parent_company_name.account_title}}</font>
-             </td>
-            {% else %}
-            <td align="left" style="padding-top:4px;">
-              <font size="12px" color="#0a012c">{{parent_company_name.account_title}} ( {{header.account_id.account_title}} ) </font>
-            </td>
-           {% endif %}
+             {% if parent_company_name.id == header.account_id.id %}
+               <td align="left" style="padding-top:4px;">
+                 <font size="12px" color="#0a012c">{{parent_company_name.account_title}}</font>
+               </td>
+              {% else %}
+              <td align="left" style="padding-top:4px;">
+                <font size="12px" color="#0a012c">{{parent_company_name.account_title}} ( {{header.account_id.account_title}} ) </font>
+              </td>
+             {% endif %}
            <th align="left" style="width: 180px;"><font size="13px" color="#0a012c">Invoice No.</font</th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.sale_no}}</font></td>
+           <td align="center" style="padding-top:4px;"><font size="15px" color="#0a012c"><b>{{header.sale_no}}</b></font></td>
          </tr>
          <tr>
            <th align="left"><font size="12px" color="#0a012c">Address</font</th>
            <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.Address}}</font></td>
            <th align="left"><font size="12px" color="#0a012c">Invoice Date</font</th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.date}}</font></td>
-
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.date|date:"d-m-Y"}}</font></td>
          </tr>
          <!-- <tr>
            <th align="left"><font size="12px" color="#0a012c">Purchase Order No.</font></th>
@@ -106,9 +105,9 @@
          </tr> -->
          <tr>
            <th align="left"><font size="12px" color="#0a012c">Sales Tax Number</font</th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.stn}}</font></td>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{parent_company_name.stn}}</font></td>
            <th align="left"><font size="12px" color="#0a012c">NTN  / CNIC</font</th>
-           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{header.account_id.ntn}}</font></td>
+           <td align="left" style="padding-top:4px;"><font size="12px" color="#0a012c">{{parent_company_name.ntn}}</font></td>
          </tr>
        </thead>
        </table>

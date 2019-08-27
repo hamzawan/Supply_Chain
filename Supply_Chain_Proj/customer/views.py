@@ -908,6 +908,11 @@ def new_delivery_challan_customer(request):
     else:
         get_last_dc_no = 101
     item_code_dc = request.POST.get('item_code_dc',False)
+    focus = request.POST.get('focus',False)
+    if focus:
+        data = Add_products.objects.all()
+        row = serializers.serialize('json',data)
+        return HttpResponse(json.dumps({'row':row}))
     if item_code_dc:
         data = Add_products.objects.filter(product_code = item_code_dc)
         row = serializers.serialize('json',data)
