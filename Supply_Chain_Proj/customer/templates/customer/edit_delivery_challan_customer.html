@@ -77,7 +77,8 @@
                 <th width="70px">S No.</th>
                 <th width="170px">Item Code</th>
                 <th width="170px">Item Name</th>
-                <th>Description</th>
+                <th>Item Description</th>
+                <th width="200px">Description</th>
                 <th width="90px">Quantity</th>
                 <th width="90px">Unit</th>
                 <th>Action</th>
@@ -91,6 +92,7 @@
               <td>{{ value.item_id.product_code }}</td>
               <td>{{ value.item_id.product_name }}</td>
               <td><pre>{{ value.item_id.product_desc }}</pre></td>
+              <td>{{ value.description }}</td>
               <td>{{ value.quantity }}</td>
               <td>{{ value.item_id.unit }}</td>
               <td style="display:none;">{{ value.po_no }}</td>

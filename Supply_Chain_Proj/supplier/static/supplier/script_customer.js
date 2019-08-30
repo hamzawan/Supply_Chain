@@ -1105,6 +1105,7 @@ $(document).ready(function(){
 												 '<td id="get_item_code">'+type[0].fields['product_code']+'</td>' +
 												 '<td>'+type[0].fields['product_name']+'</td>' +
 												 '<td><pre>'+type[0].fields['product_desc']+'</pre></td>' +
+												 '<td><input type="text" class="form-control form-control-sm"></td>' +
 												 '<td id="quantity"><input type="text" class="form-control form-control-sm" required ></td>' +
 												 '<td>'+type[0].fields['unit']+'</td>' +
 												 '<td style="display:none;"></td>' +
@@ -1304,6 +1305,9 @@ $(document).ready(function(){
 								if (i === 5) {
 									$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
 								}
+								if (i === 6) {
+									$(this).html('<input type="text" class="form-control" value="' + $(this).text() + '">');
+								}
 					});
 					$(this).parents("tr").find(".add-dc-customer, .edit-dc-customer").toggle();
 					$(".add-new-dc-customer").attr("disabled", "disabled");
@@ -1441,6 +1445,7 @@ $(document).ready(function(){
 									var $tds = $(this).find('td');
 									var row = {
 										'id' : "",
+										'description':"",
 										'quantity' : "",
 										'po_no': "",
 									};
@@ -1449,9 +1454,12 @@ $(document).ready(function(){
 												row["id"] = ($(this).text());
 										}
 										else if (i === 5) {
+												row["description"] = ($(this).text());
+										}
+										else if (i === 6) {
 												row["quantity"] = ($(this).text());
 										}
-										else if (i === 7) {
+										else if (i === 8) {
 												row["po_no"] = po_client
 										}
 									});
@@ -1503,6 +1511,7 @@ $(document).ready(function(){
 															 '<td>'+type[i].fields['product_code']+'</td>' +
 															 '<td>'+type[i].fields['product_name']+'</td>' +
 															 '<td><pre>'+type[i].fields['product_desc']+'</pre></td>' +
+															 '<td><input type="text" class="form-control"></td>' +
 															 '<td><input type="text" class="form-control" required ></td>' +
 															 '<td>'+type[i].fields['unit']+'</td>' +
 															 '<td style="display:none;"></td>' +
@@ -1654,6 +1663,9 @@ $(document).ready(function(){
 											if (i === 5 ) {
 												$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
 											}
+											if (i === 6 ) {
+												$(this).html('<input type="text" class="form-control form-control-sm" value="' + $(this).text() + '">');
+											}
 								});
 								$(this).parents("tr").find(".add-dc-edit-customer, .edit-dc-edit-customer").toggle();
 								$(".edit-dc-supplier").attr("disabled", "disabled");
@@ -1691,6 +1703,7 @@ $(document).ready(function(){
 								var row = {
 									'id' : "",
 									'quantity' : "",
+									'description' : "",
 									'po_no': "",
 								};
 								$tds.each(function(i, el){
@@ -1698,9 +1711,12 @@ $(document).ready(function(){
 											row["id"] = ($(this).text());
 									}
 									else if (i === 5) {
+											row["description"] = ($(this).text());
+									}
+									else if (i === 6) {
 											row["quantity"] = ($(this).text());
 									}
-									else if (i === 7) {
+									else if (i === 8) {
 											row["po_no"] = ($(this).text());
 									}
 								});

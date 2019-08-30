@@ -97,6 +97,7 @@ class DcHeaderCustomer(models.Model):
 
 class DcDetailCustomer(models.Model):
     item_id = models.ForeignKey(Add_products, models.SET_NULL, blank = True, null = True)
+    description = models.CharField(max_length = 100)
     quantity = models.DecimalField(max_digits = 8, decimal_places = 2)
     accepted_quantity = models.IntegerField()
     returned_quantity = models.IntegerField()

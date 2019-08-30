@@ -1532,7 +1532,8 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 							'quantity' : "",
 							'price' : "",
 							'sales_tax': "",
-							'dc_no': ""
+							'dc_no': "",
+							'dcdetailid':""
 						};
 						$tds.each(function(i, el){
 							if (i === 1) {
@@ -1549,6 +1550,10 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 							}
 							else if (i === 12) {
 									row["dc_no"] = ($(this).text());
+							}
+							else if (i === 13) {
+									row["dcdetailid"] = ($(this).text());
+									console.log($(this).text());
 							}
 						});
 						data.push(row);
@@ -2867,6 +2872,7 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 								'<td id="sales_tax_amount_edit">0.00</td>' +
 								'<td id="total_amount" style="font-weight:bold;" class="sum"><b>0.00</b></td>' +
 								'<td style="display:none;">'+data.dc_ref+'</td>' +
+								'<td style="display:none;">'+data.row[i][1]+'</td>' +
 					'<td><a class="add-sale-edit" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-sale-edit" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="delete-sale-edit" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 						'</tr>';
 						count++;
@@ -3027,7 +3033,8 @@ $('#edit-sale-submit').on('submit',function(e){
 					'quantity' : "",
 					'price' : "",
 					'sales_tax' : "",
-					'dc_no': ""
+					'dc_no': "",
+					'dcdetailid': ""
 				};
 				$tds.each(function(i, el){
 					if (i === 0) {
@@ -3044,6 +3051,10 @@ $('#edit-sale-submit').on('submit',function(e){
 					}
 					else if (i === 11) {
 							row["dc_no"] = ($(this).text());
+					}
+					else if (i === 12) {
+							row["dcdetailid"] = ($(this).text());
+							console.log($(this).text());
 					}
 				});
 				data.push(row);

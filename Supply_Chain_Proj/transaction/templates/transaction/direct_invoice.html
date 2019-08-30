@@ -64,18 +64,19 @@
             {% for value in dc_detail %}
             <tr>
               <td>{{ forloop.counter }}</td>
-              <td style="display:none;">{{value.1}}</td>
-              <td>{{ value.2 }}</td>
+              <td style="display:none;">{{value.2}}</td>
               <td>{{ value.3 }}</td>
-              <td><pre>{{ value.4 }}</pre></td>
-              <td id="quantity"><input type="text" name="" style="width:70px;" class="form-control form-control-sm" value="{{ value.8 }}"></td>
+              <td>{{ value.4 }}</td>
+              <td><pre>{{ value.5 }}</pre></td>
+              <td id="quantity"><input type="text" name="" style="width:70px;" class="form-control form-control-sm" value="{{ value.9 }}"></td>
               <td>{{ value.5 }}</td>
               <td id="price"><input type="text" style="width:70px;" class="form-control form-control-sm" name="" value=""></td>
               <td id="value_of_goods">0.00</td>
               <td id="sales_tax"><input type="text" class="form-control form-control-sm" name="" value="17"></td>
               <td id="sales_tax_amount">0.00</td>
               <td id="total" style="font-weight:bold;" class="sum"><b>0.00</b></td>
-              <td style="display:none;">{{ value.0 }}</td>
+              <td style="display:none;">{{ value.1 }}</td>
+              <td style="display:none;">{{ value.10 }}</td>
               <td><a class="edit-transaction-sale" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="add-transaction-sale" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="delete-transaction-sale" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
             </tr>
             {% endfor %}

@@ -975,7 +975,7 @@ def new_delivery_challan_customer(request):
         header_id = DcHeaderCustomer.objects.filter(company_id = company.id).get(dc_no = get_last_dc_no)
         for value in items:
             item_id = Add_products.objects.get(id = value["id"])
-            dc_detail = DcDetailCustomer(item_id = item_id, quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, po_no = value["po_no"] ,dc_id = header_id)
+            dc_detail = DcDetailCustomer(item_id = item_id, description = value["description"] ,quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, po_no = value["po_no"] ,dc_id = header_id)
             dc_detail.save()
         return JsonResponse({'result':'success'})
     return render(request, 'customer/new_delivery_challan_customer.html',{'all_item_code':all_item_code,'get_last_dc_no':get_last_dc_no,'all_accounts':all_accounts,'all_po_code':all_po_code,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
@@ -1043,7 +1043,7 @@ def edit_delivery_challan_customer(request,pk):
         items = json.loads(request.POST.get('items'))
         for value in items:
             item_id = Add_products.objects.get(id = value["id"])
-            dc_detail_update = DcDetailCustomer(item_id = item_id, quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, po_no = value["po_no"] ,dc_id = header_id)
+            dc_detail_update = DcDetailCustomer(item_id = item_id,description = value["description"] ,quantity = value["quantity"],accepted_quantity = 0, returned_quantity = 0, po_no = value["po_no"] ,dc_id = header_id)
             dc_detail_update.save()
         return JsonResponse({"result":"success"})
     return render(request,'customer/edit_delivery_challan_customer.html',{'dc_header':dc_header,'pk':pk,'dc_detail':dc_detail, 'all_item_code':all_item_code, 'all_accounts':all_accounts,'all_po_code':all_po_code,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})

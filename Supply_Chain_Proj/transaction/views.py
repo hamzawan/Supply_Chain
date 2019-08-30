@@ -1415,15 +1415,16 @@ def direct_sale(request, pk):
     header_id = DcHeaderCustomer.objects.get(id = pk)
     cursor = connection.cursor()
     dc_detail = cursor.execute('''Select * From (
-                                Select distinct dc_id_id,IP.id,IP.product_code,IP.product_name, IP.product_desc, IP.unit,
+                                Select distinct SD.id as Sd_detail_id,dc_id_id, IP.id,IP.product_code,IP.product_name, IP.product_desc, IP.unit,
                                 DC.Quantity As DcQuantity,
                                 ifnull(sum(SD.Quantity),0) As SaleQuantity,
-                                (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
+                                (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity,dc.ID As dcdetailid
                                 from customer_dcdetailcustomer DC
                                 inner join inventory_add_products IP on IP.id = DC.item_id_id
                                 Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+                                AND SD.dcdetailid = DC.ID
                                 And SD.item_id_id = IP.id
-                                group by dc_id_id,ip.product_code,ip.product_name
+                                group by SD.id,DC.id,SD.dcdetailid
                                 ) As tblData
                                 Where RemainingQuantity > 0 And dc_id_id = %s ''',[header_id.id])
     dc_detail = dc_detail.fetchall()
@@ -1471,7 +1472,7 @@ def direct_sale(request, pk):
             amount = (((quantity * price) * sales_tax) / 100)
             amount = ((quantity * price ) + amount)
             item_amount = item_amount + amount
-            sale_detail = SaleDetail(item_id = item_id,  quantity = value["quantity"],cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], dc_ref = value["dc_no"], sale_id = header_id, total = amount)
+            sale_detail = SaleDetail(item_id = item_id,  quantity = value["quantity"],cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], dc_ref = value["dc_no"], dcdetailid = value["dcdetailid"] ,sale_id = header_id, total = amount)
             sale_detail.save()
         item_amount = item_amount + float(additional_tax)
         total_amount = item_amount
@@ -1629,7 +1630,7 @@ def edit_sale(request,pk):
             amount = (((quantity * price) * sales_tax) / 100)
             amount = ((quantity * price ) + amount)
             item_amount = item_amount + amount
-            sale_detail = SaleDetail(item_id = item_id, quantity = value["quantity"], cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], sale_id = header_id, dc_ref = value["dc_no"], total = amount)
+            sale_detail = SaleDetail(item_id = item_id, quantity = value["quantity"], cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], sale_id = header_id, dc_ref = value["dc_no"],dcdetailid  = value["dcdetailid"] ,total = amount)
             sale_detail.save()
         item_amount = item_amount + float(additional_tax)
         total_amount = item_amount

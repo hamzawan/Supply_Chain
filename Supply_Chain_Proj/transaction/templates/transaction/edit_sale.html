@@ -111,6 +111,7 @@
                 <td id="sales_tax_amount_edit">{{sales_tax_amount|floatformat:2}}</td>
                 <td id="total_amount">{{sales_tax_amount|floatformat:"0"|add:vog|floatformat:2}}</td>
                 <td style="display:none;">{{value.dc_ref}}</td>
+                <td style="display:none;">{{value.dcdetailid}}</td>
                 <td><a class="add-sale-edit" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-sale-edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-sale-edit" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
               </tr>
               {% endwith %}
