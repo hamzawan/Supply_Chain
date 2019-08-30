@@ -1086,7 +1086,6 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 					 .done(function fun(data){
 						 $('#dc').html('');
 							 for (var j = 0; j < data.all_dc.length; j++) {
-								 console.log(data.all_dc[j][1]);
 									$("#dc").append($("<option>").attr('value',data.all_dc[j][1]).text(data.all_dc[j][1]));
 							 }
 					 });
@@ -1163,7 +1162,6 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 												 '<td>'+count+'</td>' +
 												 '<td id="get_item_code">'+type[0].fields['item_code']+'</td>' +
 												 '<td width="160px" id="hs_code"><input type="text" style="width:80px;" class="form-control" value=""></td>' +
-
 												 '<td>'+type[0].fields['item_name']+'</td>' +
 												 '<td id="desc" ><pre>'+type[0].fields['item_description']+'</pre></td>' +
 												 '<td width="160px" id="quantity"><input type="text" style="width:80px;" class="form-control" value=""></td>' +
@@ -1195,16 +1193,18 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 							 })
 							 .done(function done(data){
 								 var index = $("table tbody tr:last-child").index();
+								 var j = 0;
 								 // total_amount = (type[0].fields['unit_price'] * type[0].fields['quantity']);
 								 for (var i = 0; i < data.row.length; i++) {
+									console.log(i, j);
 									var row = '<tr>' +
 											'<td >'+count+'</td>'+
-											'<td style="display:none;">'+data.row[i][1]+'</td>'+
-											'<td id="get_item_code">'+data.row[i][2]+'</td>' +
-											'<td>'+data.row[i][3]+'</td>' +
-											'<td id="desc" ><pre>'+data.row[i][4]+'</pre></td>' +
-											'<td id="quantity"><input type="text" style="width:80px;" class="form-control" value="'+data.row[i][8]+'"></td>' +
-											'<td>'+data.row[i][5]+'</td>' +
+											'<td style="display:none;">'+data.row[i][2]+'</td>'+
+											'<td id="get_item_code">'+data.row[i][3]+'</td>' +
+											'<td>'+data.row[i][4]+'</td>' +
+											'<td id="desc" ><pre>'+data.row[i][5]+'</pre></td>' +
+											'<td id="quantity"><input type="text" style="width:80px;" class="form-control" value="'+data.row[i][9]+'"></td>' +
+											'<td>'+data.row[i][6]+'</td>' +
 											'<td id="price" ><input type="text" style="width:80px;" class="form-control" value=""></td>' +
 											'<td id="value_of_goods" >0.00</td>' +
 											'<td id="sales_tax"><input type="text" style="width:80px;" class="form-control" value="17"></td>' +
@@ -1214,6 +1214,7 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 								'<td><a class="add-transaction-sale" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-transaction-sale" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="delete-transaction-sale" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 									'</tr>';
 									count++;
+									j = i - 1;
 								$("#new-sale-table").append(row);
 							$("table tbody tr").eq(index + i+1).find(".edit-transaction-sale, .add-transaction-sale").toggle();
 									$('[data-toggle="tooltip"]').tooltip();
@@ -1364,13 +1365,13 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 								// Edit row on edit button click
 				$(document).on("click", ".edit-transaction-sale", function(){
 						$(this).parents("tr").find("td:not(:last-child)").each(function(i){
-								if (i === 6) {
+								if (i === 5) {
 									$(this).html('<input type="text" style="width:80px;" class="form-control" value="' + $(this).text() + '">');
 								}
-								if (i === 8) {
+								if (i === 7) {
 									 $(this).html('<input type="text" style="width:80px;" class="form-control" value="' + $(this).text() + '">');
 								}
-								if (i === 10) {
+								if (i === 9) {
 									 $(this).html('<input type="text" style="width:80px;" class="form-control" value="' + $(this).text() + '">');
 								}
 
