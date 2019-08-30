@@ -1298,19 +1298,21 @@ def new_sale(request):
     if dc_code_sale:
         header_id = DcHeaderCustomer.objects.filter(company_id = company.id).get(dc_no = dc_code_sale)
         data = cursor.execute('''Select * From (
-                                Select distinct SD.id as Sd_detail_id,dc_id_id,IP.id,IP.product_code,IP.product_name, IP.product_desc, IP.unit,
+                                Select distinct SD.id as Sd_detail_id,dc_id_id, IP.id,IP.product_code,IP.product_name, IP.product_desc, IP.unit,
                                 DC.Quantity As DcQuantity,
                                 ifnull(sum(SD.Quantity),0) As SaleQuantity,
-                                (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity, DC.id as Dc_detail_id
+                                (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity,dc.ID As dcdetailid
                                 from customer_dcdetailcustomer DC
                                 inner join inventory_add_products IP on IP.id = DC.item_id_id
                                 Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+                                AND SD.dcdetailid = DC.ID
                                 And SD.item_id_id = IP.id
                                 group by SD.id,DC.id
                                 ) As tblData
                                 Where RemainingQuantity > 0 And dc_id_id = %s
                             ''',[header_id.id])
         row = data.fetchall()
+        print(row)
         return JsonResponse({"row":row,'dc_ref':header_id.id})
     # get_item_code = request.POST.get('item_code', False)
     # quantity = request.POST.get('quantity', False)
@@ -1378,7 +1380,8 @@ def new_sale(request):
             item_amount = item_amount + amount
             item_amount = item_amount + float(additional_tax)
             item_id = Add_products.objects.get(id = value["id"])
-            sale_detail = SaleDetail(item_id = item_id,  quantity = value["quantity"],cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], dc_ref = value["dc_no"], sale_id = header_id, total = amount)
+            print(value["dcdetailid"])
+            sale_detail = SaleDetail(item_id = item_id,  quantity = value["quantity"],cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], dc_ref = value["dc_no"], dcdetailid = value["dcdetailid"] ,sale_id = header_id, total = amount)
             sale_detail.save()
         total_amount = item_amount
         total_amount = total_amount + cartage_sum

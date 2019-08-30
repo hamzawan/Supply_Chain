@@ -1155,7 +1155,6 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 							 .done(function done(data){
 								 console.log(data.row);
 								 var type = JSON.parse(data.row);
-								 console.log(type.length);
 								 var index = $("table tbody tr:last-child").index();
 								 // total_amount = (type[0].fields['unit_price'] * type[0].fields['quantity']);
 										 var row = '<tr>' +
@@ -1211,6 +1210,7 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 											'<td id="sales_tax_amount">0.00</td>' +
 											'<td id="total" style="font-weight:bold;" class="sum"><b>0.00</b></td>' +
 											'<td style="display:none;">'+data.dc_ref+'</td>' +
+											'<td style="display:none;">'+data.row[i][10]+'</td>' +
 								'<td><a class="add-transaction-sale" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-transaction-sale" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="delete-transaction-sale" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 									'</tr>';
 									count++;
@@ -1433,7 +1433,8 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 							'quantity' : "",
 							'price' : "",
 							'sales_tax' : "",
-							'dc_no': ""
+							'dc_no': "",
+							'dcdetailid': ""
 						};
 						$tds.each(function(i, el){
 							if (i === 1) {
@@ -1451,6 +1452,10 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 							}
 							else if (i === 12) {
 									row["dc_no"] = ($(this).text());
+									console.log($(this).text());
+							}
+							else if (i === 13) {
+									row["dcdetailid"] = ($(this).text());
 									console.log($(this).text());
 							}
 						});
