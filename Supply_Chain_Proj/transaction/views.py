@@ -1457,7 +1457,10 @@ def direct_sale(request, pk):
 
         sale_header = SaleHeader(sale_no = sale_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = 0.00, additional_tax = additional_tax, withholding_tax = 0.00, account_id = account_id, follow_up = '2010-06-10', company_id = company, user_id = request.user, hs_code = hs_code)
         items = json.loads(request.POST.get('items'))
+        print("ITEMS", items)
+        print(type(request.POST.get('cartage')))
         cart = json.loads(request.POST.get('cartage'))
+        print(type(cart))
         sale_header.save()
         header_id = SaleHeader.objects.get(sale_no = sale_id)
         for value in cart:
@@ -1783,17 +1786,18 @@ def new_sale_non_gst(request):
 
         header_id = DcHeaderCustomer.objects.filter(company_id = company.id).get(dc_no = dc_code_sale)
         data = cursor.execute('''Select * From (
-                            Select distinct dc_id_id,IP.id,IP.product_code,IP.product_name, IP.product_desc, IP.unit,
-                            DC.Quantity As DcQuantity,
-                            ifnull(sum(SD.Quantity),0) As SaleQuantity,
-                            (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
-                            from customer_dcdetailcustomer DC
-                            inner join inventory_add_products IP on IP.id = DC.item_id_id
-                            Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
-                            And SD.item_id_id = IP.id
-                            group by dc_id_id,IP.product_code,IP.product_name
-                            ) As tblData
-                            Where RemainingQuantity > 0 And dc_id_id = %s
+                                Select distinct SD.id as Sd_detail_id,dc_id_id, IP.id,IP.product_code,IP.product_name, IP.product_desc, IP.unit,
+                                DC.Quantity As DcQuantity,
+                                ifnull(sum(SD.Quantity),0) As SaleQuantity,
+                                (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity,dc.ID As dcdetailid
+                                from customer_dcdetailcustomer DC
+                                inner join inventory_add_products IP on IP.id = DC.item_id_id
+                                Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+                                AND SD.dcdetailid = DC.ID
+                                And SD.item_id_id = IP.id
+                                group by SD.id,DC.id
+                                ) As tblData
+                                Where RemainingQuantity > 0 And dc_id_id = %s
                             ''',[header_id.id])
         row = data.fetchall()
         return JsonResponse({"row":row,'dc_ref':header_id.id})
@@ -1847,34 +1851,32 @@ def new_sale_non_gst(request):
         items = json.loads(request.POST.get('items'))
         sale_header.save()
         header_id = SaleHeader.objects.filter(company_id = company.id).get(sale_no = sale_id)
-        print(cart)
         for value in cart:
             cartage_ = Cartage_and_Po(cartage = value["cartage_amount"], po_no = value["po_no"], invoice_id = header_id.id)
             cartage_.save()
             cartage_sum = cartage_sum + float(value["cartage_amount"])
-            print(cartage_sum)
         for value in items:
             quantity = float(value["quantity"])
             price =  float((value["price"]))
             amount = quantity * price
             item_amount = item_amount + amount
             item_id = Add_products.objects.get(id = value["id"])
-            sale_detail = SaleDetail(item_id = item_id,  quantity = value["quantity"],cost_price = value["price"], retail_price = 0, sales_tax = 0, dc_ref = value["dc_no"], sale_id = header_id, total = amount)
+            sale_detail = SaleDetail(item_id = item_id,  quantity = value["quantity"],cost_price = value["price"], retail_price = 0, sales_tax = 0, dc_ref = value["dc_no"], dcdetailid = value["dcdetailid"] ,sale_id = header_id, total = amount)
             sale_detail.save()
         total_amount = item_amount
         header_id = header_id.id
         total_amount = total_amount + cartage_sum
         cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
         if payment_method == 'Cash':
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit",  ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = sale_id,  ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit",   ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = sale_id,   ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
             tran2.save()
         else:
             sale_account = ChartOfAccount.objects.get(account_title = 'Sales')
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit",  ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = sale_id,  ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_account, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit",ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_account, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = sale_id,ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/new_sale_non_gst.html',{'get_last_sale_no':get_last_sale_no, 'all_accounts':all_accounts, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
@@ -1882,6 +1884,7 @@ def new_sale_non_gst(request):
 
 @login_required
 def direct_sale_non_gst(request, pk):
+    cartage_sum = 0
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
     allow_customer_roles = customer_roles(request.user)
@@ -1892,15 +1895,16 @@ def direct_sale_non_gst(request, pk):
     header_id = DcHeaderCustomer.objects.get(id = pk)
     cursor = connection.cursor()
     dc_detail = cursor.execute('''Select * From (
-                                Select distinct dc_id_id,IP.id,IP.product_code,IP.product_name, IP.product_desc, IP.unit,
+                                Select distinct SD.id as Sd_detail_id,dc_id_id, IP.id,IP.product_code,IP.product_name, IP.product_desc, IP.unit,
                                 DC.Quantity As DcQuantity,
                                 ifnull(sum(SD.Quantity),0) As SaleQuantity,
-                                (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
+                                (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity,dc.ID As dcdetailid
                                 from customer_dcdetailcustomer DC
                                 inner join inventory_add_products IP on IP.id = DC.item_id_id
                                 Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+                                AND SD.dcdetailid = DC.ID
                                 And SD.item_id_id = IP.id
-                                group by dc_id_id,ip.product_code,ip.product_name
+                                group by SD.id,DC.id
                                 ) As tblData
                                 Where RemainingQuantity > 0 And dc_id_id = %s ''',[header_id.id])
     dc_detail = dc_detail.fetchall()
@@ -1908,15 +1912,14 @@ def direct_sale_non_gst(request, pk):
     total_amount = 0
     all_item_code = Add_products.objects.all()
     all_accounts = ChartOfAccount.objects.all()
-    get_last_sale_no = SaleHeader.objects.last()
+    get_last_sale_no = SaleHeader.objects.filter(company_id = company.id).last()
     if get_last_sale_no:
         get_last_sale_no = get_last_sale_no.sale_no
-        get_last_sale_no = get_last_sale_no[-3:]
         num = int(get_last_sale_no)
         num = num + 1
-        get_last_sale_no = 'SAL/' + str(num)
+        get_last_sale_no = str(num)
     else:
-        get_last_sale_no = 'SAL/101'
+        get_last_sale_no = '101'
     item_code = request.POST.get('item_code_sale',False)
     if item_code:
         data = Add_products.objects.filter(product_code = item_code)
@@ -1933,53 +1936,37 @@ def direct_sale_non_gst(request, pk):
         account_id = ChartOfAccount.objects.get(account_title = customer)
         date = datetime.date.today()
 
-        sale_header = SaleHeader(sale_no = sale_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = withholding_tax, account_id = account_id, follow_up = '2010-06-10', company_id = company, user_id = request.user)
-
-        items = json.loads(request.POST.get('items'))
+        sale_header = SaleHeader(sale_no = sale_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = 0.00, additional_tax = 0.00, withholding_tax = 0.00, account_id = account_id, follow_up = date, credit_days = "60", company_id = company, user_id = request.user)
         cart = json.loads(request.POST.get('cartage'))
+        items = json.loads(request.POST.get('items'))
         sale_header.save()
-        header_id = SaleHeader.objects.get(sale_no = sale_id)
+        header_id = SaleHeader.objects.filter(company_id = company.id).get(sale_no = sale_id)
+        for value in cart:
+            cartage_ = Cartage_and_Po(cartage = value["cartage_amount"], po_no = value["po_no"], invoice_id = header_id.id)
+            cartage_.save()
+            cartage_sum = cartage_sum + float(value["cartage_amount"])
         for value in items:
-            item_id = Add_products.objects.get(id = value["id"])
-            sale_detail = SaleDetail(item_id = item_id,  quantity = value["quantity"], cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], dc_ref = value["dc_no"] ,sale_id = header_id, hs_code = value["hs_code"])
-            sale_detail.save()
             quantity = float(value["quantity"])
             price =  float((value["price"]))
-            sales_tax = float(value["sales_tax"])
-            amount = (((quantity * price) * sales_tax) / 100)
-            amount = ((quantity * price ) + amount)
+            amount = quantity * price
             item_amount = item_amount + amount
-        item_amount = item_amount + float(cartage_amount) + float(additional_tax)
+            item_id = Add_products.objects.get(id = value["id"])
+            sale_detail = SaleDetail(item_id = item_id,  quantity = value["quantity"],cost_price = value["price"], retail_price = 0, sales_tax = 0, dc_ref = value["dc_no"], dcdetailid = value["dcdetailid"] ,sale_id = header_id, total = amount)
+            sale_detail.save()
         total_amount = item_amount
         header_id = header_id.id
-        cartage_amounts = cursor.execute('''Select SaleId,Cartage_amount ,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax from(
-                                    select SD.sale_id_id as SaleID, sum(DC.cartage_amount) as Cartage_amount, PS.id,PS.product_name as product_name, PS.product_desc as product_desc, PS.unit as unit,
-                                    SD.quantity as quantity, SD.cost_price as cost_price, SD.sales_tax as sales_tax,
-                                    DC.dc_no as DcNo, DCD.po_no  as po_no
-                                    from transaction_saledetail SD
-                                    inner join inventory_add_products PS on PS.id = SD.item_id_id
-                                    inner join customer_dcheadercustomer DC on SD.dc_ref = DC.id
-                                    inner join customer_dcdetailcustomer DCD on DCD.dc_id_id = DC.id
-                                    left join customer_poheadercustomer PO on PO.id = DCD.po_no
-                                    group by DCD.po_no
-                                    )as tblData where tblData.SaleId = %s
-                                    order by po_no''',[pk])
-        cartage_amounts = cartage_amounts.fetchall()
-        print(cartage_amounts)
-        for c in cartage_amounts:
-            ca = ca + c[1]
-            print(ca)
+        total_amount = total_amount + cartage_sum
         cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
         if payment_method == 'Cash':
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit",ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = sale_id,  ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit",ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = sale_id,   ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
             tran2.save()
         else:
             sale_account = ChartOfAccount.objects.get(account_title = 'Sales')
-            tran1 = Transactions(refrence_id = 0, refrence_date = date, account_id = account_id, tran_type = "", amount = total_amount, date = date, remarks = "Amount Debit",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice", company_id = company, user_id = request.user)
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = sale_id,  ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = sale_account, tran_type = "", amount = -abs(total_amount), date = date, remarks = "Amount Debit",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice", company_id = company, user_id = request.user)
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_account, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = sale_id,ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/direct_invoice_non_gst.html',{'all_item_code':all_item_code,'get_last_sale_no':get_last_sale_no, 'all_accounts':all_accounts, 'dc_header':dc_header, 'dc_detail':dc_detail, 'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
@@ -2054,17 +2041,18 @@ def edit_sale_non_gst(request,pk):
 
         header_id = DcHeaderCustomer.objects.filter(company_id = company.id).get(dc_no = dc_code_sale)
         data = cursor.execute('''Select * From (
-                            Select distinct dc_id_id,IP.id,IP.product_code,IP.product_name, IP.product_desc, IP.unit,
-                            DC.Quantity As DcQuantity,
-                            ifnull(sum(SD.Quantity),0) As SaleQuantity,
-                            (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity
-                            from customer_dcdetailcustomer DC
-                            inner join inventory_add_products IP on IP.id = DC.item_id_id
-                            Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
-                            And SD.item_id_id = IP.id
-                            group by dc_id_id,IP.product_code,IP.product_name
-                            ) As tblData
-                            Where RemainingQuantity > 0 And dc_id_id = %s
+                                Select distinct SD.id as Sd_detail_id,dc_id_id, IP.id,IP.product_code,IP.product_name, IP.product_desc, IP.unit,
+                                DC.Quantity As DcQuantity,
+                                ifnull(sum(SD.Quantity),0) As SaleQuantity,
+                                (DC.Quantity-ifnull(Sum(SD.Quantity),0)) As RemainingQuantity,dc.ID As dcdetailid
+                                from customer_dcdetailcustomer DC
+                                inner join inventory_add_products IP on IP.id = DC.item_id_id
+                                Left Join transaction_saledetail SD on SD.dc_ref = DC.dc_id_id
+                                AND SD.dcdetailid = DC.ID
+                                And SD.item_id_id = IP.id
+                                group by SD.id,DC.id
+                                ) As tblData
+                                Where RemainingQuantity > 0 And dc_id_id = %s
                             ''',[header_id.id])
         row = data.fetchall()
         return JsonResponse({"row":row,'dc_ref':header_id.id})
@@ -2109,7 +2097,7 @@ def edit_sale_non_gst(request,pk):
             price =  float((value["price"]))
             amount = quantity * price
             item_amount = item_amount + amount
-            sale_detail = SaleDetail(item_id = item_id, quantity = value["quantity"], cost_price = value["price"], retail_price = 0, sales_tax = 0, sale_id = header_id, dc_ref = value["dc_no"], total = amount)
+            sale_detail = SaleDetail(item_id = item_id, quantity = value["quantity"], cost_price = value["price"], retail_price = 0, sales_tax = 0, sale_id = header_id, dc_ref = value["dc_no"], dcdetailid = value["dcdetailid"] ,total = amount)
             sale_detail.save()
         total_amount = item_amount
         header_id = header_id.id
@@ -2120,9 +2108,9 @@ def edit_sale_non_gst(request,pk):
             tran_type = Q(tran_type = "Sale Invoice")
             delete = Transactions.objects.filter(refrence_id, tran_type)
             delete.delete()
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, ref_inv_tran_id = 0, ref_inv_tran_type = "" ,remarks = "Amount Debit", company_id = company, user_id = request.user)
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Invoice", amount = total_amount, date = date, ref_inv_tran_id = 0, ref_inv_tran_type = "" ,remarks = sale_id, company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit",  ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = sale_id,  ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
             tran2.save()
         else:
             refrence_id = Q(refrence_id = header_id)
@@ -2130,9 +2118,9 @@ def edit_sale_non_gst(request,pk):
             delete = Transactions.objects.filter(refrence_id, tran_type)
             delete.delete()
             sale_account = ChartOfAccount.objects.get(account_title = 'Sales')
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = "Amount Debit", ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Invoice", amount = total_amount, date = date, remarks = sale_id, ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_account, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = "Amount Debit", ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_account, tran_type = "Sale Invoice", amount = -abs(total_amount), date = date, remarks = sale_id, ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
     return render(request, 'transaction/edit_sale_ngst.html',{'all_item_code':all_item_code,'all_accounts':all_accounts, 'sale_header':sale_header, 'sale_detail':sale_detail, 'pk':pk, 'all_dc':all_dc,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser,'cartages':cartages})

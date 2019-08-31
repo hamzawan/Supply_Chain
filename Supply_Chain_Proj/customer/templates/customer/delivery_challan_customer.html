@@ -54,7 +54,7 @@
                 <td>{{ value.user_id.username }}</td>
                 <td>
                     {% if permission.edit == 1 %}
-                  <a class="edit_list" href="{% url 'edit-delivery-challan-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
+                      <a class="edit_list" href="{% url 'edit-delivery-challan-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
                     {% endif %}
 
                   {% with i=0 %}

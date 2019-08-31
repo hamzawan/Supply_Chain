@@ -1557,6 +1557,7 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 							}
 						});
 						data.push(row);
+						console.log(data);
 					}
 				});
 
@@ -1719,21 +1720,21 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 						 })
 						 .done(function done(data){
 							 var index = $("#new-sale-table-ngst tbody tr:last-child").index();
-							 // total_amount = (type[0].fields['unit_price'] * type[0].fields['quantity']);
 							 for (var i = 0; i < data.row.length; i++) {
 								 console.log(data);
 								var row = '<tr>' +
 										'<td >'+count+'</td>'+
-										'<td style="display:none;">'+data.row[i][1]+'</td>'+
-										'<td id="get_item_code">'+data.row[i][2]+'</td>' +
-										'<td>'+data.row[i][3]+'</td>' +
-										'<td id="desc" ><pre>'+data.row[i][4]+'</pre></td>' +
-										'<td id="quantity"><input type="text" style="width:80px;" class="form-control" value="'+data.row[i][8]+'"></td>' +
-										'<td>'+data.row[i][5]+'</td>' +
+										'<td style="display:none;">'+data.row[i][2]+'</td>'+
+										'<td id="get_item_code">'+data.row[i][3]+'</td>' +
+										'<td>'+data.row[i][4]+'</td>' +
+										'<td id="desc" ><pre>'+data.row[i][5]+'</pre></td>' +
+										'<td id="quantity"><input type="text" style="width:80px;" class="form-control" value="'+data.row[i][9]+'"></td>' +
+										'<td>'+data.row[i][6]+'</td>' +
 										'<td id="price" ><input type="text" style="width:80px;" class="form-control" value=""></td>' +
 										'<td id="value_of_goods" >0.00</td>' +
 										'<td id="total" style="font-weight:bold;" class="sum"><b>0.00</b></td>' +
-										'<td style="display:none;">'+data.dc_ref+'</td>' +
+										'<td style="display:none;">'+data.dc_ref+'</td>'+
+										'<td style="display:none;">'+data.row[i][10]+'</td>' +
 							'<td><a class="add-transaction-sale-ngst" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-transaction-sale-ngst" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="delete-transaction-sale-ngst" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 								'</tr>';
 								count++;
@@ -1788,7 +1789,6 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 
 				// Add row on add button click
 				$(document).on("click", ".add-transaction-sale-ngst", function(){
-					console.log("clicked");
 					sum = 0;
 					tax = 0;
 				var get_item_code = $($(this).parents("tr").find("#get_item_code")).filter(function() {
@@ -1876,7 +1876,7 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 							}
 
 				});
-				$(this).parents("tr").find(".add-transaction-sale, .edit-transaction-sale-ngst").toggle();
+				$(this).parents("tr").find(".add-transaction-sale-ngst, .edit-transaction-sale-ngst").toggle();
 				$(".add-item-sale").attr("disabled", "disabled");
 				});
 
@@ -1927,12 +1927,12 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 						'id' : "",
 						'quantity' : "",
 						'price' : "",
-						'dc_no': ""
+						'dc_no': "",
+						'dcdetailid':""
 					};
 					$tds.each(function(i, el){
 						if (i === 1) {
 								row["id"] = ($(this).text());
-								console.log($(this).text());
 						}
 						else if (i === 5) {
 								row["quantity"] = ($(this).text());
@@ -1942,6 +1942,9 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 						}
 						else if (i === 10) {
 								row["dc_no"] = ($(this).text());
+						}
+						else if (i === 11) {
+								row["dcdetailid"] = ($(this).text());
 								console.log($(this).text());
 						}
 					});
@@ -1991,11 +1994,14 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 						location.reload();
 					})
 				});
-				$('#new-sale-submit-direct').on('submit',function(e){
+				$('#new-sale-submit-direct-ngst').on('submit',function(e){
+					console.log("non gst direct clicked");
 				e.preventDefault();
 				console.log("clicked");
-				var table = $('#new-sale-table-direct');
+				var table = $('#new-sale-table-direct-ngst');
+				var cartage_table = $('#cartage-table');
 				var data = [];
+				var datax = [];
 				var sale_id = $('#sale_id').val();
 				var customer = $('#customer_name_sale').val();
 				var payment_method = $('#payment_method').val();
@@ -2022,24 +2028,41 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 						if (i === 1) {
 								row["id"] = ($(this).text());
 						}
-						if (i === 3) {
-								row["hs_code"] = ($(this).text());
-						}
-						else if (i === 6) {
+						else if (i === 5) {
 								row["quantity"] = ($(this).text());
 						}
-						else if (i === 8) {
+						else if (i === 7) {
 								row["price"] = ($(this).text());
 						}
-						else if (i === 10) {
-								row["sales_tax"] = ($(this).text());
-						}
-						else if (i === 13) {
+						else if (i === 9) {
 								row["dc_no"] = ($(this).text());
+						}
+						else if (i === 10) {
+								row["dcdetailid"] = ($(this).text());
 						}
 					});
 					data.push(row);
 				}
+				});
+
+				cartage_table.find('tr').each(function (i, el){
+					if(i != 0)
+					{
+						var $tdc = $(this).find('td');
+						var rowx = {
+							'cartage_amount' : "",
+							'po_no': "",
+						};
+						$tdc.each(function(i, el){
+							if (i === 1) {
+									rowx["cartage_amount"] = ($(this).text());
+							}
+							if (i === 3) {
+									rowx["po_no"] = ($(this).text());
+							}
+						});
+						datax.push(rowx);
+					}
 				});
 
 				 req =	$.ajax({
@@ -2055,6 +2078,7 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 							'additional_tax':additional_tax,
 							'withholding_tax':withholding_tax,
 							'items': JSON.stringify(data),
+							'cartage': JSON.stringify(datax),
 						},
 						dataType: 'json'
 					})
@@ -3204,15 +3228,16 @@ $('#edit-sale-submit').on('submit',function(e){
 					 // total_amount = (type[0].fields['unit_price'] * type[0].fields['quantity']);
 					 for (var i = 0; i < data.row.length; i++) {
 						var row = '<tr>' +
-								'<td style="display:none;">'+data.row[i][1]+'</td>'+
-								'<td id="get_item_code">'+data.row[i][2]+'</td>' +
-								'<td>'+data.row[i][3]+'</td>' +
-								'<td id="desc" ><pre>'+data.row[i][4]+'</pre></td>' +
-								'<td id="quantity_edit"><input type="text" style="width:80px;" class="form-control" value="'+data.row[i][8]+'"></td>' +
-								'<td>'+data.row[i][5]+'</td>' +
+								'<td style="display:none;">'+data.row[i][2]+'</td>'+
+								'<td id="get_item_code">'+data.row[i][3]+'</td>' +
+								'<td>'+data.row[i][4]+'</td>' +
+								'<td id="desc" ><pre>'+data.row[i][5]+'</pre></td>' +
+								'<td id="quantity_edit"><input type="text" style="width:80px;" class="form-control" value="'+data.row[i][9]+'"></td>' +
+								'<td>'+data.row[i][6]+'</td>' +
 								'<td id="price_edit" ><input type="text" style="width:80px;" class="form-control" value=""></td>' +
 								'<td id="value_of_goods_edit" >0.00</td>' +
-								'<td style="display:none;">'+data.dc_ref+'</td>' +
+								'<td style="display:none;">'+data.dc_ref+'</td>'+
+								'<td style="display:none;">'+data.row[i][10]+'</td>'+
 					'<td><a class="add-sale-edit-ngst" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a><a class="edit-sale-edit-ngst" title="Edit" data-toggle="tooltip" id="edit_purchase"><i class="material-icons">&#xE254;</i></a><a class="delete-sale-edit-ngst" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
 						'</tr>';
 						count++;
@@ -3368,7 +3393,8 @@ $('#edit-sale-submit-ngst').on('submit',function(e){
 					'id' : "",
 					'quantity' : "",
 					'price' : "",
-					'dc_no': ""
+					'dc_no': "",
+					'dcdetailid':""
 				};
 				$tds.each(function(i, el){
 					if (i === 0) {
@@ -3379,11 +3405,12 @@ $('#edit-sale-submit-ngst').on('submit',function(e){
 					}
 					else if (i === 6) {
 							row["price"] = ($(this).text());
-							console.log($(this).text());
 					}
 					else if (i === 8) {
 							row["dc_no"] = ($(this).text());
-							console.log($(this).text());
+					}
+					else if (i === 9) {
+							row["dcdetailid"] = ($(this).text());
 					}
 				});
 				data.push(row);

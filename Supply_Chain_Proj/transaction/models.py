@@ -89,7 +89,7 @@ class SaleHeader(models.Model):
 
 class SaleDetail(models.Model):
     item_id = models.ForeignKey(Add_products, models.SET_NULL, blank = True, null = True)
-    quantity = models.IntegerField()
+    quantity = models.DecimalField(max_digits = 8, decimal_places = 2)
     cost_price = models.DecimalField(max_digits = 8, decimal_places = 2)
     retail_price = models.DecimalField(max_digits = 8, decimal_places = 2)
     sales_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
