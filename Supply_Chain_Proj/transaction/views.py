@@ -1285,7 +1285,7 @@ def new_sale(request):
             num = num + 1
             get_last_sale_no = str(num)
         else:
-            get_last_sale_no = '8232'
+            get_last_sale_no = '8252'
     else:
         if get_last_sale_no:
             get_last_sale_no = get_last_sale_no.sale_no
@@ -1439,7 +1439,7 @@ def direct_sale(request, pk):
         num = num + 1
         get_last_sale_no = str(num)
     else:
-        get_last_sale_no = '8232'
+        get_last_sale_no = '8252'
     item_code = request.POST.get('item_code_sale',False)
     if item_code:
         data = Add_products.objects.filter(product_code = item_code)
