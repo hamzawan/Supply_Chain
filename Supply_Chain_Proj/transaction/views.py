@@ -1448,16 +1448,15 @@ def direct_sale(request, pk):
     if request.method == 'POST':
         sale_id = request.POST.get('sale_id',False)
         customer = request.POST.get('customer',False)
+        date = request.POST.get('date',False)
         payment_method = request.POST.get('payment_method',False)
         footer_desc = request.POST.get('footer_desc',False)
         hs_code = request.POST.get('hs_code',False)
         additional_tax = request.POST.get('additional_tax',False)
         account_id = ChartOfAccount.objects.get(account_title = customer)
-        date = datetime.date.today()
 
         sale_header = SaleHeader(sale_no = sale_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = 0.00, additional_tax = additional_tax, withholding_tax = 0.00, account_id = account_id, follow_up = '2010-06-10', company_id = company, user_id = request.user, hs_code = hs_code)
         items = json.loads(request.POST.get('items'))
-        print("ITEMS", items)
         print(type(request.POST.get('cartage')))
         cart = json.loads(request.POST.get('cartage'))
         print(type(cart))
@@ -1589,13 +1588,13 @@ def edit_sale(request,pk):
         credit_days = request.POST.get('credit_days',False)
         follow_up = request.POST.get('follow_up',False)
         hs_code = request.POST.get('hs_code',False)
+        date = request.POST.get('date',False)
         payment_method = request.POST.get('payment_method',False)
         footer_desc = request.POST.get('footer_desc',False)
         cartage_amount = request.POST.get('cartage_amount',False)
         additional_tax = request.POST.get('additional_tax',False)
         withholding_tax = request.POST.get('withholding_tax',False)
         account_id = ChartOfAccount.objects.get(account_title = customer)
-        date = datetime.date.today()
 
         if follow_up:
             follow_up = follow_up
@@ -1611,6 +1610,7 @@ def edit_sale(request,pk):
         sale_header.withholding_tax = withholding_tax
         sale_header.account_id = account_id
         sale_header.hs_code = hs_code
+        sale_header.date = date
 
         sale_header.save()
 
@@ -1833,13 +1833,13 @@ def new_sale_non_gst(request):
     #         return JsonResponse({"message":"False"})
     if request.method == 'POST':
         sale_id = request.POST.get('sale_id',False)
+        date = request.POST.get('date',False)
         customer = request.POST.get('customer',False)
         follow_up = request.POST.get('follow_up',False)
         credit_days = request.POST.get('credit_days',False)
         payment_method = request.POST.get('payment_method',False)
         footer_desc = request.POST.get('footer_desc',False)
         account_id = ChartOfAccount.objects.get(account_title = customer)
-        date = datetime.date.today()
 
         if follow_up:
             follow_up = follow_up
@@ -1928,13 +1928,13 @@ def direct_sale_non_gst(request, pk):
     if request.method == 'POST':
         sale_id = request.POST.get('sale_id',False)
         customer = request.POST.get('customer',False)
+        date = request.POST.get('date',False)
         payment_method = request.POST.get('payment_method',False)
         footer_desc = request.POST.get('footer_desc',False)
         cartage_amount = request.POST.get('cartage_amount',False)
         additional_tax = request.POST.get('additional_tax',False)
         withholding_tax = request.POST.get('withholding_tax',False)
         account_id = ChartOfAccount.objects.get(account_title = customer)
-        date = datetime.date.today()
 
         sale_header = SaleHeader(sale_no = sale_id, date = date, footer_description = footer_desc, payment_method = payment_method, cartage_amount = 0.00, additional_tax = 0.00, withholding_tax = 0.00, account_id = account_id, follow_up = date, credit_days = "60", company_id = company, user_id = request.user)
         cart = json.loads(request.POST.get('cartage'))
@@ -2065,7 +2065,7 @@ def edit_sale_non_gst(request,pk):
         payment_method = request.POST.get('payment_method',False)
         footer_desc = request.POST.get('footer_desc',False)
         account_id = ChartOfAccount.objects.get(account_title = customer)
-        date = datetime.date.today()
+        date = request.POST.get('date',False)
 
         if follow_up:
             follow_up = follow_up
@@ -2073,6 +2073,7 @@ def edit_sale_non_gst(request,pk):
             follow_up = '2010-06-10'
 
         sale_header.follow_up = follow_up
+        sale_header.date = date
         sale_header.credit_days = credit_days
         sale_header.payment_method = payment_method
         sale_header.footer_description = footer_desc

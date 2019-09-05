@@ -26,10 +26,10 @@
         <thead>
             <tr>
                 <th width="40px">S NO.</th>
-                <th width="60px">Size</th>
-                <th >Item Code</th>
-                <th>Item Name</th>
-                <th width="200px">Item Description</th>
+                <th width="10px">Size</th>
+                <th width="70px">Item Code</th>
+                <th width="70px">Item Name</th>
+                <th width="100px">Item Description</th>
                 <th width="70px">Inventory Stock</th>
                 <th width="70px">Unit</th>
                 <td>Action</td>
@@ -38,14 +38,14 @@
         <tbody>
           {% for value in row %}
           <tr>
-              <td>{{ forloop.counter }}</td>
-              <td>{{ value.1 }}</td>
-              <td>{{ value.2 }}</td>
-              <td>{{ value.3 }}</td>
-              <td><pre>{{ value.4 }}</pre></td>
-              <td>{{ value.7 }}</td>
-              <td>{{ value.5 }}</td>
-  			      <td>                
+              <td>{{forloop.counter}}</td>
+              <td>{{value.1}}</td>
+              <td>{{value.2}}</td>
+              <td>{{value.8}} {{value.9}} {{value.1}}</td>
+              <td><pre>{{value.4}}</pre></td>
+              <td>{{value.7}}</td>
+              <td>{{value.5}}</td>
+  			      <td>
                 {% if permission.edit == 1 %}
                 <a class="edit_list" href="{% url 'edit-item' pk=value.0 %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
                 {% endif %}

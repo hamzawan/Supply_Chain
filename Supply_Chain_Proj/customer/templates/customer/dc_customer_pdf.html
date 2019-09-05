@@ -101,7 +101,7 @@
         {% for detail in detail %}
         <tr>
           <td style="width: 70px; text-align: center; border-left:1px solid black; border-right:1px solid black;"><font style="margin-top:-100px;" size="13px">{{forloop.counter}}</font></td>
-          <td style="border-left:1px solid black; width: 700px; border-right:1px solid black;"><font size="13px">{{detail.item_id.product_name}}<font></td>
+          <td style="border-left:1px solid black; width: 700px; border-right:1px solid black;"><font size="13px">{{detail.item_id.product_name}} {{detail.description}}<font></td>
           <td style="border-left:1px solid black; width: 200px; text-align: center; border-right:1px solid black;"><font size="13px">{{detail.quantity}}</font></td>
           <td style="border-left:1px solid black; width: 200px;  text-align: center; border-right:1px solid black;"><font size="13px">{{detail.item_id.unit}}</font></td>
         </tr>

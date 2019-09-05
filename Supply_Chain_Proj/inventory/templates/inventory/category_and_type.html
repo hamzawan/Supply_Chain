@@ -80,6 +80,7 @@
           <tr>
               <td>{{forloop.counter}}</td>
               <td style="display:none;">{{value.id}}</td>
+              <td style="display:none;">{{value.main_category_id.id}}</td>
               <td>{{value.main_category_id.main}}</td>
               <td>{{value.sub_category_code}}</td>
               <td>{{value.sub}}</td>
@@ -223,26 +224,34 @@
           <!-- Modal body -->
          <form action="{% url 'edit-sub-categories' %}" method="post"  autocomplete="off">
            {% csrf_token %}
-          <div class="modal-body">
-              <div class="form-row">
-                <div class="form-group col-md-12">
-                  <label for="">Sub Category Code</label>
-                  <input type="text" readonly class="form-control form-control-sm" name="sub_category_code" id="sub_category_code">
-                </div>
+            <div class="modal-body">
+                <div class="form-row">
                   <div class="form-group col-md-12">
-                    <label for="">Select Main Category</label>
-                    <select class="form-control" name="main_category">
-                      {% for value in main_categories %}
-                      <option value="{{value.id}}">{{value.main}}</option>
-                      {% endfor %}
-                    </select>
+                    <label for="">Sub Category Code</label>
+                    <input type="text" readonly class="form-control form-control-sm" name="sub_category_code" id="sub_category_code">
                   </div>
-                <div class="form-group col-md-12">
-                   <label for="">Sub Category Name</label>
-                  <input type="text" class="form-control form-control-sm" required name="sub_category_name_edit" id="sub_category_name_edit">
-                </div>
-               </div>
-          </div>
+                    <div class="form-group col-md-12">
+                      <label for="">Select Main Category</label>
+                      <select class="form-control" name="main_category">
+                        {% for value in main_categories %}
+                        <option value="{{value.id}}">{{value.main}}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  <div class="form-group col-md-12">
+                     <label for="">Main id</label>
+                    <input type="text" class="form-control form-control-sm" readonly name="main_category_id" id="main_category_id">
+                  </div>
+                  <div class="form-group col-md-12">
+                     <label for="">Sub id</label>
+                    <input type="text" class="form-control form-control-sm" readonly name="sub_category_id" id="sub_category_id">
+                  </div>
+                  <div class="form-group col-md-12">
+                     <label for="">Sub Category Name</label>
+                    <input type="text" class="form-control form-control-sm" required name="sub_category_name_edit" id="sub_category_name_edit">
+                  </div>
+                 </div>
+            </div>
           <!-- Modal footer -->
           <div class="modal-footer">
             <input type="submit" class="btn btn-success" value="Submit"/>

@@ -21,5 +21,7 @@ class Add_products(models.Model):
     size = models.CharField(max_length = 100)
     opening_stock = models.DecimalField(max_digits = 8, decimal_places = 2)
     user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
+    main_category = models.CharField(max_length = 100)
+    sub_category = models.CharField(max_length = 100)
     main_category_id = models.ForeignKey(Category, models.SET_NULL, blank = True, null = True)
     sub_category_id = models.ForeignKey(SubCategory, models.SET_NULL, blank = True, null = True)

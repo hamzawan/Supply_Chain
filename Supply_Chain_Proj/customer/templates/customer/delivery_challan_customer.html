@@ -48,7 +48,7 @@
             {% for value in all_dc reversed %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ value.dc_no }}</td>
+                <td><h6><b>{{ value.dc_no }}</b></h6></td>
                 <td>{{value.account_id.account_title}}</td>
                 <td>{{ value.date }}</td>
                 <td>{{ value.user_id.username }}</td>

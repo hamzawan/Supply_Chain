@@ -11,6 +11,8 @@ from django.db.models import Q
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.db.models import Q
 from user.models import UserRoles
+from django.core import serializers
+
 
 def inventory_form_roles(user):
     userid = str(user.id)
@@ -86,20 +88,20 @@ def item_stock(request):
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     cursor = connection.cursor()
-    cursor.execute('''Select itemID,Size,item_code, item_name,Item_description,Unit,Size,SUM(quantity) As qty From (
-                    Select 'Opening Stock' As TranType,ID As ItemID, Size,Product_Code As Item_Code,Product_Name As Item_name,Product_desc As Item_description,Unit As unit,Opening_Stock as Quantity
+    cursor.execute('''Select itemID,Size,item_code, item_name,Item_description,Unit,Size,SUM(quantity) As qty, main_category, sub_category From (
+                    Select 'Opening Stock' As TranType,ID As ItemID, Size,Product_Code As Item_Code,Product_Name As Item_name,Product_desc As Item_description,Unit As unit,Opening_Stock as Quantity, main_category, sub_category
                     From inventory_add_products
                     union all
-                    Select 'Purchase' As TranType,P.ID As ItemID,P.Size,P.Product_Code,P.Product_name,P.Product_desc,P.unit,Quantity
+                    Select 'Purchase' As TranType,P.ID As ItemID,P.Size,P.Product_Code,P.Product_name,P.Product_desc,P.unit,Quantity,P.main_category, P.sub_category
                     From transaction_purchasedetail H Inner join inventory_add_products P On H.item_id_id = P.id
                     union All
-                    Select 'Purchase Return' As TranType,P.ID As ItemID,P.Size,P.Product_Code,P.Product_name,P.Product_desc,P.unit,Quantity * -1
+                    Select 'Purchase Return' As TranType,P.ID As ItemID,P.Size,P.Product_Code,P.Product_name,P.Product_desc,P.unit,Quantity * -1,P.main_category, P.sub_category
                     From transaction_purchasereturndetail H Inner join inventory_add_products P On H.item_id_id = P.id
                     union all
-                    Select 'Sale' As TranType,P.ID AS ItemID,P.Size,P.Product_Code,P.Product_name,P.Product_desc,P.unit,Quantity * -1
+                    Select 'Sale' As TranType,P.ID AS ItemID,P.Size,P.Product_Code,P.Product_name,P.Product_desc,P.unit,Quantity * -1,P.main_category, P.sub_category
                     From transaction_saledetail H Inner join inventory_add_products P On H.item_id_id = P.id
                     union all
-                    Select 'Sale Return' As TranType,P.ID AS ItemID,P.Size,P.Product_Code,P.Product_name,P.Product_desc,P.unit,Quantity
+                    Select 'Sale Return' As TranType,P.ID AS ItemID,P.Size,P.Product_Code,P.Product_name,P.Product_desc,P.unit,Quantity,P.main_category, P.sub_category
                     From transaction_salereturndetail H Inner join inventory_add_products P On H.item_id_id = P.id
                     ) As tblTemp
                     Group by Item_Code
@@ -122,6 +124,12 @@ def new_item_stock(request):
 @login_required
 @user_passes_test(allow_inventory_add)
 def add_product(request):
+    id = request.POST.get('id', False)
+    if id:
+        sub_categories_list = SubCategory.objects.filter(main_category_id = id).all()
+        list = serializers.serialize('json',sub_categories_list)
+        print("Hamza")
+        return JsonResponse({"list":list})
     serial_no = 0
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
@@ -132,7 +140,6 @@ def add_product(request):
     sub_categories = SubCategory.objects.all()
     if get_item_code:
         get_item_code = get_item_code.product_code
-        # serial_no = get_item_code[-4:]
         serial_no = int(get_item_code) + 1
     else:
         serial_no = '1001'
@@ -153,12 +160,10 @@ def add_product(request):
     if request.method == 'POST':
         items = json.loads(request.POST.get('items'))
         for value in items:
-            # type = value["type"][:3]
-            # size = value["size"][:3]
             item_code = str(serial_no)
             main_category_id = Category.objects.get(id = value["main_category_id"])
             sub_category_id = SubCategory.objects.get(id = value["sub_category_id"])
-            new_products = Add_products(product_code = item_code, product_name = value["item_name"], product_desc = value["item_description"],unit = value["unit"], size = value["size"], type = "" ,opening_stock = value["opening_stock"], user_id = request.user ,main_category_id = main_category_id, sub_category_id = sub_category_id)
+            new_products = Add_products(product_code = item_code, product_name = value["item_name"], product_desc = value["item_description"],unit = value["unit"], size = value["size"], type = "" ,opening_stock = value["opening_stock"], user_id = request.user ,main_category_id = main_category_id, sub_category_id = sub_category_id, main_category = main_category_id.main, sub_category = sub_category_id.sub )
             new_products.save()
             serial_no = int(serial_no) + 1
         return JsonResponse({"result":"success"})
@@ -173,21 +178,27 @@ def edit_item(request,pk):
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     all_detail = Add_products.objects.filter(id = pk).first()
+    main_categories = Category.objects.all()
+    sub_categories = SubCategory.objects.filter(main_category_id = all_detail.main_category_id)
     if request.method == "POST":
-        type = request.POST.get('type')
+        main_category = request.POST.get('main_category')
+        sub_category = request.POST.get('sub_category')
         size = request.POST.get('size')
-        product_name = request.POST.get('product_name')
         product_desc = request.POST.get('product_desc')
         select_unit = request.POST['unit']
         opening_stock = request.POST.get('opening_stock')
-        all_detail.type = type
+        main = Category.objects.filter(id = main_category).first()
+        sub = SubCategory.objects.filter(id = sub_category).first()
+        product_name = main.main+" "+sub.sub+" "+size
+        all_detail.sub_category_id = sub
+        all_detail.sub_category = sub.sub
         all_detail.size = size
         all_detail.product_name = product_name
         all_detail.product_desc = product_desc
         all_detail.unit = select_unit
         all_detail.opening_stock = opening_stock
         all_detail.save()
-    return render(request, 'inventory/edit_item.html', {'all_detail':all_detail,'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+    return render(request, 'inventory/edit_item.html', {'all_detail':all_detail,'pk':pk,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser,'main_categories':main_categories,'sub_categories':sub_categories})
 
 
 
@@ -259,9 +270,16 @@ def edit_main_categories(request):
     if request.method == "POST":
         main_category_code = request.POST.get('main_category_code')
         main_category_name_edit = request.POST.get('main_category_name_edit')
+        main_category_id = Category.objects.get(category_code = main_category_code)
         cat = Category.objects.filter(category_code = main_category_code).first()
         cat.main = main_category_name_edit
         cat.save()
+        items = Add_products.objects.filter(main_category_id = main_category_id.id).all()
+        for value in items:
+            value.main_category = main_category_name_edit
+            update_item_name = main_category_name_edit+" "+value.sub_category+" "+value.size
+            value.product_name = update_item_name
+            value.save()
     return redirect('categories')
 
 
@@ -284,11 +302,13 @@ def sub_categories(request):
 @login_required
 def edit_sub_categories(request):
     if request.method == "POST":
-        sub_category_code = request.POST.get('sub_category_code')
+        sub_category_code = request.POST.get('sub_category_id')
+        print("sub_category_code",sub_category_code)
         sub_category_name_edit = request.POST.get('sub_category_name_edit')
         main_category = request.POST.get('main_category')
+        main_category_id_from = request.POST.get('main_category_id')
         main_category_code = Category.objects.filter(id = main_category).first()
-        cat = SubCategory.objects.filter(sub_category_code = sub_category_code).first()
+        cat = SubCategory.objects.filter(id = sub_category_code).first()
         last_code = SubCategory.objects.filter(main_category_id = main_category).last()
         if last_code:
             last_code = int(last_code.sub_category_code) + 1
@@ -296,8 +316,16 @@ def edit_sub_categories(request):
             last_code = int(str(main_category_code.category_code) + str(1))
         cat.sub = sub_category_name_edit
         cat.main_category_id = main_category_code
-        cat.sub_category_code = last_code
+        # cat.sub_category_code = last_code
         cat.save()
+        items = Add_products.objects.filter(main_category_id = main_category_id_from,sub_category_id = cat.id).all()
+        for value in items:
+            value.sub_category = sub_category_name_edit
+            update_item_name = main_category_code.main+" "+sub_category_name_edit+" "+value.size
+            value.product_name = update_item_name
+            value.main_category_id = main_category_code
+            value.main_category = main_category_code.main
+            value.save()
     return redirect('categories')
 
 

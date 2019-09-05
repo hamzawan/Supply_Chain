@@ -1519,6 +1519,7 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 				var data = [];
 				var datax = [];
 				var sale_id = $('#sale_id').val();
+				var date = $('#date').val();
 				var customer = $('#customer_name_sale').val();
 				var payment_method = $('#payment_method').val();
 				var hs_code = $('#hs_code').val();
@@ -1592,6 +1593,7 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 								'hs_code':hs_code,
 								'footer_desc': footer_desc,
 								'additional_tax':additional_tax,
+								'date':date,
 								'items': JSON.stringify(data),
 								'cartage': JSON.stringify(datax),
 							},
@@ -1912,6 +1914,7 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 				var data = [];
 				var datax = [];
 				var sale_id = $('#sale_id').val();
+				var date = $('#date').val();
 				var follow_up = $('#follow_up').val();
 				var credit_days = $('#credit_days').val();
 				var customer = $('#customer_name_sale').val();
@@ -1982,6 +1985,7 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 							'customer': customer,
 							'follow_up': follow_up,
 							'credit_days': credit_days,
+							'date':date,
 							'payment_method': payment_method,
 							'footer_desc': footer_desc,
 							'items': JSON.stringify(data),
@@ -2003,6 +2007,7 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 				var data = [];
 				var datax = [];
 				var sale_id = $('#sale_id').val();
+				var date = $('#date').val();
 				var customer = $('#customer_name_sale').val();
 				var payment_method = $('#payment_method').val();
 				var footer_desc = $('#footer_desc').val();
@@ -2072,6 +2077,7 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 						data:{
 							'sale_id': sale_id,
 							'customer': customer,
+							'date':date,
 							'payment_method': payment_method,
 							'footer_desc': footer_desc,
 							'cartage_amount': cartage_amount,
@@ -3035,6 +3041,7 @@ $('#edit-sale-submit').on('submit',function(e){
 	var data = [];
 	var datax = [];
 	var sale_id = $('#sale_id').val();
+	var date = $('#date').val();
 	var follow_up = $('#follow_up').val();
 	var credit_days = $('#credit_days').val();
 	var customer = $('#customer_name_sale').val();
@@ -3117,6 +3124,7 @@ $('#edit-sale-submit').on('submit',function(e){
 					'follow_up': follow_up,
 					'credit_days': credit_days,
 					'hs_code': hs_code,
+					'date':date,
 					'payment_method': payment_method,
 					'footer_desc': footer_desc,
 					'cartage_amount': cartage_amount,
@@ -3377,6 +3385,7 @@ $('#edit-sale-submit-ngst').on('submit',function(e){
 	var data = [];
 	var datax = [];
 	var sale_id = $('#sale_id').val();
+	var date = $('#date').val();
 	var follow_up = $('#follow_up').val();
 	var credit_days = $('#credit_days').val();
 	var customer = $('#customer_name_sale').val();
@@ -3446,6 +3455,7 @@ $('#edit-sale-submit-ngst').on('submit',function(e){
 					'customer': customer,
 					'follow_up': follow_up,
 					'credit_days': credit_days,
+					'date':date,
 					'payment_method': payment_method,
 					'footer_desc': footer_desc,
 					'items': JSON.stringify(data),
@@ -4477,10 +4487,14 @@ $.fn.extend({
 		 $('#dataTable tbody').on('click','.edit_list',function(){
 			var currrow = $(this).closest('tr');
 			var id = currrow.find('td:eq(1)').text();
-			var sub_category_code = currrow.find('td:eq(3)').text();
-			var col = currrow.find('td:eq(4)').text();
+			var main_id = currrow.find('td:eq(2)').text();
+			var sub_category_code = currrow.find('td:eq(4)').text();
+			var col = currrow.find('td:eq(5)').text();
+			console.log(main_id);
 			$('#sub_category_code').val(sub_category_code);
+			$('#sub_category_id').val(id);
 			$('#sub_category_name_edit').val(col);
+			$('#main_category_id').val(main_id);
 		})
 
 
@@ -4570,6 +4584,24 @@ $.fn.extend({
 		 $("#modal_delete_button").attr("href", `/transaction/cash_payment_voucher/delete/${this.id}`);
 	 })
 
+	 $(".main_drop").change(function(){
+		 req =	$.ajax({
+				headers: { "X-CSRFToken": getCookie("csrftoken") },
+				type: 'POST',
+				url : '/inventory/add_product/',
+				data:{
+					'id':this.value
+				},
+				dataType: 'json'
+			})
+			.done(function done(data){
+				$('#sub_category').empty()
+				row = JSON.parse(data.list)
+				for (var i = 0; i < row.length; i++) {
+							$('#sub_category').append($("<option></option>").attr("value",row[i].pk).text(row[i].fields["sub"]));
+				}
+			})
+	 });
 
 		document.getElementById('box').onchange = function() {
 		document.getElementById('invoice_no').disabled = !this.checked;
