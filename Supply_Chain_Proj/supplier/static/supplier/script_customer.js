@@ -1065,24 +1065,6 @@ $(document).ready(function(){
 
 					//DC ORDER CUSTOMER
 
-		// // Append table with add row in dc supplier
-					// $(window).focus(function(e) {
-					// 	var focus = "focus"
-					// 	req =	$.ajax({
-					// 		 headers: { "X-CSRFToken": getCookie("csrftoken") },
-					// 		 type: 'POST',
-					// 		 url : '/customer/delivery_challan/new',
-					// 		 data:{
-					// 			 'focus': focus,
-					// 		 },
-					// 		 dataType: 'json'
-					// 	 })
-					// 	 .done(function done(data){
-					// 		 dc_type = JSON.parse(data.)
-					// 		 console.log(data);
-					// 	 })
-					// 	});
-
 					$(".add-new-dc-customer").on('click',function(){
 						var item_code_dc = $("#item_code_dc").val();
 						req =	$.ajax({
@@ -1904,5 +1886,29 @@ $(document).ready(function(){
 		 $(".delete-dc-customer-summary").on('click',function(){
 			 $("#modal_delete_button").attr("href", `/customer/delivery_challan/delete/${this.id}`);
 		 })
+
+ // Append table with add row in dc supplier
+			 $(window).focus(function(e) {
+				 console.log("tab changed");
+				 var focus = "focus"
+				 req =	$.ajax({
+						headers: { "X-CSRFToken": getCookie("csrftoken") },
+						type: 'POST',
+						url : '/customer/delivery_challan/new',
+						data:{
+							'focus': focus,
+						},
+						dataType: 'json'
+					})
+					.done(function done(data){
+						$("#item").empty();
+						dc_type = JSON.parse(data.row)
+						console.log(dc_type);
+						console.log(dc_type[0].fields["product_name"]);
+						for (var i = 0; i < dc_type.length; i++) {
+					      $("#item").append($("<option>").attr('value', dc_type[i].fields["product_code"]).text(dc_type[i].fields["product_code"]+" | "+dc_type[i].fields["product_name"]+" | "+dc_type[i].fields["product_desc"]));
+							}
+					})
+				 });
 
 });

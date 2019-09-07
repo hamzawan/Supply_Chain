@@ -8,7 +8,7 @@ urlpatterns = [
     path('rfq/', views.rfq_supplier, name = 'rfq-supplier'),
     path('rfq/new/', views.new_rfq_supplier, name = 'new-rfq-supplier'),
     path('rfq/edit/<pk>', views.edit_rfq_supplier, name = 'edit-rfq-supplier'),
-    path('rfq/delete/<pk>', views.delete_rfq_supplier, name = 'delete-rfq-supplier'),    
+    path('rfq/delete/<pk>', views.delete_rfq_supplier, name = 'delete-rfq-supplier'),
 
     path('quotation/', views.quotation_supplier, name = 'quotation-supplier'),
     path('quotation/new', views.new_quotation_supplier, name = 'new-quotation-supplier'),
@@ -39,5 +39,6 @@ urlpatterns = [
 
     path('show_notification_supplier/', views.show_notification_supplier, name = 'show-notification-supplier'),
     path('update_notification_supplier/', views.update_notification_supplier, name = 'update-notification-supplier'),
+    path('change_company_view/<pk>', views.change_company_view, name = 'change-company-view'),
 
 ]

@@ -1294,5 +1294,10 @@ def journal_voucher(request):
     allow_transaction_roles = transaction_roles(request.user)
     allow_inventory_roles = inventory_roles(request.user)
     account_title = request.POST.get('account_title', False)
-    print(account_title)
     return render('transaction/journal_voucher.html',{'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+
+
+@login_required
+def change_company_view(request,pk):
+    request.session['company'] = pk
+    return redirect('home')

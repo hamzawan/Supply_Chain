@@ -46,6 +46,56 @@
           </thead>
           <tbody>
             {% for value in all_dc reversed %}
+            {% with i=0%}
+            {% if is_dc %}
+            {% for i in is_dc %}
+            {% if value.dc_no == i.1  %}
+            <tr class="table-danger">
+                <td>{{ forloop.counter }}</td>
+                <td><h6><b>{{ value.dc_no }}</b></h6></td>
+                <td>{{value.account_id.account_title}}</td>
+                <td>{{ value.date }}</td>
+                <td>{{ value.user_id.username }}</td>
+                <td>
+                    {% if permission.edit == 1 %}
+                      <a class="edit_list" href="{% url 'edit-delivery-challan-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
+                    {% endif %}
+                      {% if gst.company_type == 1 %}
+                        <a href="{% url 'direct-sale' pk=value.id %} " style="color:black;" target="_blank"><i class="fas fa-file-invoice"></i></a>
+                      {% else %}
+                        <a href="{% url 'direct-sale-ngst' pk=value.id %} " style="color:black;" target="_blank"><i class="fas fa-file-invoice"></i></a>
+                      {% endif %}
+                  {% if permission.r_print == 1 %}
+                  <a href="{% url 'print-dc-customer' pk=value.id %}" target="_blank"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a>
+                  {% endif %}
+
+                  {% if permission.delete == 1 %}
+                  <a class="delete-dc-customer-summary" href="" data-toggle="modal" data-target="#deleteDcModal" id="{{value.id}}"><i class="material-icons">&#xE872;</i></a>
+                  {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+            {% else %}
+            {% endif %}
+            {% endwith %}
+            {% endfor %}
+          </tbody>
+      </table>
+      <br>
+      <table class="table table-bordered sort" id="dataTable">
+          <thead>
+              <tr>
+                  <th width="70px" >S NO.</th>
+                  <th width="140px">DC no</th>
+                  <th >Customer Name</th>
+                  <th >Date</th>
+                  <th >From</th>
+                  <th >Action</th>
+              </tr>
+          </thead>
+          <tbody>
+            {% for value in all_dc reversed %}
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td><h6><b>{{ value.dc_no }}</b></h6></td>
@@ -56,23 +106,7 @@
                     {% if permission.edit == 1 %}
                       <a class="edit_list" href="{% url 'edit-delivery-challan-customer' pk=value.id %}" data-toggle=""><i class="material-icons">&#xE254;</i></a>
                     {% endif %}
-
-                  {% with i=0 %}
-                  {% if is_dc %}
-
-                  {% for i in is_dc %}
-                    {% if value.dc_no == i.1  %}
-                      {% if gst.company_type == 1 %}
-                        <a href="{% url 'direct-sale' pk=value.id %} " style="color:black;" target="_blank"><i class="fas fa-file-invoice"></i></a>
-                      {% else %}
-                        <a href="{% url 'direct-sale-ngst' pk=value.id %} " style="color:black;" target="_blank"><i class="fas fa-file-invoice"></i></a>
-                      {% endif %}
-                    {% endif %}
-                  {% endfor %}
-                  {% else %}
-                  <a href="#" style="color:gray;"><i class="fas fa-file-invoice"></i></a>
-                  {% endif %}
-
+                    <a href="#" style="color:gray;"><i class="fas fa-file-invoice"></i></a>
                   {% if permission.r_print == 1 %}
                   <a href="{% url 'print-dc-customer' pk=value.id %}" target="_blank"><i class="fa fa-print" id="print_icon" aria-hidden="true"></i></a>
                   {% endif %}
@@ -80,8 +114,6 @@
                   {% if permission.delete == 1 %}
                   <a class="delete-dc-customer-summary" href="" data-toggle="modal" data-target="#deleteDcModal" id="{{value.id}}"><i class="material-icons">&#xE872;</i></a>
                   {% endif %}
-
-                  {% endwith %}
                 </td>
             </tr>
             {% endfor %}
