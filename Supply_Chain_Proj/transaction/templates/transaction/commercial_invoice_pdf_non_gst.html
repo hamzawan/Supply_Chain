@@ -63,6 +63,7 @@
          <font size="11px" color="#0a012c" ><b>Address:</b> {{ value.company_address }}</font><br>
          <font size="11px" color="#0a012c" ><b>Phone:</b> {{ value.phone_no }}</font><br>
          <font size="11px" color="#0a012c" ><b>Mobile:</b> {{ value.mobile_no }}</font><br>
+                  <font size="11px" color="#0a012c" ><b>NTN:</b> {{ value.ntn }}</font><br>
          {% endfor %}
      </div>
      <br>
@@ -74,17 +75,17 @@
        <thead>
          <tr>
            <th align="left" style="width: 180px;"><font size="12px" color="#0a012c">Buyer's Name</font></th>
-           {% if parent_company_name.id == header.account_id.id %}
-             <td align="left" style="padding-top:4px;">
-               <font size="12px" color="#0a012c">{{parent_company_name.account_title}}</font>
-             </td>
-            {% else %}
-            <td align="left" style="padding-top:4px;">
-              <font size="12px" color="#0a012c">{{parent_company_name.account_title}} ( {{header.account_id.account_title}} ) </font>
-            </td>
-           {% endif %}
+             {% if parent_company_name.id == header.account_id.id %}
+               <td align="left" style="padding-top:4px;">
+                 <font size="12px" color="#0a012c">{{parent_company_name.account_title}}</font>
+               </td>
+              {% else %}
+              <td align="left" style="padding-top:4px;">
+                <font size="12px" color="#0a012c">{{parent_company_name.account_title}} ( {{header.account_id.account_title}} ) </font>
+              </td>
+             {% endif %}
            <th align="left" style="width: 180px;"><font size="13px" color="#0a012c">Invoice No.</font</th>
-           <td align="center" style="padding-top:4px;"><font size="16px" color="#0a012c"><b>{{header.sale_no}}</b></font></td>
+           <td align="center" style="padding-top:4px;"><font size="15px" color="#0a012c"><b>{{header.sale_no}}</b></font></td>
          </tr>
          <tr>
            <th align="left"><font size="12px" color="#0a012c">Address</font</th>
