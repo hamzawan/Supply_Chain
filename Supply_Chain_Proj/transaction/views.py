@@ -3801,6 +3801,7 @@ def commercial_invoice(request,pk):
     total_amount_item = 0
     tax_amount = 0
     cartage = 0
+    vog = 0
     company_info = Company_info.objects.filter(id=company)
     header = SaleHeader.objects.filter(id = pk).first()
     detail = cursor.execute('''Select SaleId,DcNo,po_no,product_name, product_desc, unit, quantity, cost_price, sales_tax, total from(
@@ -3827,6 +3828,7 @@ def commercial_invoice(request,pk):
         lines = lines + len(value[4].split('\n'))
         amount = float(value[7] * value[6])
         total_amount_item = total_amount_item + amount
+        vog = vog + amount
         sales_tax_amount = amount * 17 / 100
         tax_amount = tax_amount + sales_tax_amount
         tax_amount = tax_amount
@@ -3838,7 +3840,7 @@ def commercial_invoice(request,pk):
     total_amount = round(total_amount)
     lines = lines + len(detail) + len(detail)
     total_lines = 36 - lines
-    pdf = render_to_pdf('transaction/commercial_invoice_pdf_lines.html', {'company_info':company_info,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount_item':total_amount_item,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser, 'parent_company_name':parent_company_name, 'cartage_amounts':cartage_amounts,'tax_amount':tax_amount,'total_amount':total_amount,'hs_code':hs_code,'allow_report_roles':report_roles(request.user)})
+    pdf = render_to_pdf('transaction/commercial_invoice_pdf_lines.html', {'company_info':company_info,'header':header, 'detail':detail,'total_lines':total_lines,'total_amount_item':total_amount_item,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,'is_superuser':request.user.is_superuser, 'parent_company_name':parent_company_name, 'cartage_amounts':cartage_amounts,'tax_amount':tax_amount, 'vog':vog,'total_amount':total_amount,'hs_code':hs_code,'allow_report_roles':report_roles(request.user)})
     if pdf:
         response = HttpResponse(pdf, content_type='application/pdf')
         filename = "SaleTaxInvoice%s.pdf" %(header.sale_no)
