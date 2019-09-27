@@ -2890,6 +2890,7 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 					 var index = $("#edit-sale-table tbody tr:last-child").index();
 					 for (var i = 0; i < data.row.length; i++) {
 						var row = '<tr>' +
+								'<td>'+count+'</td>'+
 								'<td style="display:none;">'+data.row[i][1]+'</td>'+
 								'<td id="get_item_code">'+data.row[i][2]+'</td>' +
 								'<td>'+data.row[i][3]+'</td>' +
@@ -3006,13 +3007,13 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 			// Edit row on edit button click
 $(document).on("click", ".edit-sale-edit", function(){
 	$(this).parents("tr").find("td:not(:last-child)").each(function(i){
-			if (i === 4) {
+			if (i === 5) {
 				$(this).html('<input type="text" style="width:80px;" class="form-control" value="' + $(this).text() + '">');
 			}
-			if (i === 6) {
+			if (i === 7) {
 				$(this).html('<input type="text" style="width:80px;" class="form-control" value="' + $(this).text() + '">');
 			}
-			if (i === 8) {
+			if (i === 9) {
 				 $(this).html('<input type="text" style="width:80px;" class="form-control" value="' + $(this).text() + '">');
 			}
 
@@ -3068,24 +3069,23 @@ $('#edit-sale-submit').on('submit',function(e){
 					'dcdetailid': ""
 				};
 				$tds.each(function(i, el){
-					if (i === 0) {
+					if (i === 1) {
 							row["id"] = ($(this).text());
 					}
-					else if (i === 4) {
+					else if (i === 5) {
 							row["quantity"] = ($(this).text());
 					}
-					else if (i === 6) {
+					else if (i === 7) {
 							row["price"] = ($(this).text());
 					}
-					else if (i === 8) {
+					else if (i === 9) {
 							row["sales_tax"] = ($(this).text());
 					}
-					else if (i === 11) {
+					else if (i === 12) {
 							row["dc_no"] = ($(this).text());
 					}
-					else if (i === 12) {
+					else if (i === 14) {
 							row["dcdetailid"] = ($(this).text());
-							console.log($(this).text());
 					}
 				});
 				data.push(row);
@@ -3236,6 +3236,7 @@ $('#edit-sale-submit').on('submit',function(e){
 					 // total_amount = (type[0].fields['unit_price'] * type[0].fields['quantity']);
 					 for (var i = 0; i < data.row.length; i++) {
 						var row = '<tr>' +
+								'<td>'+count+'</td>'+
 								'<td style="display:none;">'+data.row[i][2]+'</td>'+
 								'<td id="get_item_code">'+data.row[i][3]+'</td>' +
 								'<td>'+data.row[i][4]+'</td>' +
@@ -3326,10 +3327,10 @@ $('#edit-sale-submit').on('submit',function(e){
 			// Edit row on edit button click
 $(document).on("click", ".edit-sale-edit-ngst", function(){
 	$(this).parents("tr").find("td:not(:last-child)").each(function(i){
-			if (i === 4) {
+			if (i === 5) {
 				$(this).html('<input type="text" style="width:80px;" class="form-control" value="' + $(this).text() + '">');
 			}
-			if (i === 6) {
+			if (i === 7) {
 				$(this).html('<input type="text" style="width:80px;" class="form-control" value="' + $(this).text() + '">');
 			}
 });
@@ -3406,19 +3407,19 @@ $('#edit-sale-submit-ngst').on('submit',function(e){
 					'dcdetailid':""
 				};
 				$tds.each(function(i, el){
-					if (i === 0) {
+					if (i === 1) {
 							row["id"] = ($(this).text());
 					}
-					else if (i === 4) {
+					else if (i === 5) {
 							row["quantity"] = ($(this).text());
 					}
-					else if (i === 6) {
+					else if (i === 7) {
 							row["price"] = ($(this).text());
 					}
-					else if (i === 8) {
+					else if (i === 9) {
 							row["dc_no"] = ($(this).text());
 					}
-					else if (i === 9) {
+					else if (i === 10) {
 							row["dcdetailid"] = ($(this).text());
 					}
 				});

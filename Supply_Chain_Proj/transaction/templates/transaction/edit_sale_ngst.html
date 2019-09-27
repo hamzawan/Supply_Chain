@@ -29,7 +29,7 @@
         </div>
         <div class="form-group col-md-2">
           <label for="">Date</label>
-          <input type="date"  class="form-control form-control-sm" value="{{sale_header.date|date:'Y-m-d'}}" id="date">
+          <input type="date"  class="form-control form-control-sm" value="{{sale_header.date|date:'Y-m-d'}}" id="date" required>
         </div>
         <div class="form-group col-md-2">
          <label for="sel1">Payment Term:</label>
@@ -81,6 +81,7 @@
       <table class="table table-bordered" id="edit-sale-table-ngst">
           <thead>
               <tr>
+                  <th width="70px">S No.</th>
                   <th width="100px">Item Code</th>
                   <th width="14px">Item Name</th>
                   <th width="140px">Desc.</th>
@@ -95,6 +96,7 @@
             {% for value in sale_detail %}
             {% with vog=value.quantity|mul:value.cost_price sales_tax_amount=value.sales_tax|mul:value.quantity|mul:value.cost_price|div:100 %}
               <tr>
+                <td>{{forloop.counter}}</td>
                 <td style="display:none;">{{value.item_id.id}}</td>
                 <td>{{value.item_id.product_code}}</td>
                 <td>{{value.item_id.product_name}}</td>
