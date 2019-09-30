@@ -38,6 +38,7 @@ urlpatterns = [
 
     path('sale_return_summary/', views.sale_return_summary, name = 'sale-return-summary'),
     path('sale/return/<pk>', views.new_sale_return, name = 'new-sale-return'),
+    path('sale/return/delete/<pk>', views.delete_sale_return, name = 'delete-sale-return'),
     path('sale/return/edit/<pk>', views.edit_sale_return, name = 'edit-sale-return'),
 
 

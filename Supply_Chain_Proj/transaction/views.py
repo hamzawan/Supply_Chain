@@ -1380,7 +1380,6 @@ def new_sale(request):
             item_amount = item_amount + amount
             item_amount = item_amount + float(additional_tax)
             item_id = Add_products.objects.get(id = value["id"])
-            print(value["dcdetailid"])
             sale_detail = SaleDetail(item_id = item_id,  quantity = value["quantity"],cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], dc_ref = value["dc_no"], dcdetailid = value["dcdetailid"] ,sale_id = header_id, total = amount)
             sale_detail.save()
         total_amount = item_amount
@@ -2143,6 +2142,11 @@ def sale_return_summary(request):
 @login_required
 @user_passes_test(allow_sale_return_display)
 def new_sale_return(request,pk):
+    if SaleReturnHeader.objects.filter(sale_id = pk).first():
+        sale_no = 1
+    else:
+        sale_no = 0
+    cartage_sum = 0
     company =  request.session['company']
     company = Company_info.objects.get(id = company)
     company = Q(company_id = company)
@@ -2165,6 +2169,9 @@ def new_sale_return(request,pk):
         get_last_sale_no = 'SAL/RET/101'
     sale_header = SaleHeader.objects.filter(company, id = pk).first()
     sale_detail = SaleDetail.objects.filter(sale_id = sale_header.id).all()
+    cart = Cartage_and_Po.objects.filter(invoice_id = sale_header.id).all()
+    for value in cart:
+        cartage_sum = cartage_sum + value.cartage
     if request.method == 'POST':
         company =  request.session['company']
         company = Company_info.objects.get(id = company)
@@ -2175,38 +2182,38 @@ def new_sale_return(request,pk):
         additional_tax = request.POST.get('additional_tax',False)
         date = datetime.date.today()
         account_id = ChartOfAccount.objects.get(account_title = customer)
-        sale_return_header = SaleReturnHeader(sale_no = get_last_sale_no, date = date, footer_description = description, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = 0, account_id = account_id, company_id = company, user_id = request.user)
+        sale_return_header = SaleReturnHeader(sale_no = get_last_sale_no, date = date, footer_description = description, payment_method = payment_method, cartage_amount = cartage_amount, additional_tax = additional_tax, withholding_tax = 0, account_id = account_id, company_id = company, user_id = request.user, sale_id = pk)
         sale_return_header.save()
         items = json.loads(request.POST.get('items'))
         header_id = SaleReturnHeader.objects.get(sale_no = get_last_sale_no)
         for value in items:
-            item_id = Add_products.objects.get(id = value["item_id"])
-            sale_return_detail = SaleReturnDetail(item_id = item_id , quantity = value["quantity"], cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], sale_return_id = header_id)
-            sale_return_detail.save()
             quantity = float(value["quantity"])
             price =  float((value["price"]))
             sales_tax = float(value["sales_tax"])
             amount = (((quantity * price) * sales_tax) / 100)
             amount = ((quantity * price ) + amount)
             item_amount = item_amount + amount
-        item_amount = item_amount + float(cartage_amount) + float(additional_tax)
+            item_amount = item_amount + float(additional_tax)
+            item_id = Add_products.objects.get(id = value["item_id"])
+            sale_return_detail = SaleReturnDetail(item_id = item_id,  quantity = value["quantity"],cost_price = value["price"], retail_price = 0, sales_tax = value["sales_tax"], dc_ref = value["dc_no"], dcdetailid = value["dcdetailid"] ,sale_return_id = header_id, total = amount)
+            sale_return_detail.save()
         total_amount = item_amount
+        total_amount = total_amount + float(cartage_sum)
         header_id = header_id.id
-        total_amount = total_amount
         cash_in_hand = ChartOfAccount.objects.get(account_title = 'Cash')
-        if sale_header.payment_method == 'Cash':
-            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Return Invoice", amount = -abs(total_amount), date = date, remarks = "",ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
+        if payment_method == 'Cash':
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = cash_in_hand, tran_type = "Sale Return Invoice", amount = total_amount, date = date, remarks = sale_header.sale_no,  ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Return Invoice", amount = total_amount, date = date, remarks = "", ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Return Invoice", amount = -abs(total_amount), date = date, remarks = sale_header.sale_no,   ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
             tran2.save()
         else:
-            sale_return_account = ChartOfAccount.objects.get(account_title = 'Sales Returns')
-            tran1 = Transactions(refrence_id = 0, refrence_date = date, account_id = account_id, tran_type = "", amount = -abs(total_amount), date = date, remarks = "",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice Return" ,company_id = company, user_id = request.user)
+            sale_account = ChartOfAccount.objects.get(account_title = 'Sales Returns')
+            tran1 = Transactions(refrence_id = header_id, refrence_date = date, account_id = account_id, tran_type = "Sale Return Invoice", amount = -abs(total_amount), date = date, remarks = sale_header.sale_no,  ref_inv_tran_id = 0, ref_inv_tran_type = "" ,company_id = company, user_id = request.user)
             tran1.save()
-            tran2 = Transactions(refrence_id = 0, refrence_date = date, account_id = sale_return_account, tran_type = "", amount = total_amount, date = date, remarks = "",ref_inv_tran_id = header_id, ref_inv_tran_type = "Sale Invoice Return" ,company_id = company, user_id = request.user)
+            tran2 = Transactions(refrence_id = header_id, refrence_date = date, account_id = sale_account, tran_type = "Sale Return Invoice", amount = total_amount, date = date, remarks = sale_header.sale_no,  ref_inv_tran_id = 0, ref_inv_tran_type = "", company_id = company, user_id = request.user)
             tran2.save()
         return JsonResponse({'result':'success'})
-    return render(request, 'transaction/sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk,'get_last_sale_no':get_last_sale_no,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser})
+    return render(request, 'transaction/sale_return.html',{'sale_header':sale_header, 'sale_detail': sale_detail,'pk':pk,'get_last_sale_no':get_last_sale_no,'permission':permission,'allow_customer_roles':allow_customer_roles,'allow_supplier_roles':allow_supplier_roles,'allow_transaction_roles':allow_transaction_roles,'allow_inventory_roles':allow_inventory_roles,    'allow_report_roles':report_roles(request.user),'is_superuser':request.user.is_superuser, 'cartage_sum':cartage_sum, 'sale_no':sale_no})
 
 
 @login_required
@@ -2277,6 +2284,16 @@ def edit_sale_return(request,pk):
 
 
 @login_required
+def delete_sale_return(request, pk):
+    Transactions.objects.filter(refrence_id = pk, tran_type = "Sale Return Invoice").all().delete()
+    sale_return_id = SaleReturnHeader.objects.get(id = pk)
+    SaleReturnDetail.objects.filter(sale_return_id = sale_return_id).all().delete()
+    SaleReturnHeader.objects.filter(id = pk).delete()
+    messages.add_message(request, messages.SUCCESS, "Sales Return Deleted.")
+    return redirect('sale-return-summary')
+
+
+@login_required
 @user_passes_test(allow_coa_display)
 def chart_of_account(request):
     allow_customer_roles = customer_roles(request.user)
@@ -2287,6 +2304,12 @@ def chart_of_account(request):
     supplier = Q(account_id = '100')
     customer = Q(account_id = '200')
     bank = Q(account_id = '300')
+    main = ChartOfAccount.objects.all()
+    sub_accounts = ChartOfAccount.objects.all()
+    # for m in main:
+    #     for s in sub_accounts:
+    #         if m.id == s.parent_id:
+    #             print(m.account_title ,s.account_title)
     all_accounts = ChartOfAccount.objects.filter(supplier|customer|bank).all()
     if request.method == 'POST':
         account_title = request.POST.get('account_title')
@@ -2344,7 +2367,7 @@ def edit_chart_of_account(request):
             opening_balance = -abs(Decimal(opening_balance))
         coa = ChartOfAccount.objects.filter(id = id).first()
         coa.account_title = account_title
-        coa.account_type = account_type
+        coa.parent_id = account_type
         coa.opening_balance = opening_balance
         coa.phone_no = phone_no
         coa.email_address = email_address
@@ -3481,46 +3504,42 @@ def account_ledger(request):
         image = Company_info.objects.filter(id=1).first()
         cursor = connection.cursor()
         cursor.execute('''Select tran_type,refrence_id,refrence_date,remarks,ref_inv_tran_id,ref_inv_tran_type,Sum(Debit) Debit,Sum(Credit) Credit From (
-                    Select Distinct account_id_id,'Opening' As tran_type,'' As refrence_id,'' As refrence_date,'Opening Balance' As remarks,
-                    '' AS ref_inv_tran_id,'' AS ref_inv_tran_type,
-                    Case When Sum(amount) > -1 Then  sum(amount) Else 0 End As Debit,
-                    Case When Sum(amount) < -1 Then  sum(amount) Else 0 End As Credit from (
-                    Select id As Account_id_id, Sum(Opening_Balance) As amount
-                    From transaction_chartofaccount Where ID = (
-                    Select id from transaction_chartofaccount Where Parent_ID = %s)
-                    Union All
-                    Select id As account_id_id, Sum(Opening_Balance) As amount
-                    From transaction_chartofaccount Where ID = (%s)
-                    Union All
-                    Select account_id_id,Sum(amount) As amount From transaction_transactions
-                    where account_id_id in (
-                    Case When (Select id from transaction_chartofaccount Where Parent_ID = %s)
-                    <> '' Then (Select id from transaction_chartofaccount Where Parent_ID = %s)
-                    Else (%s) END) AND refrence_date < %s
-                    Union all
-                    Select account_id_id,Sum(amount) As amount From transaction_transactions
-                    where account_id_id in (%s) AND refrence_date < %s
-                    ) tblData
-                    Group By account_id_id
-                    Union all
-                    Select Distinct account_id_id,tran_type,refrence_id,refrence_date,remarks,ref_inv_tran_id,ref_inv_tran_type,
-                    Case When amount > -1 Then  amount Else 0 End As Debit,
-                    Case When amount < -1 Then  amount Else 0 End As Credit from (
-                    Select * From transaction_transactions
-                    where account_id_id in (
-                    Case When (Select id from transaction_chartofaccount Where Parent_ID = %s)
-                    <> '' Then (Select id from transaction_chartofaccount Where Parent_ID = %s)
-                    Else (%s) END)
-                    Union all
-                    Select * From transaction_transactions
-                    where account_id_id in (%s)
-                    ) tblData
-                    Where refrence_date Between %s And %s
-                    Order By account_id_id,refrence_date Asc
-                    ) As tblLedger
-                    Group By tran_type,refrence_id,refrence_date,remarks,ref_inv_tran_id,ref_inv_tran_type
-                    Order By refrence_date Asc
-                    ''',[pk,pk,pk,pk,pk,from_date,pk,from_date,pk,pk,pk,pk,from_date,to_date])
+                            Select Distinct account_id_id,'Opening' As tran_type,'' As refrence_id,'' As refrence_date,'Opening Balance' As remarks,
+                            '' AS ref_inv_tran_id,'' AS ref_inv_tran_type,
+                            Case When Sum(amount) > -1 Then  sum(amount) Else 0 End As Debit,
+                            Case When Sum(amount) < -1 Then  sum(amount) Else 0 End As Credit from (
+                            Select id As Account_id_id, Sum(Opening_Balance) As amount
+                            From transaction_chartofaccount Where ID = (
+                            Select id from transaction_chartofaccount Where Parent_ID = %s)
+                            Union All
+                            Select id As account_id_id, Sum(Opening_Balance) As amount
+                            From transaction_chartofaccount Where ID = (%s)
+                            Union All
+                            Select account_id_id,Sum(amount) As amount From transaction_transactions
+                            where account_id_id in (
+                            Case When (Select id from transaction_chartofaccount Where Parent_ID = %s)
+                            <> '' Then (Select id from transaction_chartofaccount Where Parent_ID = %s)
+                            Else (%s) END) AND refrence_date < %s
+                            Union all
+                            Select account_id_id,Sum(amount) As amount From transaction_transactions
+                            where account_id_id in (%s) AND refrence_date < %s
+                            ) tblData
+                            Group By account_id_id
+                            Union all
+                            Select Distinct account_id_id,tran_type,refrence_id,refrence_date,remarks,ref_inv_tran_id,ref_inv_tran_type,
+                            Case When amount > -1 Then  amount Else 0 End As Debit,
+                            Case When amount < -1 Then  amount Else 0 End As Credit from (
+                            Select * From transaction_transactions
+                            where account_id_id in (Select id from transaction_chartofaccount Where Parent_ID = %s)
+                            Union all
+                            Select * From transaction_transactions
+                            where account_id_id in (%s)
+                            ) tblData
+                            Where refrence_date Between %s And %s
+                            Order By account_id_id,refrence_date Asc
+                            ) As tblLedger
+                            Group By tran_type,refrence_id,refrence_date,remarks,ref_inv_tran_id,ref_inv_tran_type
+                            Order By refrence_date Asc''',[pk,pk,pk,pk,pk,from_date,pk,from_date,pk,pk,from_date,to_date])
         row = cursor.fetchall()
         print(row)
         ledger_list = []

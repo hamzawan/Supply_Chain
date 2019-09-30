@@ -6,7 +6,7 @@
 
 <div class="card" style="width: 100%;">
 <div class="card-header">
-  <h4>Sale Return</h4>
+  <h4>Sale Return <small>{% if sale_no == 1 %} (Returned) {% else %}{% endif %}</small> </h4>
 </div>
 <ul class="list-group list-group-flush">
 <form  action="" id="new-sale-return-submit" autocomplete="off" method="post">
@@ -19,7 +19,7 @@
         </div>
         <div class="form-group col-md-2">
           <label>Customer Name</label>
-          <input list="account"  class="form-control form-control-sm" required id="customer_sale_return" value="{{sale_header.account_id.account_title}}" >
+          <input list="account" readonly  class="form-control form-control-sm" required id="customer_sale_return" value="{{sale_header.account_id.account_title}}" >
           <datalist id="account">
             {% for value in all_accounts %}
             <option value="{{value.account_title}}">{{value.account_title}}</option>
@@ -66,8 +66,9 @@
               <td id="sales_tax_amount">{{sales_tax_amount|floatformat:2}}</td>
               <td id="total">{{sales_tax_amount|add:goods_amount|floatformat:2}}</td>
               <td style="display:none;">{{ value.dc_ref }}</td>
+              <td style="display:none;">{{value.dcdetailid}}</td>
               <td>
-                  {% if permission.add == 1 %}  
+                  {% if permission.add == 1 %}
                 <a class="add-sale-return" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></a>
                 {% endif %}
 
@@ -93,13 +94,13 @@
         <div class="form-inline">
           <div class="form-group">
             <label for="text" style="font-size:14px;" >Cartage Amount:</label>
-              <input type="text" class="form-control form-control-sm" id="cartage_amount" style="border-top: 0px; border-right:0px; border-left:0px;" required value="{{sale_header.cartage_amount}}">
+              <input type="text" class="form-control form-control-sm" id="cartage_amount" readonly style="border-top: 0px; border-right:0px; border-left:0px;" required value="{{cartage_sum}}">
           </div>
         </div>
         <div class="form-inline">
           <div class="form-group">
             <label for="text" style="font-size:14px;">Additional Tax: &nbsp;&nbsp;&nbsp;</label>
-            <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" id="additional_tax" required value="{{sale_header.additional_tax}}">
+            <input type="text" class="form-control form-control-sm" style="border-top: 0px; border-right:0px; border-left:0px;" readonly id="additional_tax" required value="{{sale_header.additional_tax}}">
           </div>
         </div>
         <div class="form-inline">
@@ -123,12 +124,15 @@
       </li>
       <br>
     <div class="text-center">
+      {% if sale_no == 0 %}
       <button type="submit" class="btn btn-outline-primary has_id" id="{{pk}}">Submit <small>(Sale Return)</small></button>
+      {% else %}
+      <button type="submit" disabled class="btn btn-outline-primary">Submit <small>(Sale Return)</small></button>
+      {% endif %}
     </div>
     <br>
 </form>
 </ul>
 </div>
-
 
 {% endblock body %}

@@ -36,6 +36,7 @@ $(document).ready(function(){
 		'quantity' : "10",
 	};
 
+
 // ====================================================================================== //
 			//NEW RFQ CUSTOMER
 			$('[data-toggle="tooltip"]').tooltip();

@@ -2654,6 +2654,7 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 
 								// Add row on add button click
 								$(document).on("click", ".add-sale-return", function(){
+									console.log("clickde");
 								var empty = false;
 								var input = $(this).parents("tr").find('input[type="text"]');
 										input.each(function(){
@@ -2768,6 +2769,8 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 											'quantity' : "",
 											'price' : "",
 											'sales_tax' : "",
+											"dc_no": "",
+											"dcdetailid": "",
 										};
 										$tds.each(function(i, el){
 											if (i === 1) {
@@ -2781,6 +2784,14 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 											}
 											else if (i === 8) {
 													row["sales_tax"] = ($(this).text());
+											}
+											else if (i === 11) {
+													row["dcdetailid"] = ($(this).text());
+
+											}
+											else if (i === 11) {
+													row["dc_ref"] = ($(this).text());
+
 											}
 										});
 										data.push(row);
@@ -4579,6 +4590,10 @@ $.fn.extend({
 
 	 $(".delete-bpv-summary").on('click',function(){
 		 $("#modal_delete_button").attr("href", `/transaction/bank_payment_voucher/delete/${this.id}`);
+	 })
+
+	 $(".delete_sale_return").on('click',function(){
+		 $("#modal_delete_button").attr("href", `/transaction/sale/return/delete/${this.id}`);
 	 })
 
 	 $(".delete-cpv-summary").on('click',function(){

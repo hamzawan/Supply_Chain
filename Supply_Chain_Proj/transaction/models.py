@@ -110,17 +110,19 @@ class SaleReturnHeader(models.Model):
     withholding_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
     account_id = models.ForeignKey(ChartOfAccount, models.SET_NULL,blank=True,null=True)
     user_id = models.ForeignKey(User,models.SET_NULL, blank = True, null = True)
+    sale_id = models.IntegerField()
     company_id = models.ForeignKey(Company_info, models.SET_NULL, blank = True, null = True)
 
 
 class SaleReturnDetail(models.Model):
     item_id = models.ForeignKey(Add_products, models.SET_NULL, blank = True, null = True)
-    quantity = models.IntegerField()
+    quantity = models.DecimalField(max_digits = 8, decimal_places = 2)
     cost_price = models.DecimalField(max_digits = 8, decimal_places = 2)
     retail_price = models.DecimalField(max_digits = 8, decimal_places = 2)
     sales_tax = models.DecimalField(max_digits = 8, decimal_places = 2)
     dc_ref = models.CharField(max_length = 100)
-    hs_code = models.CharField(max_length = 100)
+    dcdetailid = models.CharField(max_length = 100)
+    total = models.DecimalField(max_digits = 8, decimal_places = 2)
     sale_return_id = models.ForeignKey(SaleReturnHeader, on_delete = models.CASCADE)
 
 

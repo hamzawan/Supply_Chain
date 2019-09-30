@@ -78,7 +78,7 @@
                   {% endif %}
 
                   {% if permission.r_return == 1 %}
-                  <a class="return" href="#" data-toggle=""><i class="fas fa-undo"></i></a>
+                  <a class="return" href="{% url 'new-sale-return' pk=value.id %}" data-toggle=""><i class="fas fa-undo"></i></a>
                   {% endif %}
 
                   {% if permission.delete == 1 %}
