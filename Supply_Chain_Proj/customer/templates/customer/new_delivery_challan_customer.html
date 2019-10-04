@@ -46,7 +46,7 @@
     <li class="list-group-item">
     <div class="table-title">
         <div class="row">
-          <div class="form-group col-md-3">
+          <!-- <div class="form-group col-md-3">
             <input type="text" list="item" placeholder="Enter Item Code here..." class="form-control form-control-sm" id="item_code_dc">
           </div>
           <datalist id="item">
@@ -56,7 +56,7 @@
           </datalist>
             <div style="margin-left:20px;">
                 <button type="button" class="btn btn-info add-new-dc-customer"><i class="fa fa-plus"></i>Insert Item</button>
-            </div>
+            </div> -->
             <div class="form-group col-md-3">
               <input type="text" list="po" placeholder="Enter Po No here..." class="form-control form-control-sm" id="item_code_po_dc">
             </div>
@@ -88,6 +88,25 @@
             </tr>
           </thead>
           <tbody>
+            <tr>
+              <td></td>
+              <td style="display:none;" ></td>
+              <td width="400px">
+                  <input type="text" list="item" placeholder="Enter Item Code here..." class="form-control form-control-sm textfield">
+                <datalist id="item">
+                  {% for value in all_item_code %}
+                  <option value="{{value.product_code}}">{{value.product_code}} | {{value.product_name}} | {{value.product_desc}}</option>
+                  {% endfor %}
+                </datalist>
+              </td>
+              <td></td>
+              <td></td>
+              <td><input type="text" class="form-control form-control-sm" name="" value=""></td>
+              <td><input type="text" class="form-control form-control-sm" name="" value=""></td>
+              <td></td>
+              <td style="display:none;" ></td>
+              <td><button type="button" class="btn btn-succes add-dc-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></button><a class="edit-dc-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><button type="button" class="btn btn-succes add-new-row" title="Add" data-toggle="tooltip"><i class="fas fa-plus"></i></button><a class="delete-dc-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>
+            </tr>
           </tbody>
       </table>
     </div>

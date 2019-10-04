@@ -844,7 +844,6 @@ $(document).ready(function(){
 							}
 						});
 						data.push(row);
-						console.log(data);
 					}
 				});
 
@@ -1066,46 +1065,46 @@ $(document).ready(function(){
 
 					//DC ORDER CUSTOMER
 
-					$(".add-new-dc-customer").on('click',function(){
-						var item_code_dc = $("#item_code_dc").val();
-						req =	$.ajax({
-							 headers: { "X-CSRFToken": getCookie("csrftoken") },
-							 type: 'POST',
-							 url : '/customer/delivery_challan/new',
-							 data:{
-								 'item_code_dc': item_code_dc,
-							 },
-							 dataType: 'json'
-						 })
-						 .done(function done(data){
-							 if (data.row) {
-								 var type = JSON.parse(data.row);
-								 console.log(type);
-								 var index = $("table tbody tr:last-child").index();
-										 var row = '<tr>' +
-												 '<td>'+count+'</td>' +
-												 '<td style="display:none;">'+type[0]['pk']+'</td>' +
-												 '<td id="get_item_code">'+type[0].fields['product_code']+'</td>' +
-												 '<td>'+type[0].fields['product_name']+'</td>' +
-												 '<td><pre>'+type[0].fields['product_desc']+'</pre></td>' +
-												 '<td><input type="text" class="form-control form-control-sm"></td>' +
-												 '<td id="quantity"><input type="text" class="form-control form-control-sm" required ></td>' +
-												 '<td>'+type[0].fields['unit']+'</td>' +
-												 '<td style="display:none;"></td>' +
-									 '<td><button type="button" class="btn btn-succes add-dc-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></button><a class="edit-dc-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-dc-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
-										 '</tr>';
-									 $("#new-dc-customer-table").append(row);
-								 $("table tbody tr").eq(index + 1).find(".add-dc-customer, .edit-dc-customer").toggle();
-										 $('[data-toggle="tooltip"]').tooltip();
-									 $('#item_code_dc').val("");
-									 $(".add-new-dc-customer").attr("disabled", "disabled");
-				 					 $(".has_id").attr("disabled", "disabled");
-							 }
-							 else{
-								 alert(data.message)
-							 }
-						 })
-					});
+					// $(".add-new-dc-customer").on('click',function(){
+					// 	var item_code_dc = $("#item_code_dc").val();
+					// 	req =	$.ajax({
+					// 		 headers: { "X-CSRFToken": getCookie("csrftoken") },
+					// 		 type: 'POST',
+					// 		 url : '/customer/delivery_challan/new',
+					// 		 data:{
+					// 			 'item_code_dc': item_code_dc,
+					// 		 },
+					// 		 dataType: 'json'
+					// 	 })
+					// 	 .done(function done(data){
+					// 		 if (data.row) {
+					// 			 var type = JSON.parse(data.row);
+					// 			 console.log(type);
+					// 			 var index = $("table tbody tr:last-child").index();
+					// 					 var row = '<tr>' +
+					// 							 '<td>'+count+'</td>' +
+					// 							 '<td style="display:none;">'+type[0]['pk']+'</td>' +
+					// 							 '<td id="get_item_code">'+type[0].fields['product_code']+'</td>' +
+					// 							 '<td>'+type[0].fields['product_name']+'</td>' +
+					// 							 '<td><pre>'+type[0].fields['product_desc']+'</pre></td>' +
+					// 							 '<td><input type="text" class="form-control form-control-sm"></td>' +
+					// 							 '<td id="quantity"><input type="text" class="form-control form-control-sm" required ></td>' +
+					// 							 '<td>'+type[0].fields['unit']+'</td>' +
+					// 							 '<td style="display:none;"></td>' +
+					// 				 '<td><button type="button" class="btn btn-succes add-dc-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></button><a class="edit-dc-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><a class="delete-dc-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td>' +
+					// 					 '</tr>';
+					// 				 $("#new-dc-customer-table").append(row);
+					// 			 $("table tbody tr").eq(index + 1).find(".add-dc-customer, .edit-dc-customer").toggle();
+					// 					 $('[data-toggle="tooltip"]').tooltip();
+					// 				 $('#item_code_dc').val("");
+					// 				 $(".add-new-dc-customer").attr("disabled", "disabled");
+				 	// 				 $(".has_id").attr("disabled", "disabled");
+					// 		 }
+					// 		 else{
+					// 			 alert(data.message)
+					// 		 }
+					// 	 })
+					// });
 
 
 					$(".add-new-po-customer-dc").click(function(){
@@ -1213,6 +1212,32 @@ $(document).ready(function(){
 				// 		});
 				// 	}
 				// });
+				$('body').on('click','.add-new-row',function(){
+						$('#new-dc-customer-table > tbody:last-child').append('<tr><td>'+count+'</td><td style="display:none;" ></td><td><input type="text" list="item" placeholder="Enter Item Code here..." class="form-control form-control-sm textfield"><datalist id="item"></datalist></td><td></td><td></td><td><input type="text" class="form-control form-control-sm" name="" value=""></td><td><input type="text" class="form-control form-control-sm" name="" value=""></td><td></td><td style="display:none;" ></td><td><button type="button" class="btn btn-succes add-dc-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></button><a class="edit-dc-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><button type="button" class="btn btn-succes add-new-row" title="Add" data-toggle="tooltip"><i class="fas fa-plus"></i></button><a class="delete-dc-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td></tr>');
+						count++;
+
+						var rowfocus = "rowfocus"
+						req =	$.ajax({
+							 headers: { "X-CSRFToken": getCookie("csrftoken") },
+							 type: 'POST',
+							 url : '/customer/delivery_challan/new',
+							 data:{
+								 'rowfocus': rowfocus,
+							 },
+							 dataType: 'json'
+						 })
+						 .done(function done(data){
+							 $("#item").empty();
+
+							 dc_type = JSON.parse(data.row)
+							 console.log(dc_type);
+							 console.log(dc_type[0].fields["product_name"]);
+							 for (var i = 0; i < dc_type.length; i++) {
+									 $("#item").append($("<option>").attr('value', dc_type[i].fields["product_code"]).text(dc_type[i].fields["product_code"]+" | "+dc_type[i].fields["product_name"]+" | "+dc_type[i].fields["product_desc"]));
+								 }
+						 })
+						 $(".has_id").attr("disabled", "disabled");
+					})
 
 					$(document).on("click", ".add-dc-customer", function(){
 					var empty = false;
@@ -1245,7 +1270,6 @@ $(document).ready(function(){
 									quantity = $(this).text();
 									return quantity
 							}).closest("tr");
-					console.log(quantity);
 					var get_item_code = $($(this).parents("tr").find("#get_item_code")).filter(function() {
 									item_code = $(this).text();
 									return item_code
@@ -1890,7 +1914,6 @@ $(document).ready(function(){
 
  // Append table with add row in dc supplier
 			 $(window).focus(function(e) {
-				 console.log("tab changed");
 				 var focus = "focus"
 				 req =	$.ajax({
 						headers: { "X-CSRFToken": getCookie("csrftoken") },
@@ -1904,12 +1927,36 @@ $(document).ready(function(){
 					.done(function done(data){
 						$("#item").empty();
 						dc_type = JSON.parse(data.row)
-						console.log(dc_type);
-						console.log(dc_type[0].fields["product_name"]);
 						for (var i = 0; i < dc_type.length; i++) {
 					      $("#item").append($("<option>").attr('value', dc_type[i].fields["product_code"]).text(dc_type[i].fields["product_code"]+" | "+dc_type[i].fields["product_name"]+" | "+dc_type[i].fields["product_desc"]));
 							}
 					})
 				 });
+
+
+				 $('body').on('change','.textfield',function(){
+						 var closestParent = $(this).closest('tr');//get the values relative to the parent
+						 console.log(closestParent);
+						 var rows = $(closestParent, '#new-dc-customer-table');
+						 itemfield = $('.textfield').val();
+						 req =	$.ajax({
+								headers: { "X-CSRFToken": getCookie("csrftoken") },
+								type: 'POST',
+								url : '/customer/delivery_challan/new',
+								data:{
+									'itemfield': itemfield,
+								},
+								dataType: 'json'
+							})
+							.done(function done(data){
+								row = JSON.parse(data.row);
+								console.log(row[0].pk);
+								rows.find("td:eq(1)").text(row[0].pk)
+								rows.find("td:eq(3)").text(row[0].fields['product_name'])
+								rows.find("td:eq(4)").text(row[0].fields['product_desc'])
+								rows.find("td:eq(7)").text(row[0].fields['unit'])
+								rows.find("td:eq(8)").text()
+							})
+				 })
 
 });

@@ -1620,7 +1620,6 @@ $('#edit-purchase-submit-ngst').on('submit',function(e){
 				 .done(function fun(data){
 					 $('#dc').html('');
 						 for (var j = 0; j < data.all_dc.length; j++) {
-							 console.log(data.all_dc[j][1]);
 								$("#dc").append($("<option>").attr('value',data.all_dc[j][1]).text(data.all_dc[j][1]));
 						 }
 				 });
@@ -4619,6 +4618,7 @@ $.fn.extend({
 			})
 	 });
 
+	 
 		document.getElementById('box').onchange = function() {
 		document.getElementById('invoice_no').disabled = !this.checked;
 		};

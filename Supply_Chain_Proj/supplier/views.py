@@ -24,6 +24,7 @@ from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.models import User
 from user.models import UserRoles
 from django.contrib import messages
+from django.contrib.gis.geoip2 import GeoIP2
 
 def customer_roles(user):
     user_id = Q(user_id = user.id)
@@ -341,8 +342,24 @@ def mrn_roles(user):
     mrn_roles = UserRoles.objects.filter(user_id,child_form).first()
     return mrn_roles
 
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
 @login_required
 def home(request):
+    # ips = get_client_ip(request)
+    # g = GeoIP2()
+    # try:
+    #     print(g.city('45.76.117.228'))
+    # except Exception as e:
+    #     print(e)
     allow_customer_roles = customer_roles(request.user)
     allow_supplier_roles = supplier_roles(request.user)
     allow_transaction_roles = transaction_roles(request.user)
