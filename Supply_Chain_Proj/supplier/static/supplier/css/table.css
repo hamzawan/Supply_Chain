@@ -3,6 +3,12 @@ body {
     background: #F5F7FA;
 font-family: 'Open Sans', sans-serif;
 }
+/* .not-active {
+    pointer-events: none;
+    cursor: default;
+    text-decoration: none;
+    color: gray;
+  } */
 .table-wrapperss {
 width: 700px;
 margin: 30px auto;

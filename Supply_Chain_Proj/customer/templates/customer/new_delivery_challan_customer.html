@@ -46,17 +46,6 @@
     <li class="list-group-item">
     <div class="table-title">
         <div class="row">
-          <!-- <div class="form-group col-md-3">
-            <input type="text" list="item" placeholder="Enter Item Code here..." class="form-control form-control-sm" id="item_code_dc">
-          </div>
-          <datalist id="item">
-            {% for value in all_item_code %}
-            <option value="{{value.product_code}}">{{value.product_code}} | {{value.product_name}} | {{value.product_desc}}</option>
-            {% endfor %}
-          </datalist>
-            <div style="margin-left:20px;">
-                <button type="button" class="btn btn-info add-new-dc-customer"><i class="fa fa-plus"></i>Insert Item</button>
-            </div> -->
             <div class="form-group col-md-3">
               <input type="text" list="po" placeholder="Enter Po No here..." class="form-control form-control-sm" id="item_code_po_dc">
             </div>
@@ -65,9 +54,6 @@
               <option value="{{value.po_client}}">{{value.po_client}} | {{value.account_id.account_title}}</option>
               {% endfor %}
             </datalist>
-              <!-- <div style="margin-left:20px;">
-                  <button type="button" class="btn btn-info add-new-po-customer-dc"><i class="fa fa-plus"></i>Insert PO</button>
-              </div> -->
             <div style="margin-left:20px;">
                 <a type="button" class="btn btn-success add-new-dc-customer" href="{% url 'add-product' %}" target="_blank"><i class="fa fa-plus"></i>Add new Item <small>(Inventory)</small> </a>
             </div>

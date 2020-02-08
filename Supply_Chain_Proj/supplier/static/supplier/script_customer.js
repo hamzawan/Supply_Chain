@@ -1213,7 +1213,8 @@ $(document).ready(function(){
 				// 	}
 				// });
 				$('body').on('click','.add-new-row',function(){
-						$('#new-dc-customer-table > tbody:last-child').append('<tr><td>'+count+'</td><td style="display:none;" ></td><td><input type="text" list="item" placeholder="Enter Item Code here..." class="form-control form-control-sm textfield"><datalist id="item"></datalist></td><td></td><td></td><td><input type="text" class="form-control form-control-sm" name="" value=""></td><td><input type="text" class="form-control form-control-sm" name="" value=""></td><td></td><td style="display:none;" ></td><td><button type="button" class="btn btn-succes add-dc-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></button><a class="edit-dc-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><button type="button" class="btn btn-succes add-new-row" title="Add" data-toggle="tooltip"><i class="fas fa-plus"></i></button><a class="delete-dc-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td></tr>');
+					$(".add-new-row").attr("disabled", "disabled")
+						$('#new-dc-customer-table > tbody:last-child').append('<tr><td>'+count+'</td><td style="display:none;" ></td><td><input type="text" list="item" placeholder="Enter Item Code here..." class="form-control form-control-sm textfield"><datalist id="item"></datalist></td><td></td><td></td><td><input type="text" class="form-control form-control-sm" name="" value=""></td><td><input type="text" class="form-control form-control-sm" name="" value=""></td><td></td><td style="display:none;" ></td><td><button type="button" class="btn btn-succes add-dc-customer" title="Add" data-toggle="tooltip"><i class="material-icons">&#xE03B;</i></button><a class="edit-dc-customer" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a><button type="button" class="btn btn-succes add-new-row not-active"  title="Add" data-toggle="tooltip"><i class="fas fa-plus"></i></button><a class="delete-dc-customer" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a></td></tr>');
 						count++;
 
 						var rowfocus = "rowfocus"
@@ -1227,19 +1228,21 @@ $(document).ready(function(){
 							 dataType: 'json'
 						 })
 						 .done(function done(data){
+							$('table > tbody  > tr:last').each(function(index, tr) { 
+								$(this).find('td:eq(9) button.add-new-row').attr("disabled", "disabled");
+							 });
 							 $("#item").empty();
 
 							 dc_type = JSON.parse(data.row)
-							 console.log(dc_type);
-							 console.log(dc_type[0].fields["product_name"]);
 							 for (var i = 0; i < dc_type.length; i++) {
 									 $("#item").append($("<option>").attr('value', dc_type[i].fields["product_code"]).text(dc_type[i].fields["product_code"]+" | "+dc_type[i].fields["product_name"]+" | "+dc_type[i].fields["product_desc"]));
 								 }
 						 })
 						 $(".has_id").attr("disabled", "disabled");
 					})
-
+					$(".add-new-row").attr("disabled", "disabled")
 					$(document).on("click", ".add-dc-customer", function(){
+					
 					var empty = false;
 					var input = $(this).parents("tr").find('input[type="text"]');
 					input.each(function(i){
@@ -1250,9 +1253,15 @@ $(document).ready(function(){
 							if(!$(this).val()){
 								$(this).addClass("error");
 								empty = true;
+								$(".add-new-row").attr("disabled", "disabled")
+						
 							}
 							else{
 									$(this).removeClass("error");
+									// $(".add-new-row").attr("disabled", false)
+									$('table > tbody  > tr:last').each(function(index, tr) { 
+										$(this).find('td:eq(9) button.add-new-row').attr("disabled", false);
+									 });
 									}
 						}
 						});
@@ -1936,7 +1945,6 @@ $(document).ready(function(){
 
 				 $('body').on('change','.textfield',function(){
 						 var closestParent = $(this).closest('tr');//get the values relative to the parent
-						 console.log(closestParent);
 						 var rows = $(closestParent, '#new-dc-customer-table');
 						 itemfield = $('.textfield').val();
 						 req =	$.ajax({
@@ -1950,7 +1958,6 @@ $(document).ready(function(){
 							})
 							.done(function done(data){
 								row = JSON.parse(data.row);
-								console.log(row[0].pk);
 								rows.find("td:eq(1)").text(row[0].pk)
 								rows.find("td:eq(3)").text(row[0].fields['product_name'])
 								rows.find("td:eq(4)").text(row[0].fields['product_desc'])

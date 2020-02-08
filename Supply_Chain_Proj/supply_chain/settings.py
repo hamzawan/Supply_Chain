@@ -25,7 +25,7 @@ GEOIP_PATH = os.path.join(BASE_DIR, 'geoip')
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
+SECRET_KEY = '9ye446=deeyqd9ubq206svc-=81lw-p87fc@#hpg14gm*h-l+w'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
